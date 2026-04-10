@@ -24,7 +24,8 @@
       "Bash(curl -LsSf https://astral.sh/uv/install.sh)",
       "Bash(sh)",
       "Bash(export PATH=\"$HOME/.local/bin:$PATH\")",
-      "Bash(uv run:*)"
+      "Bash(uv run:*)",
+      "Bash(git merge:*)"
     ]
   }
 }
