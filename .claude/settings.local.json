@@ -11,7 +11,20 @@
       "Bash(cp ~/.claude/skills/agent-teams/agents/*.md /Users/remyjardinet/Documents/Sites/hackathon-sdp/.claude/agents/)",
       "Bash(git init:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(cp ~/.claude/hooks/pre-push .git/hooks/pre-push)",
+      "Bash(chmod +x .git/hooks/pre-push)",
+      "Bash(git checkout:*)",
+      "Bash(uv sync:*)",
+      "Read(//Users/remyjardinet/.cargo/bin/**)",
+      "Read(//Users/remyjardinet/.local/bin/**)",
+      "Bash(export PATH=\"$HOME/.local/bin:$HOME/.cargo/bin:$PATH\")",
+      "Bash(uv --version)",
+      "Bash(curl -LsSf https://astral.sh/uv/install.sh)",
+      "Bash(sh)",
+      "Bash(export PATH=\"$HOME/.local/bin:$PATH\")",
+      "Bash(uv run:*)"
     ]
   }
 }
