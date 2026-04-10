@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+      "Bash(cp -r ~/.claude/skills/base/ .claude/skills/)",
+      "Bash(cp -r ~/.claude/skills/security/ .claude/skills/)",
+      "Bash(cp -r ~/.claude/skills/project-tooling/ .claude/skills/)",
+      "Bash(cp -r ~/.claude/skills/session-management/ .claude/skills/)",
+      "Bash(cp -r ~/.claude/skills/python/ .claude/skills/)",
+      "Bash(mkdir -p /Users/remyjardinet/Documents/Sites/hackathon-sdp/.claude/agents)",
+      "Bash(cp ~/.claude/skills/agent-teams/agents/*.md /Users/remyjardinet/Documents/Sites/hackathon-sdp/.claude/agents/)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
