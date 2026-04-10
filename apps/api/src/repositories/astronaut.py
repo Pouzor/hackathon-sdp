@@ -1,0 +1,36 @@
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.models.astronaut import Astronaut
+
+
+class AstronautRepository:
+    def __init__(self, db: AsyncSession) -> None:
+        self._db = db
+
+    async def get_by_email(self, email: str) -> Astronaut | None:
+        result = await self._db.execute(select(Astronaut).where(Astronaut.email == email))
+        return result.scalar_one_or_none()
+
+    async def get_by_id(self, astronaut_id: int) -> Astronaut | None:
+        result = await self._db.execute(select(Astronaut).where(Astronaut.id == astronaut_id))
+        return result.scalar_one_or_none()
+
+    async def create(
+        self,
+        email: str,
+        first_name: str,
+        last_name: str,
+        photo_url: str | None = None,
+    ) -> Astronaut:
+        astronaut = Astronaut(
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            photo_url=photo_url,
+            roles=["astronaut"],
+        )
+        self._db.add(astronaut)
+        await self._db.commit()
+        await self._db.refresh(astronaut)
+        return astronaut

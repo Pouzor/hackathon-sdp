@@ -12,19 +12,27 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/planets"
 
-    # Security
+    # JWT
     secret_key: str = "change-me-in-production"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
 
-    # Google OAuth
+    # Google OAuth — toutes les valeurs viennent du .env
     google_client_id: str = ""
     google_client_secret: str = ""
     google_redirect_uri: str = "http://localhost:8000/api/v1/auth/google/callback"
+    google_auth_url: str = "https://accounts.google.com/o/oauth2/v2/auth"
+    google_token_url: str = "https://oauth2.googleapis.com/token"
+    google_userinfo_url: str = "https://www.googleapis.com/oauth2/v3/userinfo"
+
+    # Domaine autorisé
     allowed_domain: str = "eleven-labs.com"
 
     # CORS
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:5174"]
+
+    # Frontend URL (pour les redirections post-login)
+    frontend_url: str = "http://localhost:5173"
 
 
 settings = Settings()
