@@ -1,17 +1,17 @@
 # EPIC 3 — Attribution de points (P1)
 
-## F-301 — Attribution de points à un astronaute
+## F-301 — Attribution de points à un astronaute ✅
 
 **Description:** Endpoint admin pour attribuer des points, historisation immuable.
 
 **Acceptance Criteria:**
-- [ ] `POST /api/v1/point-attributions` (admin uniquement)
-- [ ] Corps : `astronaut_id`, `activity_id`, `points` (optionnel, défaut = `base_points`), `comment`
-- [ ] `season_id` = saison active (automatique)
-- [ ] `planet_id` = planète de l'astronaute (automatique)
-- [ ] Incrémente `astronaut.total_points` ET compteur planète de la saison
-- [ ] Historisation immuable (pas de UPDATE sur `PointAttribution`)
-- [ ] Applique les modificateurs (F-303, F-304) automatiquement
+- [x] `POST /api/v1/point-attributions` (admin uniquement)
+- [x] Corps : `astronaut_ids`, `activity_id`, `points` (optionnel, défaut = `base_points`), `comment`
+- [x] `season_id` = saison active (automatique)
+- [x] `planet_id` = planète de l'astronaute (automatique)
+- [x] Incrémente `astronaut.total_points` ET compteur planète de la saison (`SeasonPlanetScore`)
+- [x] Historisation immuable (pas de UPDATE sur `PointAttribution`)
+- [x] Applique les modificateurs (F-303, F-304) automatiquement
 
 **Test Cases:**
 | Cas | Attendu |
@@ -23,15 +23,15 @@
 
 ---
 
-## F-302 — Attribution à plusieurs co-auteurs
+## F-302 — Attribution à plusieurs co-auteurs ✅
 
 **Description:** Multi-assignation pour activités collaboratives.
 
 **Acceptance Criteria:**
-- [ ] `astronaut_ids` (liste) dans le corps de la requête
-- [ ] Activité doit avoir `allow_multiple_assignees = true`
-- [ ] Chaque co-auteur reçoit **le total des points** (pas de split)
-- [ ] Une `PointAttribution` créée par astronaute
+- [x] `astronaut_ids` (liste) dans le corps de la requête
+- [x] Activité doit avoir `allow_multiple_assignees = true`
+- [x] Chaque co-auteur reçoit **le total des points** (pas de split)
+- [x] Une `PointAttribution` créée par astronaute
 
 **Test Cases:**
 | Cas | Attendu |
@@ -42,15 +42,15 @@
 
 ---
 
-## F-303 — Multiplicateur "1ère contribution ever"
+## F-303 — Multiplicateur "1ère contribution ever" ✅
 
 **Description:** Bonus x2 pour la toute première contribution d'un astronaute.
 
 **Acceptance Criteria:**
-- [ ] Détecté automatiquement au moment de l'attribution
-- [ ] Si aucun `PointAttribution` antérieur → points × 2
-- [ ] Multiplicateur appliqué avant sauvegarde
-- [ ] Indiqué dans le `comment` système ou champ dédié
+- [x] Détecté automatiquement au moment de l'attribution
+- [x] Si aucun `PointAttribution` antérieur → points × 2
+- [x] Multiplicateur appliqué avant sauvegarde
+- [x] Tracé via champ dédié `first_ever_multiplier_applied` sur `PointAttribution`
 
 **Test Cases:**
 | Cas | Attendu |
@@ -61,15 +61,16 @@
 
 ---
 
-## F-304 — Bonus "1ère contribution de la saison"
+## F-304 — Bonus "1ère contribution de la saison" ✅
 
 **Description:** +25 pts automatiques pour la 1ère contribution dans la saison active.
 
 **Acceptance Criteria:**
-- [ ] Vérifié à chaque attribution
-- [ ] Si aucune attribution pour cet astronaute dans la saison active → +25 pts
-- [ ] Déclenché une seule fois par saison par astronaute
-- [ ] Cumulable avec le multiplicateur F-303 (si 1ère ever ET 1ère de la saison)
+- [x] Vérifié à chaque attribution
+- [x] Si aucune attribution pour cet astronaute dans la saison active → +25 pts
+- [x] Déclenché une seule fois par saison par astronaute
+- [x] Cumulable avec le multiplicateur F-303 (si 1ère ever ET 1ère de la saison)
+- [x] Tracé via champ dédié `first_season_bonus_applied` sur `PointAttribution`
 
 **Test Cases:**
 | Cas | Attendu |
@@ -80,7 +81,7 @@
 
 ---
 
-## F-305 — Calcul automatique des points d'ancienneté
+## F-305 — Calcul automatique des points d'ancienneté ❌ (non implémenté)
 
 **Description:** Crédit automatique des points d'ancienneté à la création de saison.
 
@@ -89,6 +90,8 @@
 - [ ] Calcul : `floor((today - hire_date).years) × points_per_year`
 - [ ] Crée une `PointAttribution` par astronaute (activité type "ancienneté")
 - [ ] Idempotent (pas de doublon si rejoué)
+
+> **Note:** Dépend de F-206 (endpoint config ancienneté) et F-202 (CRUD astronautes)
 
 **Test Cases:**
 | Cas | Attendu |
@@ -99,15 +102,15 @@
 
 ---
 
-## F-306 — Suppression / correction d'une attribution
+## F-306 — Suppression / correction d'une attribution ✅
 
 **Description:** Suppression admin avec audit log et recalcul des compteurs.
 
 **Acceptance Criteria:**
-- [ ] `DELETE /api/v1/point-attributions/{id}` (admin uniquement)
-- [ ] Soft delete (conserver pour audit) ou hard delete avec log séparé
-- [ ] Recalcul de `astronaut.total_points` et compteur planète
-- [ ] Audit log : qui a supprimé, quand, pourquoi (`reason` obligatoire)
+- [x] `DELETE /api/v1/point-attributions/{id}` (admin uniquement)
+- [x] Soft delete (champs `is_deleted`, `deleted_by`, `deletion_reason`, `deleted_at`)
+- [x] Recalcul de `astronaut.total_points` et compteur planète (`SeasonPlanetScore`)
+- [x] Audit log : `deleted_by` (astronaut_id), `deleted_at`, `deletion_reason` (obligatoire)
 
 **Test Cases:**
 | Cas | Attendu |

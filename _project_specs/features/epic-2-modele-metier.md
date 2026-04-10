@@ -1,13 +1,13 @@
 # EPIC 2 — Modèle métier & configuration (P1)
 
-## F-201 — Modèle Planet
+## F-201 — Modèle Planet ✅
 
 **Acceptance Criteria:**
-- [ ] CRUD complet admin (`/api/v1/planets`)
-- [ ] Champs : `name`, `mantra`, `blason_url`, `color_hex`, `is_competing`, `is_default_for_newcomers`
-- [ ] Seed des 6 planètes existantes
-- [ ] Unicité du nom
-- [ ] Suppression contrôlée (pas si des astronautes y sont rattachés)
+- [x] CRUD complet admin (`/api/v1/planets`)
+- [x] Champs : `name`, `mantra`, `blason_url`, `color_hex`, `is_competing`, `is_default_for_newcomers`
+- [x] Seed des 6 planètes existantes
+- [x] Unicité du nom
+- [ ] Suppression contrôlée (pas si des astronautes y sont rattachés) — _à implémenter dans F-202_
 
 **Test Cases:**
 | Cas | Attendu |
@@ -19,11 +19,12 @@
 
 ---
 
-## F-202 — Modèle Astronaut
+## F-202 — Modèle Astronaut 🔶 (partiel)
 
 **Acceptance Criteria:**
-- [ ] CRUD admin + édition profil par le propriétaire
-- [ ] Champs : `first_name`, `last_name`, `email`, `photo_url`, `hobbies`, `client`, `planet_id`, `hire_date`, `total_points`
+- [x] Modèle SQLAlchemy + migration (champs complets)
+- [ ] CRUD admin + édition profil par le propriétaire — _routes non encore créées_
+- [x] Champs : `first_name`, `last_name`, `email`, `photo_url`, `hobbies`, `client`, `planet_id`, `hire_date`, `total_points`
 - [ ] Un astronaute peut modifier : `photo_url`, `hobbies`, `client` uniquement
 - [ ] Admin peut tout modifier sauf `total_points` (calculé)
 
@@ -37,14 +38,14 @@
 
 ---
 
-## F-203 — Modèle Season
+## F-203 — Modèle Season ✅
 
 **Acceptance Criteria:**
-- [ ] CRUD admin
-- [ ] Une seule saison `is_active` à la fois (contrainte)
-- [ ] Activation d'une saison désactive l'ancienne
-- [ ] Clôture : reset des compteurs planète, conservation des points individuels
-- [ ] Archivage des trophées de saison
+- [x] CRUD admin (`/api/v1/seasons`)
+- [x] Une seule saison `is_active` à la fois (contrainte + endpoint `activate`)
+- [x] Activation d'une saison désactive l'ancienne
+- [x] Clôture : reset des compteurs planète (`SeasonPlanetScore`), conservation des points individuels
+- [ ] Archivage des trophées de saison — _dépend de F-Epic 4_
 
 **Test Cases:**
 | Cas | Attendu |
@@ -56,12 +57,12 @@
 
 ---
 
-## F-204 — Modèle Activity
+## F-204 — Modèle Activity ✅
 
 **Acceptance Criteria:**
-- [ ] CRUD admin (`/api/v1/activities`)
-- [ ] Champs : `name`, `base_points`, `category`, `is_collaborative`, `allow_multiple_assignees`
-- [ ] Catalogue pré-rempli (seed) avec les activités du brief
+- [x] CRUD admin (`/api/v1/activities`)
+- [x] Champs : `name`, `base_points`, `category`, `is_collaborative`, `allow_multiple_assignees`
+- [x] Catalogue pré-rempli (seed) avec les activités du brief (9 activités)
 
 **Catalogue seed initial:**
 - Article de blog (40 pts)
@@ -81,13 +82,13 @@
 
 ---
 
-## F-205 — Modèle Grade
+## F-205 — Modèle Grade ✅
 
 **Acceptance Criteria:**
-- [ ] CRUD admin
-- [ ] Seed des 14 grades (rookie → Fleet Admiral 3 stars)
-- [ ] Calcul du grade courant basé sur `total_points`
-- [ ] Endpoint `GET /api/v1/astronauts/{id}/grade`
+- [x] CRUD admin (`/api/v1/grades`)
+- [x] Seed des 14 grades (Rookie → Fleet Admiral ★★★)
+- [x] Calcul du grade courant basé sur `total_points` (`GradeRepository.get_for_points`)
+- [ ] Endpoint `GET /api/v1/astronauts/{id}/grade` — _à implémenter dans F-202_
 
 **Grades (seed):**
 Rookie (0), Cadet (100), Ensign (250), Lieutenant (500), Commander (1000),
@@ -103,11 +104,12 @@ Admiral (9500), Fleet Admiral 1★ (12500), Fleet Admiral 2★ (16000), Fleet Ad
 
 ---
 
-## F-206 — Configuration ancienneté
+## F-206 — Configuration ancienneté 🔶 (partiel)
 
 **Acceptance Criteria:**
-- [ ] Endpoint admin `PUT /api/v1/config/seniority`
-- [ ] Paramètre `points_per_year` (défaut : 50)
+- [x] Modèle `SeniorityConfig` en BDD (seed : `points_per_year = 50`)
+- [ ] Endpoint admin `PUT /api/v1/config/seniority` — _non encore créé_
+- [x] Paramètre `points_per_year` (défaut : 50)
 - [ ] Calcul : `floor(years_since_hire) × points_per_year`
 - [ ] Modifié → recalcul des points d'ancienneté de tous les astronautes
 
