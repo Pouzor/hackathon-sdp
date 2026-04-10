@@ -47,7 +47,10 @@ addopts = "--tb=short"
 
 [tool.coverage.run]
 source = ["src"]
-omit = ["src/db/migrations/*"]
+omit = [
+    "src/db/migrations/*",
+    "src/db/seed.py",       # script de seed dev, pas de logique métier
+]
 
 [tool.coverage.report]
 fail_under = 80
