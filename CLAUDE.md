@@ -322,11 +322,70 @@ pnpm install
 pnpm dev
 
 # Tests backend
-cd apps/api && uv run pytest --cov
+cd apps/api && uv run python -m pytest --cov
 
 # Tests frontend
 cd apps/frontend && pnpm test
 ```
+
+---
+
+## 10b. Environnement Python — règles impératives
+
+### Pourquoi `uv run python -m pytest` et pas `uv run pytest`
+
+`uv run pytest` peut résoudre le binaire `pytest` depuis le PATH système (Homebrew, pyenv, etc.)
+au lieu du venv géré par uv. **Toujours utiliser `python -m pytest`** pour garantir l'isolation.
+
+### Procédure complète pour lancer les tests backend
+
+```bash
+cd apps/api
+
+# 1. Créer / mettre à jour le venv (à faire après chaque changement de pyproject.toml)
+uv sync
+
+# 2. Copier et remplir le .env si ce n'est pas déjà fait
+cp ../../.env.example .env
+# Éditer .env avec les vraies valeurs
+
+# 3. Charger les variables d'environnement dans le shell courant
+source .env
+
+# 4. Lancer les tests avec le Python du venv
+uv run python -m pytest
+
+# Avec coverage :
+uv run python -m pytest --cov=src --cov-report=term-missing
+
+# Un fichier spécifique :
+uv run python -m pytest tests/unit/test_security.py -v
+```
+
+### Alternative : activer le venv manuellement
+
+```bash
+cd apps/api
+source .venv/bin/activate   # active le venv uv
+source ../../.env           # charge les variables d'environnement
+
+pytest --cov=src            # pytest du venv, .env chargé
+mypy --strict src/          # idem
+
+deactivate                  # quitter le venv
+```
+
+### Variables d'environnement en tests
+
+- Les tests **unitaires** (mocks complets) n'ont pas besoin du `.env`.
+- Les tests **d'intégration** avec BDD réelle nécessitent `DATABASE_URL`.
+- Ne jamais hardcoder de valeurs de secrets dans les fixtures de test.
+- Utiliser `pytest-dotenv` ou `source .env` avant de lancer la suite d'intégration.
+
+### Règle stricte
+
+❌ **Ne jamais** utiliser `uv run pytest` directement — risque de prendre le pytest système.
+✅ **Toujours** utiliser `uv run python -m pytest` ou activer le venv avec `source .venv/bin/activate`.
 
 ---
 
