@@ -2,6 +2,20 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ASTRONAUTS, type Astronaut } from "@/components/features/astronauts/mockAstronauts";
 
+import canardPng  from "../../../img/blasons/Canard.png";
+import chatPng    from "../../../img/blasons/Chat.png";
+import pandaPng   from "../../../img/blasons/Panda.png";
+import raccoonPng from "../../../img/blasons/Raccoon.png";
+import genericPng from "../../../img/blasons/Generic.png";
+
+const BLASONS: Record<string, string> = {
+  duck:    canardPng,
+  cats:    chatPng,
+  donut:   pandaPng,
+  raccoon: raccoonPng,
+  hq:      genericPng,
+};
+
 const PLANET_FILTERS = [
   { id: "all",     label: "Toutes les planètes" },
   { id: "raccoon", label: "Raccoons of Asgard", color: "#eab308" },
@@ -32,6 +46,7 @@ function AstronautCard({ astronaut }: { astronaut: Astronaut }) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   const color = astronaut.planet.color;
+  const blason = BLASONS[astronaut.planet.id];
 
   return (
     <div
@@ -39,6 +54,8 @@ function AstronautCard({ astronaut }: { astronaut: Astronaut }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
+        position: "relative",
+        overflow: "hidden",
         background: hovered ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)",
         border: `1px solid ${hovered ? color + "50" : "rgba(255,255,255,0.07)"}`,
         borderRadius: 14,
@@ -49,6 +66,26 @@ function AstronautCard({ astronaut }: { astronaut: Astronaut }) {
         display: "flex", flexDirection: "column", gap: 12,
       }}
     >
+      {/* Blason oversized background */}
+      <img
+        src={blason}
+        alt=""
+        aria-hidden
+        draggable={false}
+        style={{
+          position: "absolute",
+          right: -50,
+          bottom: -55,
+          width: 190,
+          height: 190,
+          objectFit: "contain",
+          opacity: hovered ? 0.12 : 0.07,
+          transition: "opacity 0.3s, transform 0.3s",
+          transform: hovered ? "scale(1.06)" : "scale(1)",
+          pointerEvents: "none",
+          filter: `drop-shadow(0 0 12px ${color}40)`,
+        }}
+      />
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <AvatarCircle astronaut={astronaut} size={48} />
         <div style={{ flex: 1, minWidth: 0 }}>

@@ -2,6 +2,20 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getAstronaut, type Astronaut } from "@/components/features/astronauts/mockAstronauts";
 
+import canardPng  from "../../../img/blasons/Canard.png";
+import chatPng    from "../../../img/blasons/Chat.png";
+import pandaPng   from "../../../img/blasons/Panda.png";
+import raccoonPng from "../../../img/blasons/Raccoon.png";
+import genericPng from "../../../img/blasons/Generic.png";
+
+const BLASONS: Record<string, string> = {
+  duck:    canardPng,
+  cats:    chatPng,
+  donut:   pandaPng,
+  raccoon: raccoonPng,
+  hq:      genericPng,
+};
+
 type Tab = "contributions" | "trophees";
 
 function StatCard({ label, value, color = "white" }: { label: string; value: string; color?: string }) {
@@ -60,6 +74,7 @@ export function AstronautProfilePage() {
   const astronaut: Astronaut | undefined = getAstronaut(Number(id));
   if (!astronaut) return <ProfileNotFound />;
 
+  const blason = BLASONS[astronaut.planet.id];
   const { firstName, lastName, email, planet, grade, totalPoints, hireDate, hobbies, client, contributions, trophies } = astronaut;
   const initials = `${firstName[0]}${lastName[0]}`;
   const color = planet.color;
@@ -71,11 +86,31 @@ export function AstronautProfilePage() {
   ];
 
   return (
-    <div style={{ width: "100vw", minHeight: "100vh", background: "#040812", color: "white" }}>
+    <div style={{ width: "100vw", minHeight: "100vh", background: "#040812", color: "white", position: "relative", overflow: "hidden" }}>
+
+      {/* Blason oversized background */}
+      <img
+        src={blason}
+        alt=""
+        aria-hidden
+        draggable={false}
+        style={{
+          position: "fixed",
+          right: -180,
+          bottom: -180,
+          width: 700,
+          height: 700,
+          objectFit: "contain",
+          opacity: 0.05,
+          pointerEvents: "none",
+          filter: `drop-shadow(0 0 40px ${color}30)`,
+          zIndex: 0,
+        }}
+      />
 
       {/* Header */}
       <div style={{
-        position: "sticky", top: 0, zIndex: 20,
+        position: "sticky", top: 0, zIndex: 20, isolation: "isolate",
         background: "rgba(4, 8, 18, 0.92)",
         backdropFilter: "blur(20px)",
         borderBottom: "1px solid rgba(255,255,255,0.07)",
@@ -101,7 +136,7 @@ export function AstronautProfilePage() {
         </span>
       </div>
 
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "40px 40px 60px" }}>
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "40px 40px 60px", position: "relative", zIndex: 1 }}>
 
         {/* Hero card */}
         <div style={{
