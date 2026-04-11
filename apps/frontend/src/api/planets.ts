@@ -16,10 +16,11 @@ export function usePlanet(id: number) {
   });
 }
 
-export function usePlanetContributions(planetId: number) {
+export function usePlanetContributions(planetId: number | null) {
   return useQuery({
     queryKey: ["point-attributions", "planet", planetId],
     queryFn: () =>
       apiClient.get<PointAttribution[]>(`/point-attributions?planet_id=${planetId}`),
+    enabled: planetId !== null,
   });
 }

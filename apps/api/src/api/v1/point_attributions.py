@@ -55,15 +55,12 @@ async def list_attributions(
     else:
         rows = []
 
-    # Batch-fetch activities and astronauts to avoid N+1 queries
+    # Batch-fetch with WHERE IN to avoid N+1 queries
     activity_ids = list({r.activity_id for r in rows})
     astronaut_ids = list({r.astronaut_id for r in rows})
 
-    activities_list = [a for aid in activity_ids for a in [await activity_repo.get_by_id(aid)] if a]
-    astronauts_list = [a for aid in astronaut_ids for a in [await astronaut_repo.get_by_id(aid)] if a]
-
-    activity_map = {a.id: a for a in activities_list}
-    astronaut_map = {a.id: a for a in astronauts_list}
+    activity_map = {a.id: a for a in await activity_repo.get_by_ids(activity_ids)}
+    astronaut_map = {a.id: a for a in await astronaut_repo.get_by_ids(astronaut_ids)}
 
     result = []
     for r in rows:

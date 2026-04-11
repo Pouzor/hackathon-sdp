@@ -131,7 +131,7 @@ export function PlanetDetail({
   const planetEntry = PLANET_CONFIG.find((p) => p.id === planet.id);
 
   const { data: members = [] } = useAstronauts(planet.apiId ?? undefined);
-  const { data: contributions = [] } = usePlanetContributions(planet.apiId ?? 0);
+  const { data: contributions = [] } = usePlanetContributions(planet.apiId);
   // Trophées : pas encore d'API — liste vide en attendant
   const trophies: Trophy[] = [];
 

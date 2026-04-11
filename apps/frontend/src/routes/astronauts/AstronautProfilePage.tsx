@@ -4,7 +4,7 @@ import { useAstronaut } from "@/api/astronauts";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
 import type { PointAttribution } from "@/api/types";
-import { PLANET_CONFIG } from "@/components/features/solar-system/SolarSystem";
+import { useMergedPlanets } from "@/api/useMergedPlanets";
 
 import canardPng  from "../../../img/blasons/Canard.png";
 import chatPng    from "../../../img/blasons/Chat.png";
@@ -77,6 +77,7 @@ export function AstronautProfilePage() {
 
   const astronautId = Number(id);
   const { data: astronaut, isLoading, isError } = useAstronaut(astronautId);
+  const { planets } = useMergedPlanets();
 
   const { data: contributions = [] } = useQuery({
     queryKey: ["point-attributions", "astronaut", astronautId],
@@ -94,9 +95,9 @@ export function AstronautProfilePage() {
 
   if (isError || !astronaut) return <ProfileNotFound />;
 
-  const planet = PLANET_CONFIG.find((p) => p.apiId === astronaut.planet_id) ?? null;
+  const planet = planets.find((p) => p.apiId === astronaut.planet_id) ?? null;
   const color = planet?.color ?? "#b8c8e8";
-  const blason = planet ? BLASONS[planet.id] : genericPng;
+  const blason = planet ? (BLASONS[planet.id] ?? genericPng) : genericPng;
   const initials = `${astronaut.first_name[0]}${astronaut.last_name[0]}`;
   const years = astronaut.hire_date ? yearsAt(astronaut.hire_date) : 0;
 

@@ -23,6 +23,12 @@ class AstronautRepository:
         result = await self._db.execute(select(Astronaut).where(Astronaut.id == astronaut_id))
         return result.scalar_one_or_none()
 
+    async def get_by_ids(self, astronaut_ids: list[int]) -> list[Astronaut]:
+        if not astronaut_ids:
+            return []
+        result = await self._db.execute(select(Astronaut).where(Astronaut.id.in_(astronaut_ids)))
+        return list(result.scalars().all())
+
     async def create(
         self,
         email: str,

@@ -19,12 +19,15 @@ def _season_repo(db: AsyncSession = Depends(get_db)) -> SeasonRepository:
     return SeasonRepository(db)
 
 
-async def _enrich(planet: Planet, season_repo: SeasonRepository) -> PlanetOut:
+async def _enrich(
+    planet: Planet,
+    season_repo: SeasonRepository,
+    active_season_id: int | None,
+) -> PlanetOut:
     """Enrichit une planète avec le score de la saison active."""
     out = PlanetOut.model_validate(planet)
-    active = await season_repo.get_active()
-    if active is not None:
-        score_row = await season_repo.get_or_create_planet_score(active.id, planet.id)
+    if active_season_id is not None:
+        score_row = await season_repo.get_or_create_planet_score(active_season_id, planet.id)
         out.season_score = score_row.points
     return out
 
@@ -35,7 +38,9 @@ async def list_planets(
     season_repo: SeasonRepository = Depends(_season_repo),
 ) -> list[PlanetOut]:
     planets = await repo.get_all()
-    return [await _enrich(p, season_repo) for p in planets]
+    active = await season_repo.get_active()
+    active_season_id = active.id if active else None
+    return [await _enrich(p, season_repo, active_season_id) for p in planets]
 
 
 @router.get("/{planet_id}", response_model=PlanetOut)
@@ -47,7 +52,8 @@ async def get_planet(
     planet = await repo.get_by_id(planet_id)
     if planet is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Planète introuvable")
-    return await _enrich(planet, season_repo)
+    active = await season_repo.get_active()
+    return await _enrich(planet, season_repo, active.id if active else None)
 
 
 @router.post("", response_model=PlanetOut, status_code=status.HTTP_201_CREATED)
@@ -61,7 +67,8 @@ async def create_planet(
     if existing is not None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Nom de planète déjà utilisé")
     planet = await repo.create(**body.model_dump())
-    return await _enrich(planet, season_repo)
+    active = await season_repo.get_active()
+    return await _enrich(planet, season_repo, active.id if active else None)
 
 
 @router.patch("/{planet_id}", response_model=PlanetOut)
@@ -77,7 +84,8 @@ async def update_planet(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Planète introuvable")
     updates = {k: v for k, v in body.model_dump().items() if v is not None}
     planet = await repo.update(planet, **updates)
-    return await _enrich(planet, season_repo)
+    active = await season_repo.get_active()
+    return await _enrich(planet, season_repo, active.id if active else None)
 
 
 @router.delete("/{planet_id}", status_code=status.HTTP_204_NO_CONTENT)
