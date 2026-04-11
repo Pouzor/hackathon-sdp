@@ -1,12 +1,10 @@
 import { Routes, Route } from "react-router-dom";
-import { Layout } from "@/components/features/Layout";
+import { HomePage } from "@/routes/home/HomePage";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<div className="p-8 text-center">Bienvenue sur le Site des Planètes</div>} />
-      </Route>
+      <Route path="/" element={<HomePage />} />
     </Routes>
   );
 }
