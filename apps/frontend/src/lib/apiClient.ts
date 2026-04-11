@@ -1,4 +1,5 @@
-const BASE_URL = import.meta.env.VITE_API_URL as string;
+const BASE_URL = import.meta.env.VITE_API_URL;
+if (!BASE_URL) throw new Error("VITE_API_URL is not defined — copy .env.example to .env");
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {

@@ -1,3 +1,6 @@
+// NOTE: Les styles inline sont intentionnels ici — les valeurs (couleurs API, rayons d'orbite,
+// angles, durées d'animation) sont calculées dynamiquement depuis les données serveur et ne
+// peuvent pas être exprimées avec des classes Tailwind statiques.
 import { type ReactNode } from "react";
 import { Sun } from "./planets/Sun";
 import { HQPlanet } from "./planets/HQPlanet";
