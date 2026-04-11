@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { StarField } from "@/components/features/solar-system/StarField";
 import { SolarSystem, PLANETS, type PlanetData } from "@/components/features/solar-system/SolarSystem";
 import { PlanetDetail } from "@/components/features/planet-detail/PlanetDetail";
@@ -20,11 +21,13 @@ const NAV_LINK: React.CSSProperties = {
   textDecoration: "none",
 };
 
-function NavLink({ children }: { children: React.ReactNode }) {
+function NavLink({ children, to }: { children: React.ReactNode; to?: string }) {
+  const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   return (
     <a
       href="#"
+      onClick={(e) => { e.preventDefault(); if (to) navigate(to); }}
       style={{
         ...NAV_LINK,
         color: hovered ? "white" : "rgba(255,255,255,0.75)",
@@ -60,7 +63,7 @@ function NavBar() {
       }}
     >
       {/* Nav links */}
-      <NavLink>Astronautes</NavLink>
+      <NavLink to="/astronauts">Astronautes</NavLink>
 
       {/* Separator */}
       <div style={{ width: 1, height: 18, background: "rgba(255,255,255,0.1)", margin: "0 4px" }} />
