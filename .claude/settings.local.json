@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
@@ -25,7 +28,25 @@
       "Bash(sh)",
       "Bash(export PATH=\"$HOME/.local/bin:$PATH\")",
       "Bash(uv run:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(gh pr:*)",
+      "Bash(git pull:*)",
+      "Bash(pnpm install:*)",
+      "Bash(npm run:*)",
+      "Bash(node_modules/.bin/tsc:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(git -C /Users/remyjardinet/Documents/Sites/hackathon-sdp push -u origin feat/frontend-astronauts)",
+      "Bash(git -C /Users/remyjardinet/Documents/Sites/hackathon-sdp add apps/frontend/src/routes/astronauts/AstronautsPage.tsx apps/frontend/src/routes/astronauts/AstronautProfilePage.tsx)",
+      "Bash(git -C /Users/remyjardinet/Documents/Sites/hackathon-sdp commit -m ':*)",
+      "Bash(git -C /Users/remyjardinet/Documents/Sites/hackathon-sdp push)",
+      "Bash(git -C /Users/remyjardinet/Documents/Sites/hackathon-sdp checkout main)",
+      "Bash(git -C /Users/remyjardinet/Documents/Sites/hackathon-sdp pull)",
+      "Bash(git:*)",
+      "mcp__plugin_context-mode_context-mode__ctx_search",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm coverage:*)"
     ]
   }
 }
