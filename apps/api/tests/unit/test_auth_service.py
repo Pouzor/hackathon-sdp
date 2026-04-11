@@ -131,3 +131,66 @@ def test_build_google_auth_url_contains_client_id() -> None:
     assert "test-client-id" in url
     assert "eleven-labs.com" in url
     assert "test-state" in url
+
+
+def test_build_google_auth_url_contains_redirect_uri_and_scope() -> None:
+    with patch("src.services.auth.settings") as mock_settings:
+        mock_settings.google_client_id = "cid"
+        mock_settings.google_redirect_uri = "http://localhost:8000/api/v1/auth/google/callback"
+        mock_settings.google_auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
+        mock_settings.allowed_domain = "eleven-labs.com"
+
+        service = AuthService(MagicMock())
+        url = service.build_google_auth_url(state="s")
+
+    assert "redirect_uri" in url
+    assert "openid" in url
+    assert "hd=eleven-labs.com" in url
+
+
+# ─── exchange_code_for_user_info ────────────────────────────────────────────
+
+async def test_exchange_code_google_token_error() -> None:
+    """Si Google renvoie une erreur sur le token endpoint → HTTPException 401."""
+    import httpx
+    from unittest.mock import patch as mock_patch
+
+    service = AuthService(MagicMock())
+
+    mock_token_response = MagicMock()
+    mock_token_response.status_code = 400
+
+    with mock_patch("src.services.auth.httpx.AsyncClient") as mock_client_cls:
+        mock_client = AsyncMock()
+        mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+        mock_client.post = AsyncMock(return_value=mock_token_response)
+
+        with pytest.raises(HTTPException) as exc_info:
+            await service.exchange_code_for_user_info("bad-code")
+
+    assert exc_info.value.status_code == 401
+
+
+async def test_exchange_code_google_userinfo_error() -> None:
+    """Si Google renvoie une erreur sur userinfo → HTTPException 401."""
+    service = AuthService(MagicMock())
+
+    mock_token_response = MagicMock()
+    mock_token_response.status_code = 200
+    mock_token_response.json.return_value = {"access_token": "goog-token"}
+
+    mock_userinfo_response = MagicMock()
+    mock_userinfo_response.status_code = 403
+
+    with patch("src.services.auth.httpx.AsyncClient") as mock_client_cls:
+        mock_client = AsyncMock()
+        mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+        mock_client.post = AsyncMock(return_value=mock_token_response)
+        mock_client.get = AsyncMock(return_value=mock_userinfo_response)
+
+        with pytest.raises(HTTPException) as exc_info:
+            await service.exchange_code_for_user_info("ok-code")
+
+    assert exc_info.value.status_code == 401
