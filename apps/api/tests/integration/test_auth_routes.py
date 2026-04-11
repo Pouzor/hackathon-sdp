@@ -32,6 +32,81 @@ async def test_me_without_token_returns_401(client: AsyncClient) -> None:
     assert response.status_code == 401
 
 
+async def test_google_callback_redirects_to_frontend(client: AsyncClient) -> None:
+    """GET /auth/google/callback avec code valide → 307 redirect vers frontend/auth/callback?token=."""
+    from unittest.mock import MagicMock
+
+    from src.api.v1.auth import _get_auth_service
+    from src.schemas.auth import GoogleUserInfo
+
+    mock_astronaut = MagicMock(
+        id=1,
+        email="jean@eleven-labs.com",
+        roles=["astronaut"],
+        planet_id=None,
+    )
+    user_info = GoogleUserInfo(
+        sub="google-1",
+        email="jean@eleven-labs.com",
+        email_verified=True,
+        given_name="Jean",
+        family_name="Dupont",
+        hd="eleven-labs.com",
+    )
+
+    mock_service = MagicMock()
+    mock_service.exchange_code_for_user_info = AsyncMock(return_value=user_info)
+    mock_service.verify_allowed_domain = MagicMock()
+    mock_service.get_or_create_astronaut = AsyncMock(return_value=mock_astronaut)
+    mock_service.create_jwt = MagicMock(return_value="test.jwt.token")
+
+    app.dependency_overrides[_get_auth_service] = lambda: mock_service
+
+    response = await client.get(
+        "/api/v1/auth/google/callback?code=valid-code&state=state123",
+        follow_redirects=False,
+    )
+    app.dependency_overrides.clear()
+
+    assert response.status_code == 307
+    location = response.headers.get("location", "")
+    assert "/auth/callback" in location
+    assert "token=test.jwt.token" in location
+
+
+async def test_google_callback_forbidden_domain(client: AsyncClient) -> None:
+    """GET /auth/google/callback avec email @gmail.com → 403."""
+    from fastapi import HTTPException
+
+    from src.api.v1.auth import _get_auth_service
+    from src.schemas.auth import GoogleUserInfo
+
+    user_info = GoogleUserInfo(
+        sub="google-ext",
+        email="hacker@gmail.com",
+        email_verified=True,
+        given_name="Hack",
+        family_name="Er",
+        hd="gmail.com",
+    )
+
+    mock_service = MagicMock()
+    mock_service.exchange_code_for_user_info = AsyncMock(return_value=user_info)
+    mock_service.verify_allowed_domain = MagicMock(
+        side_effect=HTTPException(status_code=403, detail="Accès réservé")
+    )
+
+    app.dependency_overrides[_get_auth_service] = lambda: mock_service
+
+    response = await client.get(
+        "/api/v1/auth/google/callback?code=ext-code&state=state123",
+        follow_redirects=False,
+    )
+    app.dependency_overrides.clear()
+
+    assert response.status_code == 403
+
+
 async def test_me_with_valid_token(client: AsyncClient) -> None:
     """GET /auth/me avec token valide et astronaute mocké → 200."""
     from src.db.session import get_db
