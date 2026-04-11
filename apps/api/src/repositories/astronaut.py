@@ -47,3 +47,10 @@ class AstronautRepository:
         await self._db.commit()
         await self._db.refresh(astronaut)
         return astronaut
+
+    async def update_roles(self, astronaut: Astronaut, roles: list[str]) -> Astronaut:
+        """Met à jour les rôles d'un astronaute."""
+        astronaut.roles = roles
+        await self._db.commit()
+        await self._db.refresh(astronaut)
+        return astronaut

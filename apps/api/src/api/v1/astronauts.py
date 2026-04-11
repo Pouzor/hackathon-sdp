@@ -1,12 +1,17 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.deps import CurrentAdmin
 from src.db.session import get_db
 from src.models.astronaut import Astronaut
 from src.models.grade import Grade
 from src.repositories.astronaut import AstronautRepository
 from src.repositories.grade import GradeRepository
-from src.schemas.astronaut import AstronautOut
+from src.schemas.astronaut import AstronautOut, AstronautRoleUpdate
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/astronauts", tags=["astronauts"])
 
@@ -53,3 +58,39 @@ async def get_astronaut(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Astronaute introuvable")
     grades = await grade_repo.get_all()
     return _enrich(astronaut, _resolve_grade(astronaut.total_points, grades))
+
+
+@router.patch("/{astronaut_id}/roles", response_model=AstronautOut)
+async def update_astronaut_roles(
+    astronaut_id: int,
+    body: AstronautRoleUpdate,
+    current_admin: CurrentAdmin,
+    astronaut_repo: AstronautRepository = Depends(_astronaut_repo),
+    grade_repo: GradeRepository = Depends(_grade_repo),
+) -> AstronautOut:
+    """Met à jour les rôles d'un astronaute (admin uniquement).
+    Un admin ne peut pas se retirer lui-même le rôle admin.
+    """
+    if current_admin.id == astronaut_id and "admin" not in body.roles:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Un admin ne peut pas se retirer lui-même le rôle admin",
+        )
+
+    target = await astronaut_repo.get_by_id(astronaut_id)
+    if target is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Astronaute introuvable")
+
+    new_roles = list(set(body.roles))
+    updated = await astronaut_repo.update_roles(target, new_roles)
+
+    logger.info(
+        "roles_updated admin=%s target=%s old_roles=%s new_roles=%s",
+        current_admin.email,
+        updated.email,
+        target.roles,
+        new_roles,
+    )
+
+    grades = await grade_repo.get_all()
+    return _enrich(updated, _resolve_grade(updated.total_points, grades))
