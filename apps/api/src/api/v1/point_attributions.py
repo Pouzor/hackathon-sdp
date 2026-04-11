@@ -55,12 +55,22 @@ async def list_attributions(
     else:
         rows = []
 
+    # Batch-fetch activities and astronauts to avoid N+1 queries
+    activity_ids = list({r.activity_id for r in rows})
+    astronaut_ids = list({r.astronaut_id for r in rows})
+
+    activities_list = [a for aid in activity_ids for a in [await activity_repo.get_by_id(aid)] if a]
+    astronauts_list = [a for aid in astronaut_ids for a in [await astronaut_repo.get_by_id(aid)] if a]
+
+    activity_map = {a.id: a for a in activities_list}
+    astronaut_map = {a.id: a for a in astronauts_list}
+
     result = []
     for r in rows:
         out = PointAttributionOut.model_validate(r)
-        activity = await activity_repo.get_by_id(r.activity_id)
+        activity = activity_map.get(r.activity_id)
         out.activity_name = activity.name if activity else None
-        astronaut = await astronaut_repo.get_by_id(r.astronaut_id)
+        astronaut = astronaut_map.get(r.astronaut_id)
         if astronaut:
             out.astronaut_first_name = astronaut.first_name
             out.astronaut_last_name = astronaut.last_name

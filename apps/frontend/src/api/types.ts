@@ -1,4 +1,6 @@
-// Types mirroring the FastAPI schemas
+// TODO: Ces types doivent être générés via openapi-typescript depuis /openapi.json
+// (cf. CLAUDE.md §2 et packages/shared-types). En attendant, ils reflètent manuellement
+// les schémas Pydantic du backend — toute modification du backend doit être répercutée ici.
 
 export type Planet = {
   id: number;

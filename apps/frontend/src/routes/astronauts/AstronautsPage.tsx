@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAstronauts } from "@/api/astronauts";
+import { useMergedPlanets } from "@/api/useMergedPlanets";
 import type { Astronaut } from "@/api/types";
-import { PLANET_CONFIG } from "@/components/features/solar-system/SolarSystem";
+import { type PlanetData } from "@/components/features/solar-system/SolarSystem";
 
 import canardPng  from "../../../img/blasons/Canard.png";
 import chatPng    from "../../../img/blasons/Chat.png";
@@ -18,9 +19,8 @@ const BLASONS: Record<string, string> = {
   hq:      genericPng,
 };
 
-// Lookup planète par apiId
-function usePlanetById(planetId: number | null) {
-  return PLANET_CONFIG.find((p) => p.apiId === planetId) ?? null;
+function findPlanetByApiId(planets: PlanetData[], planetId: number | null) {
+  return planets.find((p) => p.apiId === planetId) ?? null;
 }
 
 const PLANET_FILTERS = [
@@ -32,12 +32,12 @@ const PLANET_FILTERS = [
   { id: "hq",      label: "HQ",                   color: "#b8c8e8" },
 ];
 
-function AstronautCard({ astronaut }: { astronaut: Astronaut }) {
+function AstronautCard({ astronaut, planets }: { astronaut: Astronaut; planets: PlanetData[] }) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
-  const planet = usePlanetById(astronaut.planet_id);
+  const planet = findPlanetByApiId(planets, astronaut.planet_id);
   const color = planet?.color ?? "#b8c8e8";
-  const blason = planet ? BLASONS[planet.id] : genericPng;
+  const blason = planet ? (BLASONS[planet.id] ?? genericPng) : genericPng;
   const initials = `${astronaut.first_name[0]}${astronaut.last_name[0]}`;
 
   return (
@@ -127,19 +127,20 @@ export function AstronautsPage() {
   const [planetSlugFilter, setPlanetSlugFilter] = useState("all");
 
   const { data: allAstronauts = [], isLoading } = useAstronauts();
+  const { planets } = useMergedPlanets();
 
   const filtered = useMemo(() => {
-    const targetPlanet = PLANET_CONFIG.find((p) => p.id === planetSlugFilter);
+    const targetPlanet = planets.find((p) => p.id === planetSlugFilter);
     return allAstronauts.filter((a) => {
       const matchName = `${a.first_name} ${a.last_name}`
         .toLowerCase()
         .includes(search.toLowerCase());
       const matchPlanet =
         planetSlugFilter === "all" ||
-        (targetPlanet !== null && a.planet_id === targetPlanet?.apiId);
+        (targetPlanet != null && a.planet_id === targetPlanet.apiId);
       return matchName && matchPlanet;
     });
-  }, [allAstronauts, search, planetSlugFilter]);
+  }, [allAstronauts, planets, search, planetSlugFilter]);
 
   return (
     <div style={{ width: "100vw", minHeight: "100vh", background: "#040812", color: "white" }}>
@@ -255,7 +256,7 @@ export function AstronautsPage() {
             gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
             gap: 14,
           }}>
-            {filtered.map((a) => <AstronautCard key={a.id} astronaut={a} />)}
+            {filtered.map((a) => <AstronautCard key={a.id} astronaut={a} planets={planets} />)}
           </div>
         )}
       </div>

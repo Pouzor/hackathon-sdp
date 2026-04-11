@@ -127,7 +127,7 @@ export function PlanetDetail({
   visible: boolean;
 }) {
   const [tab, setTab] = useState<Tab>("contributions");
-  const blason = BLASONS[planet.id];
+  const blason = BLASONS[planet.id] ?? genericPng;
   const planetEntry = PLANET_CONFIG.find((p) => p.id === planet.id);
 
   const { data: members = [] } = useAstronauts(planet.apiId ?? undefined);
