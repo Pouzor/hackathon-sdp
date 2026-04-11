@@ -63,39 +63,32 @@
 
 ---
 
-## F-504 — Page détail planète
+## F-504 — Page détail planète ✅ DONE (mock front-only)
 
-**Route:** `/planets/:id`
+**Route:** overlay depuis la homepage (clic sur la planète)
+
+**Implémentation :**
+- `apps/frontend/src/components/features/planet-detail/PlanetDetail.tsx`
+- `apps/frontend/src/components/features/planet-detail/mockData.ts`
 
 **Acceptance Criteria:**
-- [ ] Header : blason, nom, mantra, couleur de fond, total points saison courante
-- [ ] Liste des astronautes membres (photos + noms)
-- [ ] Historique des trophées (F-404)
-- [ ] Timeline des activités et points gagnés (triée par date desc)
-- [ ] Total points recalculé dynamiquement (React Query polling ou invalidation)
-
-**Test Cases:**
-| Cas | Attendu |
-|-----|---------|
-| Page planète | Tous les blocs présents |
-| Attribution de points en arrière-plan | Total mis à jour sans reload |
-| Planète inexistante | 404 |
+- [x] Blason + planète 3D animée (pulse), couleur, total points saison
+- [x] Liste des astronautes membres (triée par points, grade affiché)
+- [x] Historique des trophées (icône, description, date)
+- [x] Timeline des contributions (astronaute, activité, points, bonus)
+- [x] Onglet contributions ouvert par défaut
+- [ ] Connecter à l'API (remplacer mockData par React Query hooks)
+- [ ] Total points recalculé dynamiquement (React Query polling)
+- [ ] Planète inexistante → 404
 
 ---
 
-## F-505 — Page classement / scoreboard
+## F-505 — Page classement / scoreboard ✅ DONE (mock front-only, widget homepage)
 
-**Route:** `/` ou `/scoreboard`
+**Implémentation :** widget `Leaderboard` dans `apps/frontend/src/routes/home/HomePage.tsx`
 
 **Acceptance Criteria:**
-- [ ] Classement des 4 planètes `is_competing = true` uniquement
-- [ ] Points de la saison active (pas les points totaux)
-- [ ] Mise à jour par polling React Query (30s en MVP)
-- [ ] Planètes hors compétition absentes du classement
-
-**Test Cases:**
-| Cas | Attendu |
-|-----|---------|
-| 4 planètes en compétition | 4 lignes, triées desc |
-| Planète "Nouveaux arrivants" | Absente du classement |
-| Après attribution de points | Position mise à jour au prochain poll |
+- [x] 4 planètes `is_competing = true` triées par score, barres de progression
+- [x] Total saison en footer du widget
+- [ ] Pas de page dédiée `/scoreboard` pour l'instant (acceptable MVP)
+- [ ] Connecter à l'API (React Query, polling 30s)
