@@ -92,7 +92,7 @@ def upgrade() -> None:
             "roles",
             postgresql.ARRAY(sa.String()),
             nullable=False,
-            server_default="'{astronaut}'",
+            server_default=sa.text("'{astronaut}'"),
         ),
         sa.Column("total_points", sa.Integer(), nullable=False, server_default="0"),
         sa.Column(

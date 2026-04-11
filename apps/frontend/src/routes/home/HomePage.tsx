@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { StarField } from "@/components/features/solar-system/StarField";
-import { SolarSystem, PLANETS, type PlanetData } from "@/components/features/solar-system/SolarSystem";
+import { SolarSystem, type PlanetData } from "@/components/features/solar-system/SolarSystem";
 import { PlanetDetail } from "@/components/features/planet-detail/PlanetDetail";
+import { useMergedPlanets } from "@/api/useMergedPlanets";
 
-// ── Mock current user ────────────────────────────────────────────────────────
+// ── Current user (mock jusqu'à l'implémentation OAuth) ──────────────────────
 const ME = { name: "Jean Dupont", points: 420, contributions: 8 };
 
 // ── NavBar ───────────────────────────────────────────────────────────────────
@@ -126,8 +127,8 @@ function NavBar() {
 // ── Leaderboard ──────────────────────────────────────────────────────────────
 const RANK_ICONS = ["👑", "🥈", "🥉", "4"];
 
-function Leaderboard() {
-  const competing = [...PLANETS]
+function Leaderboard({ planets }: { planets: PlanetData[] }) {
+  const competing = [...planets]
     .filter((p) => p.isCompeting)
     .sort((a, b) => b.score - a.score);
 
@@ -294,6 +295,7 @@ function hexToRgb(hex: string): string {
 export function HomePage() {
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetData | null>(null);
   const planetSelected = selectedPlanet !== null;
+  const { planets } = useMergedPlanets();
 
   return (
     <div
@@ -379,7 +381,7 @@ export function HomePage() {
       </div>
 
       {/* Leaderboard — left side */}
-      <Leaderboard />
+      <Leaderboard planets={planets} />
 
       {/* Solar System — centered, fades + shifts left when planet selected */}
       <div
@@ -396,7 +398,7 @@ export function HomePage() {
           pointerEvents: planetSelected ? "none" : "auto",
         }}
       >
-        <SolarSystem onPlanetClick={setSelectedPlanet} />
+        <SolarSystem planets={planets} onPlanetClick={setSelectedPlanet} />
       </div>
 
       {/* Planet Detail overlay */}

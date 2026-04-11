@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.core.config import settings
 from src.core.errors import internal_error_handler, not_found_handler
 from src.api.v1.activities import router as activities_router
+from src.api.v1.astronauts import router as astronauts_router
 from src.api.v1.auth import router as auth_router
 from src.api.v1.grades import router as grades_router
 from src.api.v1.health import router as health_router
@@ -35,6 +36,7 @@ app.include_router(health_router)
 app.include_router(version_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(planets_router, prefix="/api/v1")
+app.include_router(astronauts_router, prefix="/api/v1")
 app.include_router(seasons_router, prefix="/api/v1")
 app.include_router(activities_router, prefix="/api/v1")
 app.include_router(grades_router, prefix="/api/v1")

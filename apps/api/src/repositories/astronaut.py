@@ -8,6 +8,13 @@ class AstronautRepository:
     def __init__(self, db: AsyncSession) -> None:
         self._db = db
 
+    async def get_all(self, planet_id: int | None = None) -> list[Astronaut]:
+        q = select(Astronaut).order_by(Astronaut.total_points.desc())
+        if planet_id is not None:
+            q = q.where(Astronaut.planet_id == planet_id)
+        result = await self._db.execute(q)
+        return list(result.scalars().all())
+
     async def get_by_email(self, email: str) -> Astronaut | None:
         result = await self._db.execute(select(Astronaut).where(Astronaut.email == email))
         return result.scalar_one_or_none()

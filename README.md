@@ -39,8 +39,10 @@ docker compose up -d
 ```bash
 # Backend
 cd apps/api
+cp ../../.env.example .env   # puis remplir les valeurs
 uv sync
 uv run alembic upgrade head
+PYTHONPATH=. uv run python scripts/seed.py --reset   # fixtures de dev
 uv run uvicorn src.main:app --reload
 
 # Frontend

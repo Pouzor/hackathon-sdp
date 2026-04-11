@@ -25,4 +25,5 @@ class PlanetUpdate(BaseModel):
 
 class PlanetOut(PlanetBase):
     id: int
+    season_score: int = 0  # points saison active, enrichi à la volée
     model_config = {"from_attributes": True}

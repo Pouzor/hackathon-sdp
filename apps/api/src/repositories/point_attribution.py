@@ -48,6 +48,19 @@ class PointAttributionRepository:
         )
         return list(result.scalars().all())
 
+    async def get_by_planet(
+        self, planet_id: int, season_id: int | None = None, limit: int = 50
+    ) -> list[PointAttribution]:
+        q = select(PointAttribution).where(
+            PointAttribution.planet_id == planet_id,
+            PointAttribution.is_deleted.is_(False),
+        )
+        if season_id is not None:
+            q = q.where(PointAttribution.season_id == season_id)
+        q = q.order_by(PointAttribution.awarded_at.desc()).limit(limit)
+        result = await self._db.execute(q)
+        return list(result.scalars().all())
+
     async def get_by_id(self, attribution_id: int) -> PointAttribution | None:
         result = await self._db.execute(
             select(PointAttribution).where(PointAttribution.id == attribution_id)
