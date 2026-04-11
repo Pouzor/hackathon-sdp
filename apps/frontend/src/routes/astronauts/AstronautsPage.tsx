@@ -1,6 +1,9 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ASTRONAUTS, type Astronaut } from "@/components/features/astronauts/mockAstronauts";
+import { useAstronauts } from "@/api/astronauts";
+import { useMergedPlanets } from "@/api/useMergedPlanets";
+import type { Astronaut } from "@/api/types";
+import { type PlanetData } from "@/components/features/solar-system/SolarSystem";
 
 import canardPng  from "../../../img/blasons/Canard.png";
 import chatPng    from "../../../img/blasons/Chat.png";
@@ -16,37 +19,26 @@ const BLASONS: Record<string, string> = {
   hq:      genericPng,
 };
 
-const PLANET_FILTERS = [
-  { id: "all",     label: "Toutes les planètes" },
-  { id: "raccoon", label: "Raccoons of Asgard", color: "#eab308" },
-  { id: "duck",    label: "Duck Invaders",      color: "#22c55e" },
-  { id: "donut",   label: "Donut Factory",      color: "#ec4899" },
-  { id: "cats",    label: "SchizoCats",          color: "#3b82f6" },
-  { id: "hq",      label: "HQ",                 color: "#b8c8e8" },
-];
-
-function AvatarCircle({ astronaut, size = 52 }: { astronaut: Astronaut; size?: number }) {
-  const initials = `${astronaut.firstName[0]}${astronaut.lastName[0]}`;
-  const color = astronaut.planet.color;
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: "50%",
-      background: `linear-gradient(135deg, ${color}50, ${color}18)`,
-      border: `2px solid ${color}60`,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: size * 0.3, fontWeight: 700, color,
-      flexShrink: 0,
-    }}>
-      {initials}
-    </div>
-  );
+function findPlanetByApiId(planets: PlanetData[], planetId: number | null) {
+  return planets.find((p) => p.apiId === planetId) ?? null;
 }
 
-function AstronautCard({ astronaut }: { astronaut: Astronaut }) {
+const PLANET_FILTERS = [
+  { id: "all",     label: "Toutes les planètes", color: undefined },
+  { id: "raccoon", label: "Raccoons of Asgard",  color: "#eab308" },
+  { id: "duck",    label: "Duck Invaders",        color: "#22c55e" },
+  { id: "donut",   label: "Donut Factory",        color: "#ec4899" },
+  { id: "cats",    label: "SchizoCats",            color: "#3b82f6" },
+  { id: "hq",      label: "HQ",                   color: "#b8c8e8" },
+];
+
+function AstronautCard({ astronaut, planets }: { astronaut: Astronaut; planets: PlanetData[] }) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
-  const color = astronaut.planet.color;
-  const blason = BLASONS[astronaut.planet.id];
+  const planet = findPlanetByApiId(planets, astronaut.planet_id);
+  const color = planet?.color ?? "#b8c8e8";
+  const blason = planet ? (BLASONS[planet.id] ?? genericPng) : genericPng;
+  const initials = `${astronaut.first_name[0]}${astronaut.last_name[0]}`;
 
   return (
     <div
@@ -74,10 +66,8 @@ function AstronautCard({ astronaut }: { astronaut: Astronaut }) {
         draggable={false}
         style={{
           position: "absolute",
-          right: -50,
-          bottom: -55,
-          width: 190,
-          height: 190,
+          right: -50, bottom: -55,
+          width: 190, height: 190,
           objectFit: "contain",
           opacity: hovered ? 0.12 : 0.07,
           transition: "opacity 0.3s, transform 0.3s",
@@ -87,36 +77,46 @@ function AstronautCard({ astronaut }: { astronaut: Astronaut }) {
         }}
       />
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <AvatarCircle astronaut={astronaut} size={48} />
+        <div style={{
+          width: 48, height: 48, borderRadius: "50%", flexShrink: 0,
+          background: `linear-gradient(135deg, ${color}50, ${color}18)`,
+          border: `2px solid ${color}60`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 14, fontWeight: 700, color,
+        }}>
+          {initials}
+        </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ color: "white", fontSize: 14, fontWeight: 700 }}>
-            {astronaut.firstName} {astronaut.lastName}
+            {astronaut.first_name} {astronaut.last_name}
           </div>
           <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginTop: 2 }}>
-            {astronaut.grade}
+            {astronaut.grade_name ?? "—"}
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
           <div style={{ color, fontSize: 16, fontWeight: 800, fontFamily: "'Arial Black', Arial, sans-serif" }}>
-            {astronaut.totalPoints.toLocaleString()}
+            {astronaut.total_points.toLocaleString()}
           </div>
           <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>pts</div>
         </div>
       </div>
 
       {/* Planet badge */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: 6,
-        background: `${color}12`,
-        border: `1px solid ${color}30`,
-        borderRadius: 6, padding: "4px 10px",
-        width: "fit-content",
-      }}>
-        <div style={{ width: 6, height: 6, borderRadius: "50%", background: color, flexShrink: 0 }} />
-        <span style={{ color, fontSize: 10, fontWeight: 600, letterSpacing: "0.05em" }}>
-          {astronaut.planet.name}
-        </span>
-      </div>
+      {planet && (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 6,
+          background: `${color}12`,
+          border: `1px solid ${color}30`,
+          borderRadius: 6, padding: "4px 10px",
+          width: "fit-content",
+        }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: color, flexShrink: 0 }} />
+          <span style={{ color, fontSize: 10, fontWeight: 600, letterSpacing: "0.05em" }}>
+            {planet.name}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -124,15 +124,23 @@ function AstronautCard({ astronaut }: { astronaut: Astronaut }) {
 export function AstronautsPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [planetFilter, setPlanetFilter] = useState("all");
+  const [planetSlugFilter, setPlanetSlugFilter] = useState("all");
+
+  const { data: allAstronauts = [], isLoading } = useAstronauts();
+  const { planets } = useMergedPlanets();
 
   const filtered = useMemo(() => {
-    return ASTRONAUTS.filter((a) => {
-      const matchName = `${a.firstName} ${a.lastName}`.toLowerCase().includes(search.toLowerCase());
-      const matchPlanet = planetFilter === "all" || a.planet.id === planetFilter;
+    const targetPlanet = planets.find((p) => p.id === planetSlugFilter);
+    return allAstronauts.filter((a) => {
+      const matchName = `${a.first_name} ${a.last_name}`
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      const matchPlanet =
+        planetSlugFilter === "all" ||
+        (targetPlanet != null && a.planet_id === targetPlanet.apiId);
       return matchName && matchPlanet;
     });
-  }, [search, planetFilter]);
+  }, [allAstronauts, planets, search, planetSlugFilter]);
 
   return (
     <div style={{ width: "100vw", minHeight: "100vh", background: "#040812", color: "white" }}>
@@ -196,8 +204,7 @@ export function AstronautsPage() {
               border: "1px solid rgba(255,255,255,0.1)",
               borderRadius: 8, color: "white",
               padding: "7px 14px 7px 32px",
-              fontSize: 13, width: 240,
-              outline: "none",
+              fontSize: 13, width: 240, outline: "none",
             }}
           />
         </div>
@@ -208,11 +215,11 @@ export function AstronautsPage() {
         {/* Planet filter tabs */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 32 }}>
           {PLANET_FILTERS.map((f) => {
-            const active = planetFilter === f.id;
+            const active = planetSlugFilter === f.id;
             return (
               <button
                 key={f.id}
-                onClick={() => setPlanetFilter(f.id)}
+                onClick={() => setPlanetSlugFilter(f.id)}
                 style={{
                   background: active
                     ? (f.color ? `${f.color}20` : "rgba(255,255,255,0.1)")
@@ -235,7 +242,11 @@ export function AstronautsPage() {
         </div>
 
         {/* Grid */}
-        {filtered.length === 0 ? (
+        {isLoading ? (
+          <div style={{ textAlign: "center", color: "rgba(255,255,255,0.3)", marginTop: 80, fontSize: 14 }}>
+            Chargement…
+          </div>
+        ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", color: "rgba(255,255,255,0.3)", marginTop: 80, fontSize: 14 }}>
             Aucun astronaute trouvé
           </div>
@@ -245,7 +256,7 @@ export function AstronautsPage() {
             gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
             gap: 14,
           }}>
-            {filtered.map((a) => <AstronautCard key={a.id} astronaut={a} />)}
+            {filtered.map((a) => <AstronautCard key={a.id} astronaut={a} planets={planets} />)}
           </div>
         )}
       </div>

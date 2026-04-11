@@ -19,6 +19,12 @@ class ActivityRepository:
         result = await self._db.execute(select(Activity).where(Activity.id == activity_id))
         return result.scalar_one_or_none()
 
+    async def get_by_ids(self, activity_ids: list[int]) -> list[Activity]:
+        if not activity_ids:
+            return []
+        result = await self._db.execute(select(Activity).where(Activity.id.in_(activity_ids)))
+        return list(result.scalars().all())
+
     async def create(self, **kwargs: object) -> Activity:
         activity = Activity(**kwargs)
         self._db.add(activity)

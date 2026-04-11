@@ -1,3 +1,6 @@
+// NOTE: Les styles inline sont intentionnels ici — les valeurs (couleurs API, rayons d'orbite,
+// angles, durées d'animation) sont calculées dynamiquement depuis les données serveur et ne
+// peuvent pas être exprimées avec des classes Tailwind statiques.
 import { type ReactNode } from "react";
 import { Sun } from "./planets/Sun";
 import { HQPlanet } from "./planets/HQPlanet";
@@ -6,9 +9,10 @@ import { SchizoCatsPlanet } from "./planets/SchizoCatsPlanet";
 import { DonutPlanet } from "./planets/DonutPlanet";
 import { RaccoonPlanet } from "./planets/RaccoonPlanet";
 
-// ── Mock data ────────────────────────────────────────────────────────────────
+// ── Planet data type ─────────────────────────────────────────────────────────
 export type PlanetData = {
-  id: string;
+  id: string;         // slug visuel ("duck", "raccoon", …)
+  apiId: number | null; // ID base de données (null tant que l'API n'a pas répondu)
   name: string;
   score: number;
   orbitRadius: number;
@@ -20,68 +24,47 @@ export type PlanetData = {
   Component: React.FC<{ size: number }>;
 };
 
-export const PLANETS: PlanetData[] = [
+// Config visuelle statique — fusionnée avec l'API dans useMergedPlanets()
+export const PLANET_CONFIG: PlanetData[] = [
   {
-    id: "hq",
-    name: "HQ",
-    score: 0,
-    orbitRadius: 145,
-    period: 9,
-    startAngle: 45,
-    size: 32,
-    color: "#b8c8e8",
-    isCompeting: false,
+    id: "hq", apiId: null,
+    name: "HQ", score: 0,
+    orbitRadius: 145, period: 9, startAngle: 45, size: 32,
+    color: "#b8c8e8", isCompeting: false,
     Component: HQPlanet,
   },
   {
-    id: "duck",
-    name: "Duck Invaders",
-    score: 1100,
-    orbitRadius: 245,
-    period: 15,
-    startAngle: 130,
-    size: 52,
-    color: "#22c55e",
-    isCompeting: true,
+    id: "duck", apiId: null,
+    name: "Duck Invaders", score: 0,
+    orbitRadius: 245, period: 15, startAngle: 130, size: 52,
+    color: "#22c55e", isCompeting: true,
     Component: DuckPlanet,
   },
   {
-    id: "cats",
-    name: "SchizoCats",
-    score: 750,
-    orbitRadius: 365,
-    period: 23,
-    startAngle: 215,
-    size: 60,
-    color: "#3b82f6",
-    isCompeting: true,
+    id: "cats", apiId: null,
+    name: "SchizoCats", score: 0,
+    orbitRadius: 365, period: 23, startAngle: 215, size: 60,
+    color: "#3b82f6", isCompeting: true,
     Component: SchizoCatsPlanet,
   },
   {
-    id: "donut",
-    name: "Donut Factory",
-    score: 980,
-    orbitRadius: 480,
-    period: 32,
-    startAngle: 290,
-    size: 66,
-    color: "#ec4899",
-    isCompeting: true,
+    id: "donut", apiId: null,
+    name: "Donut Factory", score: 0,
+    orbitRadius: 480, period: 32, startAngle: 290, size: 66,
+    color: "#ec4899", isCompeting: true,
     Component: DonutPlanet,
   },
   {
-    id: "raccoon",
-    name: "Raccoons of Asgard",
-    score: 1250,
-    orbitRadius: 595,
-    period: 41,
-    startAngle: 355,
-    size: 72,
-    color: "#eab308",
-    isCompeting: true,
+    id: "raccoon", apiId: null,
+    name: "Raccoons of Asgard", score: 0,
+    orbitRadius: 595, period: 41, startAngle: 355, size: 72,
+    color: "#eab308", isCompeting: true,
     Component: RaccoonPlanet,
   },
 ];
+
+// Rétrocompatibilité — utilisé par les composants qui n'ont pas encore migré
+export const PLANETS = PLANET_CONFIG;
 
 // Asteroid belt pre-computed positions (between SchizoCats and Donut orbits)
 const ASTEROIDS = [
@@ -243,7 +226,13 @@ function AsteroidBelt() {
 }
 
 // ── SolarSystem ───────────────────────────────────────────────────────────────
-export function SolarSystem({ onPlanetClick }: { onPlanetClick?: (planet: PlanetData) => void }) {
+export function SolarSystem({
+  planets = PLANET_CONFIG,
+  onPlanetClick,
+}: {
+  planets?: PlanetData[];
+  onPlanetClick?: (planet: PlanetData) => void;
+}) {
   return (
     <div
       style={{
@@ -261,7 +250,7 @@ export function SolarSystem({ onPlanetClick }: { onPlanetClick?: (planet: Planet
         }}
       >
         {/* Orbit rings */}
-        {PLANETS.map((p) => (
+        {planets.map((p) => (
           <OrbitRing key={p.id} radius={p.orbitRadius} />
         ))}
 
@@ -286,7 +275,7 @@ export function SolarSystem({ onPlanetClick }: { onPlanetClick?: (planet: Planet
         </div>
 
         {/* Planets */}
-        {PLANETS.map((planet) => (
+        {planets.map((planet) => (
           <OrbitingPlanet key={planet.id} planet={planet} billboard onPlanetClick={onPlanetClick}>
             <planet.Component size={planet.size} />
           </OrbitingPlanet>

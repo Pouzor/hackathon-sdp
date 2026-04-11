@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getAstronaut, type Astronaut } from "@/components/features/astronauts/mockAstronauts";
+import { useAstronaut } from "@/api/astronauts";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/apiClient";
+import type { PointAttribution } from "@/api/types";
+import { useMergedPlanets } from "@/api/useMergedPlanets";
 
 import canardPng  from "../../../img/blasons/Canard.png";
 import chatPng    from "../../../img/blasons/Chat.png";
@@ -71,18 +75,35 @@ export function AstronautProfilePage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("contributions");
 
-  const astronaut: Astronaut | undefined = getAstronaut(Number(id));
-  if (!astronaut) return <ProfileNotFound />;
+  const astronautId = Number(id);
+  const { data: astronaut, isLoading, isError } = useAstronaut(astronautId);
+  const { planets } = useMergedPlanets();
 
-  const blason = BLASONS[astronaut.planet.id];
-  const { firstName, lastName, email, planet, grade, totalPoints, hireDate, hobbies, client, contributions, trophies } = astronaut;
-  const initials = `${firstName[0]}${lastName[0]}`;
-  const color = planet.color;
-  const years = yearsAt(hireDate);
+  const { data: contributions = [] } = useQuery({
+    queryKey: ["point-attributions", "astronaut", astronautId],
+    queryFn: () => apiClient.get<PointAttribution[]>(`/point-attributions?astronaut_id=${astronautId}`),
+    enabled: !isNaN(astronautId),
+  });
+
+  if (isLoading) {
+    return (
+      <div style={{ width: "100vw", height: "100vh", background: "#040812", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.3)" }}>
+        Chargement…
+      </div>
+    );
+  }
+
+  if (isError || !astronaut) return <ProfileNotFound />;
+
+  const planet = planets.find((p) => p.apiId === astronaut.planet_id) ?? null;
+  const color = planet?.color ?? "#b8c8e8";
+  const blason = planet ? (BLASONS[planet.id] ?? genericPng) : genericPng;
+  const initials = `${astronaut.first_name[0]}${astronaut.last_name[0]}`;
+  const years = astronaut.hire_date ? yearsAt(astronaut.hire_date) : 0;
 
   const TABS: { key: Tab; label: string; count: number }[] = [
     { key: "contributions", label: "Contributions", count: contributions.length },
-    { key: "trophees",      label: "Trophées",      count: trophies.length },
+    { key: "trophees",      label: "Trophées",      count: 0 },
   ];
 
   return (
@@ -96,10 +117,8 @@ export function AstronautProfilePage() {
         draggable={false}
         style={{
           position: "fixed",
-          right: -180,
-          bottom: -180,
-          width: 700,
-          height: 700,
+          right: -180, bottom: -180,
+          width: 700, height: 700,
           objectFit: "contain",
           opacity: 0.05,
           pointerEvents: "none",
@@ -132,7 +151,7 @@ export function AstronautProfilePage() {
         </button>
         <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.1)" }} />
         <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}>
-          {firstName} {lastName}
+          {astronaut.first_name} {astronaut.last_name}
         </span>
       </div>
 
@@ -142,23 +161,17 @@ export function AstronautProfilePage() {
         <div style={{
           background: "rgba(255,255,255,0.03)",
           border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: 20,
-          padding: "32px 36px",
-          marginBottom: 28,
-          position: "relative",
-          overflow: "hidden",
+          borderRadius: 20, padding: "32px 36px", marginBottom: 28,
+          position: "relative", overflow: "hidden",
         }}>
-          {/* Color glow */}
           <div style={{
             position: "absolute", top: -60, right: -60,
             width: 260, height: 260, borderRadius: "50%",
             background: `radial-gradient(circle, ${color}18 0%, transparent 70%)`,
-            filter: "blur(30px)",
-            pointerEvents: "none",
+            filter: "blur(30px)", pointerEvents: "none",
           }} />
 
           <div style={{ display: "flex", gap: 28, alignItems: "flex-start", position: "relative" }}>
-            {/* Avatar */}
             <div style={{
               width: 88, height: 88, borderRadius: "50%", flexShrink: 0,
               background: `linear-gradient(135deg, ${color}50, ${color}18)`,
@@ -170,32 +183,32 @@ export function AstronautProfilePage() {
               {initials}
             </div>
 
-            {/* Identity */}
             <div style={{ flex: 1 }}>
               <h1 style={{ color: "white", fontSize: 26, fontWeight: 900, margin: "0 0 4px", fontFamily: "'Arial Black', Arial, sans-serif" }}>
-                {firstName} {lastName}
+                {astronaut.first_name} {astronaut.last_name}
               </h1>
-              <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, marginBottom: 12 }}>{email}</div>
+              <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, marginBottom: 12 }}>{astronaut.email}</div>
 
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {/* Planet badge */}
-                <div style={{
-                  display: "flex", alignItems: "center", gap: 6,
-                  background: `${color}18`, border: `1px solid ${color}40`,
-                  borderRadius: 20, padding: "4px 12px",
-                }}>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: color }} />
-                  <span style={{ color, fontSize: 11, fontWeight: 600 }}>{planet.name}</span>
-                </div>
-                {/* Grade badge */}
-                <div style={{
-                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: 20, padding: "4px 12px",
-                  color: "rgba(255,255,255,0.7)", fontSize: 11,
-                }}>
-                  {grade}
-                </div>
-                {/* Seniority badge */}
+                {planet && (
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    background: `${color}18`, border: `1px solid ${color}40`,
+                    borderRadius: 20, padding: "4px 12px",
+                  }}>
+                    <div style={{ width: 7, height: 7, borderRadius: "50%", background: color }} />
+                    <span style={{ color, fontSize: 11, fontWeight: 600 }}>{planet.name}</span>
+                  </div>
+                )}
+                {astronaut.grade_name && (
+                  <div style={{
+                    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 20, padding: "4px 12px",
+                    color: "rgba(255,255,255,0.7)", fontSize: 11,
+                  }}>
+                    {astronaut.grade_name}
+                  </div>
+                )}
                 {years > 0 && (
                   <div style={{
                     background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)",
@@ -209,37 +222,32 @@ export function AstronautProfilePage() {
             </div>
           </div>
 
-          {/* Stats row */}
           <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
-            <StatCard label="Total points" value={totalPoints.toLocaleString() + " pts"} color={color} />
+            <StatCard label="Total points" value={astronaut.total_points.toLocaleString() + " pts"} color={color} />
             <StatCard label="Contributions" value={contributions.length.toString()} />
-            <StatCard label="Trophées" value={trophies.length.toString()} color="#fbbf24" />
-            {client !== "—" && <StatCard label="Client" value={client} />}
+            <StatCard label="Trophées" value="0" color="#fbbf24" />
+            {astronaut.client && astronaut.client !== "—" && <StatCard label="Client" value={astronaut.client} />}
           </div>
         </div>
 
         {/* Hobbies */}
-        {hobbies && (
+        {astronaut.hobbies && (
           <div style={{
             background: "rgba(255,255,255,0.03)",
             border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: 12, padding: "14px 20px",
-            marginBottom: 24,
+            borderRadius: 12, padding: "14px 20px", marginBottom: 24,
             display: "flex", gap: 10, alignItems: "center",
           }}>
             <span style={{ fontSize: 16 }}>🎲</span>
             <div>
               <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 2 }}>Hobbies</div>
-              <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 13 }}>{hobbies}</div>
+              <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 13 }}>{astronaut.hobbies}</div>
             </div>
           </div>
         )}
 
         {/* Tabs */}
-        <div style={{
-          display: "flex", borderBottom: "1px solid rgba(255,255,255,0.07)",
-          marginBottom: 8,
-        }}>
+        <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.07)", marginBottom: 8 }}>
           {TABS.map((t) => (
             <button
               key={t.key}
@@ -250,8 +258,7 @@ export function AstronautProfilePage() {
                 color: tab === t.key ? "white" : "rgba(255,255,255,0.4)",
                 fontSize: 13, fontWeight: tab === t.key ? 600 : 400,
                 borderBottom: tab === t.key ? `2px solid ${color}` : "2px solid transparent",
-                marginBottom: -1,
-                transition: "color 0.2s",
+                marginBottom: -1, transition: "color 0.2s",
                 display: "flex", alignItems: "center", gap: 6,
               }}
             >
@@ -276,62 +283,48 @@ export function AstronautProfilePage() {
                   Aucune contribution cette saison
                 </p>
               ) : (
-                contributions.map((c) => (
-                  <div key={c.id} style={{
-                    padding: "12px 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.05)",
-                  }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ color: "white", fontSize: 13, fontWeight: 500 }}>{c.activity}</div>
-                        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, marginTop: 2 }}>{c.date}</div>
+                contributions.map((c) => {
+                  const bonus = c.first_ever_multiplier_applied
+                    ? "×2 first ever"
+                    : c.first_season_bonus_applied
+                    ? "+25 first season"
+                    : null;
+                  return (
+                    <div key={c.id} style={{ padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ color: "white", fontSize: 13, fontWeight: 500 }}>
+                            {c.activity_name ?? `Activité #${c.activity_id}`}
+                          </div>
+                          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, marginTop: 2 }}>
+                            {c.awarded_at.slice(0, 10)}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                          <span style={{ color: "#4ade80", fontSize: 14, fontWeight: 700 }}>+{c.points}</span>
+                          <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, marginLeft: 3 }}>pts</span>
+                        </div>
                       </div>
-                      <div style={{ textAlign: "right", flexShrink: 0 }}>
-                        <span style={{ color: "#4ade80", fontSize: 14, fontWeight: 700 }}>+{c.points}</span>
-                        <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, marginLeft: 3 }}>pts</span>
-                      </div>
+                      {bonus && (
+                        <div style={{
+                          display: "inline-block", marginTop: 4,
+                          background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.25)",
+                          borderRadius: 4, padding: "1px 7px", color: "#fbbf24", fontSize: 10,
+                        }}>
+                          {bonus}
+                        </div>
+                      )}
                     </div>
-                    {c.bonus && (
-                      <div style={{
-                        display: "inline-block", marginTop: 4,
-                        background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.25)",
-                        borderRadius: 4, padding: "1px 7px",
-                        color: "#fbbf24", fontSize: 10,
-                      }}>
-                        {c.bonus}
-                      </div>
-                    )}
-                  </div>
-                ))
+                  );
+                })
               )}
             </>
           )}
 
           {tab === "trophees" && (
-            <>
-              {trophies.length === 0 ? (
-                <p style={{ color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: 40 }}>
-                  Aucun trophée pour l'instant
-                </p>
-              ) : (
-                trophies.map((t) => (
-                  <div key={t.id} style={{
-                    display: "flex", alignItems: "center", gap: 14,
-                    padding: "12px 14px",
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.07)",
-                    borderRadius: 10, marginBottom: 8,
-                  }}>
-                    <span style={{ fontSize: 28 }}>{t.icon}</span>
-                    <div>
-                      <div style={{ color: "white", fontSize: 13, fontWeight: 600 }}>{t.name}</div>
-                      <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginTop: 2 }}>{t.description}</div>
-                      <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 10, marginTop: 3 }}>{t.date}</div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </>
+            <p style={{ color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: 40 }}>
+              Aucun trophée pour l'instant
+            </p>
           )}
         </div>
       </div>

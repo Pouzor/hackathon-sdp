@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { type PlanetData, PLANETS } from "@/components/features/solar-system/SolarSystem";
-import { getPlanetDetail, type Member, type Contribution, type Trophy } from "./mockData";
+import { type PlanetData, PLANET_CONFIG } from "@/components/features/solar-system/SolarSystem";
+import { useAstronauts } from "@/api/astronauts";
+import { usePlanetContributions } from "@/api/planets";
+import type { Astronaut, PointAttribution } from "@/api/types";
+import { type Trophy } from "./mockData";
 
 // Blason images
 import canardPng  from "../../../../img/blasons/Canard.png";
@@ -21,53 +24,58 @@ type Tab = "membres" | "contributions" | "trophees";
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function MemberRow({ member, rank, color }: { member: Member; rank: number; color: string }) {
+function MemberRow({ member, rank, color }: { member: Astronaut; rank: number; color: string }) {
+  const initials = `${member.first_name[0]}${member.last_name[0]}`;
   return (
     <div style={{
       display: "flex", alignItems: "center", gap: 12,
       padding: "10px 0",
       borderBottom: "1px solid rgba(255,255,255,0.05)",
     }}>
-      {/* Rank */}
       <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, width: 18, textAlign: "right" }}>
         {rank}
       </span>
-      {/* Avatar */}
       <div style={{
         width: 34, height: 34, borderRadius: "50%",
         background: `linear-gradient(135deg, ${color}60, ${color}20)`,
         border: `1px solid ${color}50`,
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 11, fontWeight: 700, color,
-        flexShrink: 0,
+        fontSize: 11, fontWeight: 700, color, flexShrink: 0,
       }}>
-        {member.avatar}
+        {initials}
       </div>
-      {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ color: "white", fontSize: 13, fontWeight: 600 }}>{member.name}</div>
-        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{member.grade}</div>
+        <div style={{ color: "white", fontSize: 13, fontWeight: 600 }}>
+          {member.first_name} {member.last_name}
+        </div>
+        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{member.grade_name ?? "—"}</div>
       </div>
-      {/* Points */}
       <div style={{ textAlign: "right" }}>
-        <span style={{ color, fontSize: 14, fontWeight: 700 }}>{member.points.toLocaleString()}</span>
+        <span style={{ color, fontSize: 14, fontWeight: 700 }}>{member.total_points.toLocaleString()}</span>
         <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, marginLeft: 3 }}>pts</span>
       </div>
     </div>
   );
 }
 
-function ContributionRow({ c }: { c: Contribution }) {
+function ContributionRow({ c }: { c: PointAttribution }) {
+  const astronautName = c.astronaut_first_name
+    ? `${c.astronaut_first_name} ${c.astronaut_last_name ?? ""}`.trim()
+    : `Astronaute #${c.astronaut_id}`;
+  const bonus = c.first_ever_multiplier_applied
+    ? "×2 first ever"
+    : c.first_season_bonus_applied
+    ? "+25 first season"
+    : null;
+  const date = c.awarded_at.slice(0, 10);
+
   return (
-    <div style={{
-      padding: "10px 0",
-      borderBottom: "1px solid rgba(255,255,255,0.05)",
-    }}>
+    <div style={{ padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ color: "white", fontSize: 13, fontWeight: 500 }}>{c.activity}</div>
+          <div style={{ color: "white", fontSize: 13, fontWeight: 500 }}>{c.activity_name ?? `Activité #${c.activity_id}`}</div>
           <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, marginTop: 2 }}>
-            {c.astronaut} · {c.date}
+            {astronautName} · {date}
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -75,14 +83,13 @@ function ContributionRow({ c }: { c: Contribution }) {
           <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, marginLeft: 3 }}>pts</span>
         </div>
       </div>
-      {c.bonus && (
+      {bonus && (
         <div style={{
           display: "inline-block", marginTop: 4,
           background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.25)",
-          borderRadius: 4, padding: "1px 7px",
-          color: "#fbbf24", fontSize: 10,
+          borderRadius: 4, padding: "1px 7px", color: "#fbbf24", fontSize: 10,
         }}>
-          {c.bonus}
+          {bonus}
         </div>
       )}
     </div>
@@ -120,14 +127,18 @@ export function PlanetDetail({
   visible: boolean;
 }) {
   const [tab, setTab] = useState<Tab>("contributions");
-  const detail = getPlanetDetail(planet.id);
-  const blason = BLASONS[planet.id];
-  const planetEntry = PLANETS.find((p) => p.id === planet.id);
+  const blason = BLASONS[planet.id] ?? genericPng;
+  const planetEntry = PLANET_CONFIG.find((p) => p.id === planet.id);
+
+  const { data: members = [] } = useAstronauts(planet.apiId ?? undefined);
+  const { data: contributions = [] } = usePlanetContributions(planet.apiId);
+  // Trophées : pas encore d'API — liste vide en attendant
+  const trophies: Trophy[] = [];
 
   const TABS: { key: Tab; label: string; count?: number }[] = [
-    { key: "membres",       label: "Membres",       count: detail.members.length },
-    { key: "contributions", label: "Contributions", count: detail.contributions.length },
-    { key: "trophees",      label: "Trophées",      count: detail.trophies.length },
+    { key: "membres",       label: "Membres",       count: members.length },
+    { key: "contributions", label: "Contributions", count: contributions.length },
+    { key: "trophees",      label: "Trophées",      count: trophies.length },
   ];
 
   return (
@@ -264,9 +275,9 @@ export function PlanetDetail({
           <div style={{ display: "flex", gap: 20 }}>
             {[
               { label: "Score saison",  value: planet.score.toLocaleString() + " pts", color: planet.color },
-              { label: "Membres",       value: detail.members.length.toString(),       color: "white" },
-              { label: "Contributions", value: detail.contributions.length.toString(), color: "white" },
-              { label: "Trophées",      value: detail.trophies.length.toString(),      color: "#fbbf24" },
+              { label: "Membres",       value: members.length.toString(),              color: "white" },
+              { label: "Contributions", value: contributions.length.toString(),        color: "white" },
+              { label: "Trophées",      value: trophies.length.toString(),             color: "#fbbf24" },
             ].map((stat) => (
               <div key={stat.label} style={{
                 background: "rgba(255,255,255,0.04)",
@@ -326,13 +337,13 @@ export function PlanetDetail({
 
           {tab === "membres" && (
             <div style={{ paddingTop: 8 }}>
-              {detail.members.length === 0 ? (
+              {members.length === 0 ? (
                 <p style={{ color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: 40 }}>
                   Aucun membre pour l'instant
                 </p>
               ) : (
-                detail.members
-                  .sort((a, b) => b.points - a.points)
+                [...members]
+                  .sort((a, b) => b.total_points - a.total_points)
                   .map((m, i) => <MemberRow key={m.id} member={m} rank={i + 1} color={planet.color} />)
               )}
             </div>
@@ -340,24 +351,24 @@ export function PlanetDetail({
 
           {tab === "contributions" && (
             <div style={{ paddingTop: 8 }}>
-              {detail.contributions.length === 0 ? (
+              {contributions.length === 0 ? (
                 <p style={{ color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: 40 }}>
                   Aucune contribution cette saison
                 </p>
               ) : (
-                detail.contributions.map((c) => <ContributionRow key={c.id} c={c} />)
+                contributions.map((c) => <ContributionRow key={c.id} c={c} />)
               )}
             </div>
           )}
 
           {tab === "trophees" && (
             <div style={{ paddingTop: 12 }}>
-              {detail.trophies.length === 0 ? (
+              {trophies.length === 0 ? (
                 <p style={{ color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: 40 }}>
                   Aucun trophée pour l'instant
                 </p>
               ) : (
-                detail.trophies.map((t) => <TrophyCard key={t.id} trophy={t} />)
+                trophies.map((t) => <TrophyCard key={t.id} trophy={t} />)
               )}
             </div>
           )}

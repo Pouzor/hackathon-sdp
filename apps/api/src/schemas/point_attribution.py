@@ -32,4 +32,8 @@ class PointAttributionOut(BaseModel):
     first_ever_multiplier_applied: bool
     first_season_bonus_applied: bool
     awarded_at: datetime
+    # enrichi à la volée
+    activity_name: str | None = None
+    astronaut_first_name: str | None = None
+    astronaut_last_name: str | None = None
     model_config = {"from_attributes": True}

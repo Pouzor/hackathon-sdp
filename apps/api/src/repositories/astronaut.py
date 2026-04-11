@@ -8,6 +8,13 @@ class AstronautRepository:
     def __init__(self, db: AsyncSession) -> None:
         self._db = db
 
+    async def get_all(self, planet_id: int | None = None) -> list[Astronaut]:
+        q = select(Astronaut).order_by(Astronaut.total_points.desc())
+        if planet_id is not None:
+            q = q.where(Astronaut.planet_id == planet_id)
+        result = await self._db.execute(q)
+        return list(result.scalars().all())
+
     async def get_by_email(self, email: str) -> Astronaut | None:
         result = await self._db.execute(select(Astronaut).where(Astronaut.email == email))
         return result.scalar_one_or_none()
@@ -15,6 +22,12 @@ class AstronautRepository:
     async def get_by_id(self, astronaut_id: int) -> Astronaut | None:
         result = await self._db.execute(select(Astronaut).where(Astronaut.id == astronaut_id))
         return result.scalar_one_or_none()
+
+    async def get_by_ids(self, astronaut_ids: list[int]) -> list[Astronaut]:
+        if not astronaut_ids:
+            return []
+        result = await self._db.execute(select(Astronaut).where(Astronaut.id.in_(astronaut_ids)))
+        return list(result.scalars().all())
 
     async def create(
         self,

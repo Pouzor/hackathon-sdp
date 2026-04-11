@@ -136,6 +136,42 @@ class PointAttributionService:
 
         return attributions
 
+    async def list_enriched(
+        self,
+        planet_id: int | None = None,
+        astronaut_id: int | None = None,
+    ) -> list[PointAttribution]:
+        """Retourne les attributions avec activity_name et noms d'astronaute enrichis."""
+        from src.schemas.point_attribution import PointAttributionOut  # local import to avoid circular
+
+        active = await self._season_repo.get_active()
+        season_id = active.id if active else None
+
+        if planet_id is not None:
+            rows = await self._pa_repo.get_by_planet(planet_id, season_id=season_id)
+        elif astronaut_id is not None:
+            rows = await self._pa_repo.get_by_astronaut(astronaut_id)
+        else:
+            rows = []
+
+        activity_ids = list({r.activity_id for r in rows})
+        astronaut_ids = list({r.astronaut_id for r in rows})
+
+        activity_map = {a.id: a for a in await self._activity_repo.get_by_ids(activity_ids)}
+        astronaut_map = {a.id: a for a in await self._astronaut_repo.get_by_ids(astronaut_ids)}
+
+        result: list[PointAttribution] = []
+        for r in rows:
+            out = PointAttributionOut.model_validate(r)
+            activity = activity_map.get(r.activity_id)
+            out.activity_name = activity.name if activity else None
+            astronaut = astronaut_map.get(r.astronaut_id)
+            if astronaut:
+                out.astronaut_first_name = astronaut.first_name
+                out.astronaut_last_name = astronaut.last_name
+            result.append(out)  # type: ignore[arg-type]
+        return result
+
     async def delete_attribution(
         self,
         attribution_id: int,

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.deps import CurrentAdmin
@@ -15,6 +15,15 @@ router = APIRouter(prefix="/point-attributions", tags=["point-attributions"])
 
 def _service(db: AsyncSession = Depends(get_db)) -> PointAttributionService:
     return PointAttributionService(db)
+
+
+@router.get("", response_model=list[PointAttributionOut])
+async def list_attributions(
+    planet_id: int | None = Query(None),
+    astronaut_id: int | None = Query(None),
+    service: PointAttributionService = Depends(_service),
+) -> list[PointAttributionOut]:
+    return await service.list_enriched(planet_id=planet_id, astronaut_id=astronaut_id)  # type: ignore[return-value]
 
 
 @router.post("", response_model=list[PointAttributionOut], status_code=status.HTTP_201_CREATED)
