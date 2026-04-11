@@ -4,6 +4,11 @@ Done items for reference. Move here from active.md when complete.
 
 ---
 
+## [2026-04-11] Trombinoscope + profil astronaute (F-501, F-502 mock)
+- AstronautsPage : grille avec recherche, filtres planète, blason oversized en fond des cards
+- AstronautProfilePage : fiche complète (grade, points, ancienneté, hobbies, contributions, trophées), blason oversized en fond de page
+- 12 astronautes mock sur 5 planètes, routing React Router
+
 ## [2026-04-11] Homepage système solaire (F-505 mock)
 - Système solaire 3D avec perspective, animations orbitales, planètes billboard
 - Composants planète custom (PNGs SchizoCats/Donut/Duck, SVG Raccoon/HQ/Soleil)

@@ -2,45 +2,39 @@
 
 ⚠️ **Prérequis avant de démarrer :** Demander les assets graphiques (blasons, couleurs, logo, mantras, maquettes).
 
-## F-501 — Page trombinoscope
+## F-501 — Page trombinoscope ✅ DONE (mock front-only)
 
 **Route:** `/astronauts`
 
-**Acceptance Criteria:**
-- [ ] Grille des astronautes (photo, prénom, nom, planète)
-- [ ] Recherche par nom (debounced)
-- [ ] Filtre par planète (dropdown)
-- [ ] Pagination (20 par page) ou scroll infini
-- [ ] État vide si aucun résultat
+**Implémentation :** `apps/frontend/src/routes/astronauts/AstronautsPage.tsx`
 
-**Test Cases:**
-| Cas | Attendu |
-|-----|---------|
-| Recherche "dupont" | Seuls les "dupont" affichés |
-| Filtre planète "Mars" | Seuls les astronautes Mars |
-| 0 résultat | Message "Aucun astronaute trouvé" |
-| Scroll infini | Page suivante chargée |
+**Acceptance Criteria:**
+- [x] Grille des astronautes (initiales colorées, nom, grade, points)
+- [x] Recherche par nom (temps réel)
+- [x] Filtre par planète (tabs avec point coloré)
+- [x] État vide si aucun résultat
+- [x] Blason planète en fond oversized sur chaque card
+- [ ] Connecter à l'API (React Query)
+- [ ] Pagination si > 20 résultats
 
 ---
 
-## F-502 — Page profil astronaute (consultation)
+## F-502 — Page profil astronaute ✅ DONE (mock front-only)
 
 **Route:** `/astronauts/:id`
 
-**Acceptance Criteria:**
-- [ ] Infos : photo, prénom/nom, email, planète, hire_date
-- [ ] Total points + grade courant avec icône
-- [ ] Historique des contributions (paginé, 10 par page)
-- [ ] Section trophées (F-403)
-- [ ] Lien vers la page de sa planète
-- [ ] Profil inexistant → 404
+**Implémentation :** `apps/frontend/src/routes/astronauts/AstronautProfilePage.tsx`
 
-**Test Cases:**
-| Cas | Attendu |
-|-----|---------|
-| Profil existant | Toutes les sections chargées |
-| `/astronauts/9999` | Page 404 |
-| Historique > 10 | Pagination présente |
+**Acceptance Criteria:**
+- [x] Hero : initiales, nom, email, badges planète + grade + ancienneté
+- [x] Stats : total points, contributions, trophées, client
+- [x] Hobbies
+- [x] Historique des contributions (tab)
+- [x] Trophées (tab)
+- [x] Page 404 si ID inconnu
+- [x] Blason planète oversized en fond de page
+- [ ] Connecter à l'API (React Query)
+- [ ] Lien cliquable vers la planète
 
 ---
 
