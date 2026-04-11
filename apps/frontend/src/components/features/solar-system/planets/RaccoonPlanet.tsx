@@ -1,5 +1,8 @@
+import { useId } from "react";
+
 // Raccoons of Asgard — gold/amber planet with Norse runes + orbiting Mjölnir
 export function RaccoonPlanet({ size }: { size: number }) {
+  const uid = useId().replace(/:/g, "");
   const r = size / 2;
 
   return (
@@ -10,30 +13,30 @@ export function RaccoonPlanet({ size }: { size: number }) {
       overflow="visible"
     >
       <defs>
-        <radialGradient id="raccoonGrad" cx="35%" cy="30%">
+        <radialGradient id={`raccoonGrad-${uid}`} cx="35%" cy="30%">
           <stop offset="0%" stopColor="#fde68a" />
           <stop offset="45%" stopColor="#d97706" />
           <stop offset="100%" stopColor="#78350f" />
         </radialGradient>
-        <radialGradient id="raccoonAtmos" cx="50%" cy="50%">
+        <radialGradient id={`raccoonAtmos-${uid}`} cx="50%" cy="50%">
           <stop offset="70%" stopColor="transparent" />
           <stop offset="100%" stopColor="#fbbf24" stopOpacity="0.15" />
         </radialGradient>
-        <filter id="raccoonGlow">
+        <filter id={`raccoonGlow-${uid}`}>
           <feGaussianBlur stdDeviation="3" result="blur" />
           <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
-        <filter id="mjolnirGlow">
+        <filter id={`mjolnirGlow-${uid}`}>
           <feGaussianBlur stdDeviation="2" result="blur" />
           <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
       </defs>
 
       {/* Atmosphere glow */}
-      <circle r={r + 8} fill="url(#raccoonAtmos)" />
+      <circle r={r + 8} fill={`url(#raccoonAtmos-${uid})`} />
 
       {/* Planet body */}
-      <circle r={r} fill="url(#raccoonGrad)" filter="url(#raccoonGlow)" />
+      <circle r={r} fill={`url(#raccoonGrad-${uid})`} filter={`url(#raccoonGlow-${uid})`} />
 
       {/* Planet surface — darker amber bands */}
       <ellipse cx="0" cy={-r * 0.25} rx={r * 0.7} ry={r * 0.12} fill="#92400e" opacity="0.4" />
@@ -78,7 +81,7 @@ export function RaccoonPlanet({ size }: { size: number }) {
 
       {/* Mjölnir orbiting the planet */}
       <g style={{ animation: "mjolnirOrbit 6s linear infinite", transformOrigin: "0 0" }}
-         filter="url(#mjolnirGlow)">
+         filter={`url(#mjolnirGlow-${uid})`}>
         {/* Mjolnir shape at the orbit point */}
         <g transform={`translate(${r + 18}, 0)`}>
           {/* Hammerhead */}

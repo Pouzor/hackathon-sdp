@@ -21,22 +21,17 @@ const NAV_LINK: React.CSSProperties = {
 };
 
 function NavLink({ children }: { children: React.ReactNode }) {
+  const [hovered, setHovered] = useState(false);
   return (
     <a
       href="#"
-      style={NAV_LINK}
-      onMouseEnter={(e) =>
-        Object.assign((e.target as HTMLElement).style, {
-          color: "white",
-          background: "rgba(255,255,255,0.07)",
-        })
-      }
-      onMouseLeave={(e) =>
-        Object.assign((e.target as HTMLElement).style, {
-          color: "rgba(255,255,255,0.75)",
-          background: "transparent",
-        })
-      }
+      style={{
+        ...NAV_LINK,
+        color: hovered ? "white" : "rgba(255,255,255,0.75)",
+        background: hovered ? "rgba(255,255,255,0.07)" : "transparent",
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       {children}
     </a>

@@ -1,4 +1,7 @@
+import { useId } from "react";
+
 export function HQPlanet({ size }: { size: number }) {
+  const uid = useId().replace(/:/g, "");
   const r = size / 2;
   return (
     <svg
@@ -8,12 +11,12 @@ export function HQPlanet({ size }: { size: number }) {
       overflow="visible"
     >
       <defs>
-        <radialGradient id="hqGrad" cx="35%" cy="30%">
+        <radialGradient id={`hqGrad-${uid}`} cx="35%" cy="30%">
           <stop offset="0%" stopColor="#f0f4ff" />
           <stop offset="50%" stopColor="#b8c8e8" />
           <stop offset="100%" stopColor="#6080a8" />
         </radialGradient>
-        <filter id="hqGlow">
+        <filter id={`hqGlow-${uid}`}>
           <feGaussianBlur stdDeviation="2" result="blur" />
           <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
@@ -30,7 +33,7 @@ export function HQPlanet({ size }: { size: number }) {
       />
 
       {/* Planet */}
-      <circle r={r} fill="url(#hqGrad)" filter="url(#hqGlow)" />
+      <circle r={r} fill={`url(#hqGrad-${uid})`} filter={`url(#hqGlow-${uid})`} />
 
       {/* Cloud bands */}
       <ellipse cx="0" cy={-r * 0.3} rx={r * 0.7} ry={r * 0.12} fill="white" opacity="0.12" />

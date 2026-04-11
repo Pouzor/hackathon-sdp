@@ -1,4 +1,7 @@
+import { useId } from "react";
+
 export function Sun() {
+  const uid = useId().replace(/:/g, "");
   return (
     <svg
       width="90"
@@ -7,23 +10,23 @@ export function Sun() {
       style={{ animation: "sunPulse 3s ease-in-out infinite", overflow: "visible" }}
     >
       <defs>
-        <radialGradient id="sunGrad" cx="35%" cy="30%">
+        <radialGradient id={`sunGrad-${uid}`} cx="35%" cy="30%">
           <stop offset="0%" stopColor="#fff7d6" />
           <stop offset="35%" stopColor="#ffd700" />
           <stop offset="75%" stopColor="#ff8c00" />
           <stop offset="100%" stopColor="#e63000" />
         </radialGradient>
-        <radialGradient id="sunGlow" cx="50%" cy="50%">
+        <radialGradient id={`sunGlow-${uid}`} cx="50%" cy="50%">
           <stop offset="0%" stopColor="#ff8c00" stopOpacity="0.4" />
           <stop offset="100%" stopColor="#ff4500" stopOpacity="0" />
         </radialGradient>
-        <filter id="sunBlur">
+        <filter id={`sunBlur-${uid}`}>
           <feGaussianBlur stdDeviation="3" />
         </filter>
       </defs>
 
       {/* Outer glow */}
-      <circle r="44" fill="url(#sunGlow)" filter="url(#sunBlur)" />
+      <circle r="44" fill={`url(#sunGlow-${uid})`} filter={`url(#sunBlur-${uid})`} />
 
       {/* Corona rays — slow spin */}
       <g style={{ animation: "coronaSpin 20s linear infinite", transformOrigin: "0 0" }}>
@@ -70,7 +73,7 @@ export function Sun() {
       </g>
 
       {/* Sun body */}
-      <circle r="32" fill="url(#sunGrad)" />
+      <circle r="32" fill={`url(#sunGrad-${uid})`} />
 
       {/* Surface texture — subtle darker spots */}
       <circle cx="-8" cy="-10" r="5" fill="#e07000" opacity="0.3" />

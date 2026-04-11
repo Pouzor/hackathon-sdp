@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { type PlanetData } from "@/components/features/solar-system/SolarSystem";
+import { type PlanetData, PLANETS } from "@/components/features/solar-system/SolarSystem";
 import { getPlanetDetail, type Member, type Contribution, type Trophy } from "./mockData";
-import { PLANETS } from "@/components/features/solar-system/SolarSystem";
 
 // Blason images
 import canardPng  from "../../../../img/blasons/Canard.png";
