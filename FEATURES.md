@@ -232,17 +232,18 @@ Chaque feature a un **ID stable** (`F-XXX`) pour pouvoir la référencer.
 - Pas de modification de l'email, de la planète, des points
 - **Tests** : on ne peut pas modifier le profil d'un autre, champs interdits rejetés
 
-### F-504 — Page détail planète
-- Header : blason, mantra, couleur, total de points saison courante
-- Liste des astronautes membres
-- Historique des trophées
-- Historique des activités et points gagnés (timeline)
-- **Tests** : rendu, calcul du total live
+### F-504 — Page détail planète ✅ (mock front-only)
+- ✅ Header : blason, couleur, total de points saison courante
+- ✅ Liste des astronautes membres (triée par points, grade affiché)
+- ✅ Historique des trophées (icône, description, date)
+- ✅ Historique des contributions (astronaute, activité, points, bonus)
+- ⏳ À connecter à l'API quand le backend sera prêt (React Query hooks)
+- **Note** : accessible via clic sur une planète depuis le système solaire
 
-### F-505 — Page classement / scoreboard
-- Classement des 4 planètes en compétition (saison active)
-- Mise à jour temps réel (polling React Query suffit en MVP, websocket en P3)
-- **Tests** : ordre correct, exclusion des planètes hors compétition
+### F-505 — Page classement / scoreboard ✅ (mock front-only, widget)
+- ✅ Leaderboard des 4 planètes en compétition sur la homepage (trié par score, barres de progression)
+- ⏳ Pas de page dédiée pour l'instant — acceptable pour le MVP visuel
+- ⏳ À connecter à l'API (polling React Query)
 
 ---
 
