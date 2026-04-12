@@ -65,7 +65,10 @@ async def google_callback(
         return TokenResponse(access_token=token)
 
     base_url = settings.backoffice_url if origin == "backoffice" else settings.frontend_url
-    return RedirectResponse(url=f"{base_url}/auth/callback?token={token}", status_code=307)
+    response = RedirectResponse(url=f"{base_url}/auth/callback?token={token}", status_code=307)
+    # Prevent token leakage via Referer header (token is in query param — CLAUDE.md §5)
+    response.headers["Referrer-Policy"] = "no-referrer"
+    return response
 
 
 @router.get("/me", response_model=AstronautMe)

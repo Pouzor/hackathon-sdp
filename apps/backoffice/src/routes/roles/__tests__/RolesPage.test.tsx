@@ -14,16 +14,22 @@ function wrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
-const mockAstronauts: astronautsApi.AstronautOut[] = [
+const mockAstronauts = [
   {
     id: 1,
     email: "admin@eleven-labs.com",
     first_name: "Alice",
     last_name: "Admin",
     photo_url: null,
+    hobbies: null,
+    client: null,
+    hire_date: null,
     roles: ["astronaut", "admin"],
     planet_id: 1,
     total_points: 500,
+    grade_name: null,
+    created_at: "2024-01-01T00:00:00",
+    updated_at: "2024-01-01T00:00:00",
   },
   {
     id: 2,
@@ -31,11 +37,17 @@ const mockAstronauts: astronautsApi.AstronautOut[] = [
     first_name: "Bob",
     last_name: "Dupont",
     photo_url: null,
+    hobbies: null,
+    client: null,
+    hire_date: null,
     roles: ["astronaut"],
     planet_id: 2,
     total_points: 100,
+    grade_name: null,
+    created_at: "2024-01-01T00:00:00",
+    updated_at: "2024-01-01T00:00:00",
   },
-];
+] satisfies astronautsApi.AstronautOut[];
 
 describe("RolesPage", () => {
   beforeEach(() => {

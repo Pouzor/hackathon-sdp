@@ -1,49 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
+import type { AstronautOut, PlanetOut, ActivityOut, PointAttributionOut } from "shared-types";
 
-export interface AstronautOut {
-  id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
-  photo_url: string | null;
-  roles: string[];
-  planet_id: number | null;
-  total_points: number;
-  grade_name: string | null;
-}
-
-export interface PlanetOut {
-  id: number;
-  name: string;
-  color_hex: string;
-  is_competing: boolean;
-  season_score: number;
-}
-
-export interface ActivityOut {
-  id: number;
-  name: string;
-  base_points: number;
-  category: string;
-  is_collaborative: boolean;
-  allow_multiple_assignees: boolean;
-  is_active: boolean;
-}
-
-export interface PointAttributionOut {
-  id: number;
-  astronaut_id: number;
-  activity_id: number;
-  points: number;
-  comment: string | null;
-  first_ever_multiplier_applied: boolean;
-  first_season_bonus_applied: boolean;
-  awarded_at: string;
-  activity_name: string | null;
-  astronaut_first_name: string | null;
-  astronaut_last_name: string | null;
-}
+export type { AstronautOut, PlanetOut, ActivityOut, PointAttributionOut };
 
 export function useAstronauts() {
   return useQuery<AstronautOut[]>({
