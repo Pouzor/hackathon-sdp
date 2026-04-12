@@ -38,3 +38,39 @@ async def test_get_current_token_valid() -> None:
     credentials.credentials = token
     payload = await get_current_token(credentials)
     assert payload.astronaut_id == 1
+
+
+# ─── require_admin ──────────────────────────────────────────────────────────
+
+async def test_require_admin_raises_403_for_astronaut() -> None:
+    """Un astronaute sans rôle admin → 403."""
+    from src.core.deps import require_admin
+
+    astronaut = MagicMock()
+    astronaut.roles = ["astronaut"]
+
+    with pytest.raises(HTTPException) as exc:
+        await require_admin(astronaut)
+    assert exc.value.status_code == 403
+
+
+async def test_require_admin_passes_for_admin() -> None:
+    """Un astronaute avec rôle admin → retourne l'astronaute."""
+    from src.core.deps import require_admin
+
+    astronaut = MagicMock()
+    astronaut.roles = ["astronaut", "admin"]
+
+    result = await require_admin(astronaut)
+    assert result is astronaut
+
+
+async def test_require_admin_passes_for_admin_only_role() -> None:
+    """Un compte purement admin → retourne l'astronaute."""
+    from src.core.deps import require_admin
+
+    astronaut = MagicMock()
+    astronaut.roles = ["admin"]
+
+    result = await require_admin(astronaut)
+    assert result is astronaut

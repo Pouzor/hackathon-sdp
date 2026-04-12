@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class AstronautOut(BaseModel):
@@ -26,3 +26,18 @@ class AstronautUpdate(BaseModel):
     photo_url: str | None = Field(None, max_length=500)
     hobbies: str | None = Field(None, max_length=1000)
     client: str | None = Field(None, max_length=255)
+
+
+ALLOWED_ROLES = {"astronaut", "admin"}
+
+
+class AstronautRoleUpdate(BaseModel):
+    roles: list[str] = Field(..., min_length=1)
+
+    @field_validator("roles")
+    @classmethod
+    def validate_roles(cls, v: list[str]) -> list[str]:
+        unknown = set(v) - ALLOWED_ROLES
+        if unknown:
+            raise ValueError(f"Rôles inconnus : {unknown}. Autorisés : {ALLOWED_ROLES}")
+        return list(set(v))  # dédupliquer
