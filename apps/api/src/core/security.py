@@ -1,10 +1,10 @@
 import hashlib
 import hmac
 import secrets as _secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from jose import JWTError, jwt
+from jose import jwt
 
 from src.core.config import settings
 
@@ -12,7 +12,7 @@ from src.core.config import settings
 def create_access_token(data: dict[str, Any]) -> str:
     """Crée un JWT signé avec expiration."""
     payload = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.access_token_expire_minutes)
+    expire = datetime.now(UTC) + timedelta(minutes=settings.access_token_expire_minutes)
     payload["exp"] = expire
     return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
 
@@ -31,6 +31,8 @@ class TokenPayload:
         self.astronaut_id: int = int(data["astronaut_id"])
         self.roles: list[str] = list(data.get("roles", ["astronaut"]))
         self.planet_id: int | None = data.get("planet_id")
+        raw_exp = data.get("exp")
+        self.exp: int | None = int(raw_exp) if raw_exp is not None else None
 
     @property
     def is_admin(self) -> bool:
