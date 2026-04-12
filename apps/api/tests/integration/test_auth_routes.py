@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from src.core.security import create_access_token
+from src.core.security import create_access_token, generate_oauth_state
 from src.main import app
 
 
@@ -62,8 +62,9 @@ async def test_google_callback_redirects_to_frontend(client: AsyncClient) -> Non
 
     app.dependency_overrides[_get_auth_service] = lambda: mock_service
 
+    valid_state = generate_oauth_state("frontend")
     response = await client.get(
-        "/api/v1/auth/google/callback?code=valid-code&state=state123",
+        f"/api/v1/auth/google/callback?code=valid-code&state={valid_state}",
         follow_redirects=False,
     )
     app.dependency_overrides.clear()
@@ -98,8 +99,9 @@ async def test_google_callback_forbidden_domain(client: AsyncClient) -> None:
 
     app.dependency_overrides[_get_auth_service] = lambda: mock_service
 
+    valid_state = generate_oauth_state("frontend")
     response = await client.get(
-        "/api/v1/auth/google/callback?code=ext-code&state=state123",
+        f"/api/v1/auth/google/callback?code=ext-code&state={valid_state}",
         follow_redirects=False,
     )
     app.dependency_overrides.clear()

@@ -38,8 +38,8 @@ def _enrich(astronaut: Astronaut, grade: Grade | None) -> AstronautOut:
 
 @router.get("", response_model=list[AstronautOut])
 async def list_astronauts(
+    _current: CurrentAstronaut,
     planet_id: int | None = Query(None, description="Filtrer par planète"),
-    _current: CurrentAstronaut = Depends(),
     astronaut_repo: AstronautRepository = Depends(_astronaut_repo),
     grade_repo: GradeRepository = Depends(_grade_repo),
 ) -> list[AstronautOut]:
@@ -51,7 +51,7 @@ async def list_astronauts(
 @router.get("/{astronaut_id}", response_model=AstronautOut)
 async def get_astronaut(
     astronaut_id: int,
-    _current: CurrentAstronaut = Depends(),
+    _current: CurrentAstronaut,
     astronaut_repo: AstronautRepository = Depends(_astronaut_repo),
     grade_repo: GradeRepository = Depends(_grade_repo),
 ) -> AstronautOut:
