@@ -60,7 +60,8 @@ export function RolesPage() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) return null;
-      const payload = JSON.parse(atob(token.split(".")[1])) as { astronaut_id?: number };
+      const b64 = token.split(".")[1]!.replace(/-/g, "+").replace(/_/g, "/");
+      const payload = JSON.parse(atob(b64)) as { astronaut_id?: number };
       return payload.astronaut_id ?? null;
     } catch {
       return null;

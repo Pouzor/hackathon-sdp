@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class AstronautOut(BaseModel):
@@ -34,15 +34,10 @@ ALLOWED_ROLES = {"astronaut", "admin"}
 class AstronautRoleUpdate(BaseModel):
     roles: list[str] = Field(..., min_length=1)
 
-    @classmethod
-    def __get_validators__(cls):  # type: ignore[override]
-        yield cls.validate
-
+    @field_validator("roles")
     @classmethod
     def validate_roles(cls, v: list[str]) -> list[str]:
         unknown = set(v) - ALLOWED_ROLES
         if unknown:
             raise ValueError(f"Rôles inconnus : {unknown}. Autorisés : {ALLOWED_ROLES}")
-        if not v:
-            raise ValueError("La liste de rôles ne peut pas être vide")
         return list(set(v))  # dédupliquer

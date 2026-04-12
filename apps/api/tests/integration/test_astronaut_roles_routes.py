@@ -5,7 +5,6 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from src.core.deps import get_current_astronaut, require_admin
-from src.core.security import create_access_token
 from src.main import app
 
 
@@ -141,6 +140,26 @@ async def test_patch_roles_target_not_found(client: AsyncClient) -> None:
     )
 
     assert response.status_code == 404
+
+
+async def test_patch_roles_invalid_role_rejected(client: AsyncClient) -> None:
+    """Rôle inconnu dans la liste → 422 (validation Pydantic)."""
+    from src.api.v1.astronauts import _astronaut_repo, _grade_repo
+
+    admin = make_astronaut(1, "admin@eleven-labs.com", ["astronaut", "admin"])
+    mock_repo = MagicMock()
+    mock_grade_repo = MagicMock()
+
+    override_admin(admin)
+    app.dependency_overrides[_astronaut_repo] = lambda: mock_repo
+    app.dependency_overrides[_grade_repo] = lambda: mock_grade_repo
+
+    response = await client.patch(
+        "/api/v1/astronauts/2/roles",
+        json={"roles": ["superuser"]},
+    )
+
+    assert response.status_code == 422
 
 
 async def test_patch_roles_non_admin_forbidden(client: AsyncClient) -> None:

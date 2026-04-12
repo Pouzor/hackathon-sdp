@@ -81,6 +81,7 @@ async def update_astronaut_roles(
     if target is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Astronaute introuvable")
 
+    old_roles = list(target.roles)
     new_roles = list(set(body.roles))
     updated = await astronaut_repo.update_roles(target, new_roles)
 
@@ -88,7 +89,7 @@ async def update_astronaut_roles(
         "roles_updated admin=%s target=%s old_roles=%s new_roles=%s",
         current_admin.email,
         updated.email,
-        target.roles,
+        old_roles,
         new_roles,
     )
 
