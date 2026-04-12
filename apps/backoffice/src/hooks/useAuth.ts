@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 export const AUTH_TOKEN_KEY = "auth_token";
 
@@ -42,7 +42,7 @@ function isTokenValid(payload: JwtPayload): boolean {
 }
 
 export function useAuth(): UseAuthReturn {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  const [token, setToken] = useState(() => localStorage.getItem(AUTH_TOKEN_KEY));
 
   const user = useMemo((): AuthUser | null => {
     if (!token) return null;
@@ -58,6 +58,7 @@ export function useAuth(): UseAuthReturn {
 
   const logout = useCallback(() => {
     localStorage.removeItem(AUTH_TOKEN_KEY);
+    setToken(null);
     window.location.href = "/login";
   }, []);
 

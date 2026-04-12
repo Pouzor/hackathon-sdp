@@ -1,7 +1,9 @@
 from typing import Union
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from fastapi.responses import RedirectResponse
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
@@ -16,13 +18,17 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 _ALLOWED_ORIGINS = {"frontend", "backoffice"}
 
+limiter = Limiter(key_func=get_remote_address)
+
 
 def _get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
     return AuthService(AstronautRepository(db))
 
 
 @router.get("/google")
+@limiter.limit("20/minute")
 async def google_login(
+    request: Request,
     origin: str = Query(default="frontend", description="'frontend' ou 'backoffice'"),
     service: AuthService = Depends(_get_auth_service),
 ) -> RedirectResponse:
@@ -35,7 +41,9 @@ async def google_login(
 
 
 @router.get("/google/callback", response_model=None)
+@limiter.limit("20/minute")
 async def google_callback(
+    request: Request,
     code: str = Query(..., description="Code OAuth retourné par Google"),
     state: str = Query(..., description="State CSRF signé (HMAC)"),
     accept: str = Header(default="text/html"),

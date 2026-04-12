@@ -1,6 +1,7 @@
 // Auth token stocké en localStorage — trade-off accepté (CLAUDE.md §5, httpOnly cookie = future work)
+import { AUTH_TOKEN_KEY } from "@/hooks/useAuth";
+
 const BASE_URL = import.meta.env.VITE_API_URL as string | undefined ?? "http://localhost:8000/api/v1";
-const AUTH_TOKEN_KEY = "auth_token";
 
 function authHeaders(): Record<string, string> {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
@@ -12,6 +13,11 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     headers: { "Content-Type": "application/json", ...authHeaders(), ...options?.headers },
     ...options,
   });
+  if (res.status === 401 || res.status === 403) {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    window.location.href = "/login";
+    throw new Error("Session expirée — redirection vers /login");
+  }
   if (!res.ok) {
     const detail = await res.json().catch(() => ({ detail: res.statusText }));
     throw new Error((detail as { detail?: string }).detail ?? res.statusText);
