@@ -9,7 +9,7 @@ from src.models.astronaut import Astronaut
 from src.models.grade import Grade
 from src.repositories.astronaut import AstronautRepository
 from src.repositories.grade import GradeRepository
-from src.schemas.astronaut import AstronautOut, AstronautRoleUpdate, AstronautSelfUpdate
+from src.schemas.astronaut import ADMIN_ONLY_FIELDS, AstronautOut, AstronautPatch, AstronautRoleUpdate
 
 logger = logging.getLogger(__name__)
 
@@ -63,13 +63,14 @@ async def get_astronaut(
 @router.patch("/{astronaut_id}", response_model=AstronautOut)
 async def update_astronaut_profile(
     astronaut_id: int,
-    body: AstronautSelfUpdate,
+    body: AstronautPatch,
     current: CurrentAstronaut,
     astronaut_repo: AstronautRepository = Depends(_astronaut_repo),
     grade_repo: GradeRepository = Depends(_grade_repo),
 ) -> AstronautOut:
     """Met à jour le profil d'un astronaute.
-    L'astronaute ne peut modifier que son propre profil ; un admin peut modifier n'importe quel profil.
+    L'astronaute ne peut modifier que son propre profil (photo_url, hobbies, client).
+    Un admin peut en plus modifier : planet_id, hire_date, first_name, last_name.
     """
     is_admin = "admin" in current.roles
     if current.id != astronaut_id and not is_admin:
@@ -82,11 +83,13 @@ async def update_astronaut_profile(
     if target is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Astronaute introuvable")
 
-    # Seuls les champs explicitement fournis dans la requête sont mis à jour
-    fields = body.model_dump(exclude_unset=True)
-    updated = await astronaut_repo.update_profile(target, fields)
+    all_fields = body.model_dump(exclude_unset=True)
+    # Filtre les champs admin-only si le requérant n'est pas admin
+    if not is_admin:
+        all_fields = {k: v for k, v in all_fields.items() if k not in ADMIN_ONLY_FIELDS}
 
-    logger.info("profile_updated by=%s target_id=%s fields=%s", current.email, astronaut_id, list(fields.keys()))
+    updated = await astronaut_repo.update_profile(target, all_fields)
+    logger.info("profile_updated by=%s target_id=%s fields=%s", current.email, astronaut_id, list(all_fields.keys()))
 
     grades = await grade_repo.get_all()
     return _enrich(updated, _resolve_grade(updated.total_points, grades))

@@ -15,7 +15,7 @@ export function LoginPage() {
   }, [isAuthenticated, navigate]);
 
   function handleGoogleLogin() {
-    window.location.href = `${API_URL}/api/v1/auth/google`;
+    window.location.href = `${API_URL}/auth/google`;
   }
 
   return (

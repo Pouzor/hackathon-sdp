@@ -28,11 +28,12 @@ class Settings(BaseSettings):
     # Domaine autorisé
     allowed_domain: str = "eleven-labs.com"
 
-    # CORS
+    # CORS — frontend (5173) + backoffice (5174)
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:5174"]
 
     # Frontend URL (pour les redirections post-login)
     frontend_url: str = "http://localhost:5173"
+    backoffice_url: str = "http://localhost:5174"
 
 
 settings = Settings()

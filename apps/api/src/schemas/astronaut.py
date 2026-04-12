@@ -43,6 +43,36 @@ class AstronautSelfUpdate(BaseModel):
         return v
 
 
+SELF_EDITABLE_FIELDS = {"photo_url", "hobbies", "client"}
+ADMIN_ONLY_FIELDS = {"planet_id", "hire_date", "first_name", "last_name"}
+
+
+class AstronautPatch(BaseModel):
+    """Body unifié pour PATCH /astronauts/{id}.
+    Champs self-edit : photo_url, hobbies, client.
+    Champs admin uniquement : planet_id, hire_date, first_name, last_name.
+    """
+
+    photo_url: str | None = Field(default=None, max_length=500)
+    hobbies: str | None = Field(default=None, max_length=1000)
+    client: str | None = Field(default=None, max_length=255)
+    planet_id: int | None = Field(default=None)
+    hire_date: date | None = Field(default=None)
+    first_name: str | None = Field(default=None, max_length=255)
+    last_name: str | None = Field(default=None, max_length=255)
+
+    model_config = {"extra": "ignore"}
+
+    @field_validator("photo_url")
+    @classmethod
+    def validate_photo_url(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        if not (v.startswith("http://") or v.startswith("https://")):
+            raise ValueError("photo_url doit être une URL HTTP/HTTPS valide")
+        return v
+
+
 ALLOWED_ROLES = {"astronaut", "admin"}
 
 

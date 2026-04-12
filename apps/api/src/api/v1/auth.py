@@ -21,10 +21,13 @@ def _get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
 
 @router.get("/google")
 async def google_login(
+    origin: str = Query(default="frontend", description="'frontend' ou 'backoffice'"),
     service: AuthService = Depends(_get_auth_service),
 ) -> RedirectResponse:
-    """Redirige vers la page de connexion Google OAuth."""
-    state = secrets.token_urlsafe(32)
+    """Redirige vers la page de connexion Google OAuth.
+    Le paramètre `origin` est encodé dans le state pour rediriger vers le bon app après login.
+    """
+    state = f"{secrets.token_urlsafe(32)}:{origin}"
     url = service.build_google_auth_url(state=state)
     return RedirectResponse(url=url)
 
@@ -32,7 +35,7 @@ async def google_login(
 @router.get("/google/callback", response_model=None)
 async def google_callback(
     code: str = Query(..., description="Code OAuth retourné par Google"),
-    state: str = Query(..., description="State anti-CSRF"),
+    state: str = Query(..., description="State anti-CSRF avec origin encodé"),
     accept: str = Header(default="text/html"),
     service: AuthService = Depends(_get_auth_service),
 ) -> Union[RedirectResponse, TokenResponse]:
@@ -41,7 +44,7 @@ async def google_callback(
     - Échange le code contre les infos utilisateur
     - Vérifie le domaine @eleven-labs.com
     - Crée l'astronaute si première connexion
-    - Redirige vers le frontend avec le JWT (ou retourne JSON si Accept: application/json)
+    - Redirige vers le frontend ou backoffice avec le JWT selon l'origin
     """
     user_info = await service.exchange_code_for_user_info(code)
     service.verify_allowed_domain(user_info)
@@ -51,8 +54,10 @@ async def google_callback(
     if "application/json" in accept:
         return TokenResponse(access_token=token)
 
-    frontend_callback = f"{settings.frontend_url}/auth/callback?token={token}"
-    return RedirectResponse(url=frontend_callback, status_code=307)
+    # Décode l'origin depuis le state (format: "{random}:{origin}")
+    origin = state.split(":")[-1] if ":" in state else "frontend"
+    base_url = settings.backoffice_url if origin == "backoffice" else settings.frontend_url
+    return RedirectResponse(url=f"{base_url}/auth/callback?token={token}", status_code=307)
 
 
 @router.get("/me", response_model=AstronautMe)
