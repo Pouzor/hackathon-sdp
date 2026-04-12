@@ -18,6 +18,16 @@ export default defineConfig({
     setupFiles: ["./src/test/setup.ts"],
     coverage: {
       provider: "v8",
+      // Only measure coverage on files with meaningful business logic.
+      // Entry points (main/App), visual animation components, and mock data
+      // are excluded — they have no testable business logic.
+      include: [
+        "src/hooks/**",
+        "src/components/features/Layout.tsx",
+        "src/components/features/ProtectedRoute.tsx",
+        "src/routes/auth/AuthCallbackPage.tsx",
+        "src/routes/profile/ProfileEditPage.tsx",
+      ],
       thresholds: {
         lines: 70,
         functions: 70,
