@@ -7,42 +7,24 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAstronaut, useUpdateProfile } from "@/api/astronauts";
 
 const schema = z.object({
-  photo_url: z.string().url("URL invalide").max(500).or(z.literal("")).nullable(),
+  photo_url: z
+    .string()
+    .max(500)
+    .refine((v) => v === "" || /^https?:\/\/.+/.test(v), { message: "URL invalide" })
+    .nullable(),
   hobbies: z.string().max(1000).nullable(),
   client: z.string().max(255).nullable(),
 });
 
 type FormValues = z.infer<typeof schema>;
 
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid rgba(255,255,255,0.12)",
-  borderRadius: 8,
-  color: "white",
-  fontSize: 14,
-  padding: "10px 14px",
-  outline: "none",
-  boxSizing: "border-box",
-};
-
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  color: "rgba(255,255,255,0.5)",
-  fontSize: 12,
-  fontWeight: 600,
-  textTransform: "uppercase",
-  letterSpacing: "0.06em",
-  marginBottom: 6,
-};
-
 export function ProfileEditPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const astronautId = user?.astronaut_id ?? 0;
+  const astronautId = user?.astronaut_id;
 
-  const { data: astronaut, isLoading } = useAstronaut(astronautId);
-  const updateProfile = useUpdateProfile(astronautId);
+  const { data: astronaut, isLoading } = useAstronaut(astronautId ?? 0);
+  const updateProfile = useUpdateProfile(astronautId ?? 0);
 
   const {
     register,
@@ -54,7 +36,6 @@ export function ProfileEditPage() {
     defaultValues: { photo_url: "", hobbies: "", client: "" },
   });
 
-  // Pre-fill form when data is loaded
   useEffect(() => {
     if (astronaut) {
       reset({
@@ -71,117 +52,97 @@ export function ProfileEditPage() {
       hobbies: values.hobbies || null,
       client: values.client || null,
     });
-    void navigate(`/astronauts/${astronautId}`);
+    void navigate(`/astronauts/${astronautId ?? ""}`);
   }
+
+  if (!astronautId) return null;
 
   if (isLoading) {
     return (
-      <div style={{
-        width: "100vw", height: "100vh", background: "#040812",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        color: "rgba(255,255,255,0.3)", fontSize: 14,
-      }}>
+      <div className="flex h-screen w-screen items-center justify-center bg-[#040812] text-sm text-white/30">
         Chargement…
       </div>
     );
   }
 
   return (
-    <div style={{
-      minHeight: "100vh", background: "#040812", color: "white",
-      display: "flex", flexDirection: "column", alignItems: "center",
-      padding: "60px 20px",
-    }}>
-      <div style={{ width: "100%", maxWidth: 480 }}>
+    <div className="flex min-h-screen w-screen flex-col items-center bg-[#040812] px-5 py-16 text-white">
+      <div className="w-full max-w-[480px]">
         <button
           onClick={() => navigate(-1)}
-          style={{
-            background: "none", border: "none", color: "rgba(255,255,255,0.4)",
-            fontSize: 13, cursor: "pointer", padding: 0, marginBottom: 24,
-          }}
+          className="mb-6 bg-transparent p-0 text-sm text-white/40 hover:text-white/70"
         >
           ← Retour
         </button>
 
-        <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 32, margin: "0 0 32px" }}>
-          Modifier mon profil
-        </h1>
+        <h1 className="mb-8 text-2xl font-bold">Modifier mon profil</h1>
 
         {updateProfile.isError && (
-          <div style={{
-            background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)",
-            borderRadius: 8, padding: "12px 16px", marginBottom: 20,
-            color: "#f87171", fontSize: 13,
-          }}>
+          <div className="mb-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             {updateProfile.error instanceof Error
               ? updateProfile.error.message
               : "Une erreur est survenue"}
           </div>
         )}
 
-        <form onSubmit={(e) => { void handleSubmit(onSubmit)(e); }} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <form onSubmit={(e) => { void handleSubmit(onSubmit)(e); }} className="flex flex-col gap-5">
           <div>
-            <label style={labelStyle}>Photo (URL)</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/50">
+              Photo (URL)
+            </label>
             <input
               {...register("photo_url")}
               type="url"
               placeholder="https://…"
-              style={inputStyle}
+              className="w-full rounded-lg border border-white/12 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/20"
             />
             {errors.photo_url && (
-              <p style={{ color: "#f87171", fontSize: 12, marginTop: 4 }}>{errors.photo_url.message}</p>
+              <p className="mt-1 text-xs text-red-400">{errors.photo_url.message}</p>
             )}
           </div>
 
           <div>
-            <label style={labelStyle}>Hobbies</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/50">
+              Hobbies
+            </label>
             <textarea
               {...register("hobbies")}
               rows={3}
               placeholder="Tes centres d'intérêt…"
-              style={{ ...inputStyle, resize: "vertical" }}
+              className="w-full resize-y rounded-lg border border-white/12 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/20"
             />
             {errors.hobbies && (
-              <p style={{ color: "#f87171", fontSize: 12, marginTop: 4 }}>{errors.hobbies.message}</p>
+              <p className="mt-1 text-xs text-red-400">{errors.hobbies.message}</p>
             )}
           </div>
 
           <div>
-            <label style={labelStyle}>Client actuel</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/50">
+              Client actuel
+            </label>
             <input
               {...register("client")}
               type="text"
               placeholder="Nom du client"
-              style={inputStyle}
+              className="w-full rounded-lg border border-white/12 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/20"
             />
             {errors.client && (
-              <p style={{ color: "#f87171", fontSize: 12, marginTop: 4 }}>{errors.client.message}</p>
+              <p className="mt-1 text-xs text-red-400">{errors.client.message}</p>
             )}
           </div>
 
-          <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 8 }}>
+          <div className="mt-2 flex justify-end gap-3">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: 8, color: "rgba(255,255,255,0.6)",
-                fontSize: 14, padding: "10px 20px", cursor: "pointer",
-              }}
+              className="rounded-lg border border-white/12 bg-white/6 px-5 py-2.5 text-sm text-white/60 hover:text-white"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={!isDirty || isSubmitting || updateProfile.isPending}
-              style={{
-                background: isDirty ? "#3b82f6" : "rgba(59,130,246,0.3)",
-                border: "none", borderRadius: 8, color: "white",
-                fontSize: 14, fontWeight: 600, padding: "10px 24px",
-                cursor: isDirty ? "pointer" : "not-allowed",
-                opacity: isSubmitting || updateProfile.isPending ? 0.7 : 1,
-              }}
+              className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting || updateProfile.isPending ? "Enregistrement…" : "Enregistrer"}
             </button>

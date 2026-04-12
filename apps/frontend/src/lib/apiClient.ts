@@ -1,8 +1,12 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 if (!BASE_URL) throw new Error("VITE_API_URL is not defined — copy .env.example to .env");
 
+// Auth token stored in localStorage per CLAUDE.md §5 (httpOnly cookie migration is future work).
+// Centralised here so every fetch goes through one place; no token is ever logged or serialised.
+const AUTH_TOKEN_KEY = "auth_token";
+
 function authHeaders(): Record<string, string> {
-  const token = localStorage.getItem("auth_token");
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
