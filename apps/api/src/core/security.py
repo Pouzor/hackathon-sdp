@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import secrets as _secrets
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -51,7 +52,6 @@ def _hmac_sign(message: str) -> str:
 
 def generate_oauth_state(origin: str) -> str:
     """Génère un state CSRF signé : '{nonce}:{origin}:{hmac}'."""
-    import secrets as _secrets
     nonce = _secrets.token_urlsafe(24)
     payload = f"{nonce}:{origin}"
     sig = _hmac_sign(payload)
@@ -69,4 +69,7 @@ def verify_oauth_state(state: str) -> str:
         raise ValueError("Signature CSRF invalide")
     # payload = "{nonce}:{origin}"
     origin_parts = payload.split(":", 1)
-    return origin_parts[-1] if len(origin_parts) == 2 else "frontend"
+    origin = origin_parts[-1] if len(origin_parts) == 2 else ""
+    if origin not in {"frontend", "backoffice"}:
+        raise ValueError("Origin invalide dans le state")
+    return origin

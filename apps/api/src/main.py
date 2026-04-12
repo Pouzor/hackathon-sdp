@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
 
 from src.core.config import settings
 from src.core.errors import internal_error_handler, not_found_handler
+from src.core.rate_limit import limiter
 from src.api.v1.activities import router as activities_router
 from src.api.v1.astronauts import router as astronauts_router
 from src.api.v1.auth import router as auth_router
@@ -16,14 +16,12 @@ from src.api.v1.point_attributions import router as point_attributions_router
 from src.api.v1.seasons import router as seasons_router
 from src.api.v1.version import router as version_router
 
-limiter = Limiter(key_func=get_remote_address)
-
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
-    docs_url="/docs",
-    redoc_url="/redoc",
-    openapi_url="/openapi.json",
+    docs_url="/docs" if settings.debug else None,
+    redoc_url="/redoc" if settings.debug else None,
+    openapi_url="/openapi.json" if settings.debug else None,
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]

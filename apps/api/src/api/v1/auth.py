@@ -2,12 +2,11 @@ from typing import Union
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from fastapi.responses import RedirectResponse
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
 from src.core.deps import CurrentAstronaut
+from src.core.rate_limit import limiter
 from src.core.security import generate_oauth_state, verify_oauth_state
 from src.db.session import get_db
 from src.repositories.astronaut import AstronautRepository
@@ -17,8 +16,6 @@ from src.services.auth import AuthService
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 _ALLOWED_ORIGINS = {"frontend", "backoffice"}
-
-limiter = Limiter(key_func=get_remote_address)
 
 
 def _get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
