@@ -2,16 +2,18 @@
 
 ⚠️ **Prérequis avant de démarrer :** Demander les assets graphiques (blasons, couleurs, logo, mantras, maquettes).
 
-## F-501 — Page trombinoscope
+## F-501 — Page trombinoscope ✅ DONE
 
 **Route:** `/astronauts`
 
+**Implémentation :** `apps/frontend/src/routes/astronauts/AstronautsPage.tsx`
+
 **Acceptance Criteria:**
-- [ ] Grille des astronautes (photo, prénom, nom, planète)
-- [ ] Recherche par nom (debounced)
-- [ ] Filtre par planète (dropdown)
-- [ ] Pagination (20 par page) ou scroll infini
-- [ ] État vide si aucun résultat
+- [x] Grille des astronautes (photo/initiales, prénom, nom, planète)
+- [x] Recherche par nom (debounced)
+- [x] Filtre par planète (dropdown)
+- [x] État vide si aucun résultat
+- [ ] Pagination — scroll infini non implémenté (acceptable MVP)
 
 **Test Cases:**
 | Cas | Attendu |
@@ -23,17 +25,19 @@
 
 ---
 
-## F-502 — Page profil astronaute (consultation)
+## F-502 — Page profil astronaute (consultation) ✅ DONE
 
 **Route:** `/astronauts/:id`
 
+**Implémentation :** `apps/frontend/src/routes/astronauts/AstronautProfilePage.tsx`
+
 **Acceptance Criteria:**
-- [ ] Infos : photo, prénom/nom, email, planète, hire_date
-- [ ] Total points + grade courant avec icône
-- [ ] Historique des contributions (paginé, 10 par page)
-- [ ] Section trophées (F-403)
-- [ ] Lien vers la page de sa planète
-- [ ] Profil inexistant → 404
+- [x] Infos : photo/initiales, prénom/nom, email, planète, hire_date
+- [x] Total points + grade courant
+- [x] Historique des contributions (React Query)
+- [x] Profil inexistant → page 404 dédiée
+- [ ] Section trophées (dépend de F-403)
+- [ ] Pagination contributions (à implémenter)
 
 **Test Cases:**
 | Cas | Attendu |
@@ -44,15 +48,22 @@
 
 ---
 
-## F-503 — Édition de son propre profil
+## F-503 — Édition de son propre profil ✅ DONE
 
 **Route:** `/profile/edit`
 
+**Implémentation :**
+- `apps/frontend/src/routes/profile/ProfileEditPage.tsx`
+- `apps/frontend/src/api/astronauts.ts` — `useUpdateProfile()`
+- PR #8 mergée le 2026-04-12
+
 **Acceptance Criteria:**
-- [ ] Formulaire avec `photo_url`, `hobbies`, `client` uniquement
-- [ ] Champs `email`, `planet_id`, `total_points` absents du formulaire
-- [ ] Validation Zod
-- [ ] Feedback succès/erreur
+- [x] Formulaire avec `photo_url`, `hobbies`, `client` uniquement
+- [x] Champs `email`, `planet_id`, `total_points` absents du formulaire
+- [x] Validation Zod
+- [x] Feedback erreur (message d'erreur API affiché)
+- [x] Redirect vers profil après succès
+- [x] Route protégée (nécessite auth)
 
 **Test Cases:**
 | Cas | Attendu |

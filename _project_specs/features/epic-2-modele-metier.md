@@ -19,14 +19,21 @@
 
 ---
 
-## F-202 — Modèle Astronaut 🔶 (partiel)
+## F-202 — Modèle Astronaut 🔶 (partiel) — self-edit ✅ DONE
+
+**Implémentation :**
+- `apps/api/src/api/v1/astronauts.py` — `PATCH /api/v1/astronauts/{id}` (self-edit + admin)
+- `apps/api/src/schemas/astronaut.py` — `AstronautSelfUpdate` (photo_url, hobbies, client)
+- `apps/api/src/repositories/astronaut.py` — `update_profile()`
+- PR #7 mergée le 2026-04-12
 
 **Acceptance Criteria:**
 - [x] Modèle SQLAlchemy + migration (champs complets)
-- [ ] CRUD admin + édition profil par le propriétaire — _routes non encore créées_
-- [x] Champs : `first_name`, `last_name`, `email`, `photo_url`, `hobbies`, `client`, `planet_id`, `hire_date`, `total_points`
-- [ ] Un astronaute peut modifier : `photo_url`, `hobbies`, `client` uniquement
-- [ ] Admin peut tout modifier sauf `total_points` (calculé)
+- [x] Un astronaute peut modifier : `photo_url`, `hobbies`, `client` uniquement
+- [x] Admin peut modifier le profil de n'importe quel astronaute (mêmes champs)
+- [x] Astronaute modifiant le profil d'un autre → 403
+- [x] `total_points` ignoré (non exposé dans le schéma)
+- [ ] Admin CRUD complet (first_name, last_name, planet_id, hire_date) — _à implémenter_
 
 **Test Cases:**
 | Cas | Attendu |

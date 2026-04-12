@@ -22,10 +22,25 @@ class AstronautOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class AstronautUpdate(BaseModel):
-    photo_url: str | None = Field(None, max_length=500)
-    hobbies: str | None = Field(None, max_length=1000)
-    client: str | None = Field(None, max_length=255)
+class AstronautSelfUpdate(BaseModel):
+    """Champs modifiables par l'astronaute lui-même (ou un admin).
+    Tous les champs sont optionnels : seuls les champs fournis sont mis à jour.
+    """
+
+    photo_url: str | None = Field(default=None, max_length=500)
+    hobbies: str | None = Field(default=None, max_length=1000)
+    client: str | None = Field(default=None, max_length=255)
+
+    model_config = {"extra": "ignore"}
+
+    @field_validator("photo_url")
+    @classmethod
+    def validate_photo_url(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        if not (v.startswith("http://") or v.startswith("https://")):
+            raise ValueError("photo_url doit être une URL HTTP/HTTPS valide")
+        return v
 
 
 ALLOWED_ROLES = {"astronaut", "admin"}
