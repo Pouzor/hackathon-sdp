@@ -142,7 +142,9 @@ class PointAttributionService:
         astronaut_id: int | None = None,
     ) -> list[PointAttribution]:
         """Retourne les attributions avec activity_name et noms d'astronaute enrichis."""
-        from src.schemas.point_attribution import PointAttributionOut  # local import to avoid circular
+        from src.schemas.point_attribution import (
+            PointAttributionOut,  # local import to avoid circular
+        )
 
         active = await self._season_repo.get_active()
         season_id = active.id if active else None

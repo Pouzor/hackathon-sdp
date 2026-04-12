@@ -11,16 +11,11 @@ export interface AstronautMe {
   total_points: number;
 }
 
-function getAuthHeaders(): HeadersInit {
-  const token = localStorage.getItem("auth_token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 export async function getMe(): Promise<AstronautMe> {
   const token = localStorage.getItem("auth_token");
   if (!token) throw new Error("Non authentifié");
   const BASE_URL = import.meta.env.VITE_API_URL as string;
-  const res = await fetch(`${BASE_URL}/api/v1/auth/me`, {
+  const res = await fetch(`${BASE_URL}/auth/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error("Erreur authentification");

@@ -90,6 +90,7 @@ async def test_create_grade_requires_admin(client: AsyncClient) -> None:
 
 async def test_create_grade_as_admin(client: AsyncClient) -> None:
     from unittest.mock import patch
+
     from src.core.deps import get_current_astronaut
     from src.models.astronaut import Astronaut
     from src.repositories.grade import GradeRepository
@@ -117,8 +118,8 @@ async def test_create_grade_as_admin(client: AsyncClient) -> None:
 
 
 async def test_update_grade_not_found(client: AsyncClient) -> None:
-    from src.db.session import get_db
     from src.core.deps import get_current_astronaut
+    from src.db.session import get_db
     from src.models.astronaut import Astronaut
 
     mock_db = mock_db_with_grade(None)
@@ -141,8 +142,8 @@ async def test_update_grade_not_found(client: AsyncClient) -> None:
 
 
 async def test_delete_grade_not_found(client: AsyncClient) -> None:
-    from src.db.session import get_db
     from src.core.deps import get_current_astronaut
+    from src.db.session import get_db
     from src.models.astronaut import Astronaut
 
     mock_db = mock_db_with_grade(None)

@@ -25,7 +25,7 @@ type Tab = "membres" | "contributions" | "trophees";
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function MemberRow({ member, rank, color }: { member: Astronaut; rank: number; color: string }) {
-  const initials = `${member.first_name[0]}${member.last_name[0]}`;
+  const initials = `${member.first_name.charAt(0)}${member.last_name.charAt(0)}`;
   return (
     <div style={{
       display: "flex", alignItems: "center", gap: 12,
@@ -305,7 +305,7 @@ export function PlanetDetail({
           {TABS.map((t) => (
             <button
               key={t.key}
-              onClick={() => setTab(t.key)}
+              onClick={() => { setTab(t.key); }}
               style={{
                 background: "none", border: "none", cursor: "pointer",
                 padding: "14px 20px",

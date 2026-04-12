@@ -57,7 +57,7 @@ function ProfileNotFound() {
       <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>Astronaute introuvable</h2>
       <p style={{ color: "rgba(255,255,255,0.4)", margin: 0 }}>Cet astronaute n'existe pas ou a quitté la galaxie.</p>
       <button
-        onClick={() => navigate("/astronauts")}
+        onClick={() => { navigate("/astronauts"); }}
         style={{
           marginTop: 8, background: "rgba(255,255,255,0.08)",
           border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8,
@@ -98,7 +98,7 @@ export function AstronautProfilePage() {
   const planet = planets.find((p) => p.apiId === astronaut.planet_id) ?? null;
   const color = planet?.color ?? "#b8c8e8";
   const blason = planet ? (BLASONS[planet.id] ?? genericPng) : genericPng;
-  const initials = `${astronaut.first_name[0]}${astronaut.last_name[0]}`;
+  const initials = `${astronaut.first_name.charAt(0)}${astronaut.last_name.charAt(0)}`;
   const years = astronaut.hire_date ? yearsAt(astronaut.hire_date) : 0;
 
   const TABS: { key: Tab; label: string; count: number }[] = [
@@ -137,7 +137,7 @@ export function AstronautProfilePage() {
         display: "flex", alignItems: "center", gap: 16,
       }}>
         <button
-          onClick={() => navigate("/astronauts")}
+          onClick={() => { navigate("/astronauts"); }}
           style={{
             background: "none", border: "none", cursor: "pointer",
             color: "rgba(255,255,255,0.45)", fontSize: 12,
@@ -251,7 +251,7 @@ export function AstronautProfilePage() {
           {TABS.map((t) => (
             <button
               key={t.key}
-              onClick={() => setTab(t.key)}
+              onClick={() => { setTab(t.key); }}
               style={{
                 background: "none", border: "none", cursor: "pointer",
                 padding: "12px 20px",

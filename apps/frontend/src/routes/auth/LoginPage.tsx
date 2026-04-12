@@ -10,7 +10,7 @@ export function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      void navigate("/", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 

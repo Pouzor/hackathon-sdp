@@ -39,3 +39,4 @@ htmlcov/
 
 # Docker
 *.log
+apps/frontend/coverage/

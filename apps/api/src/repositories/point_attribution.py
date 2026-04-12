@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -82,7 +82,7 @@ class PointAttributionRepository:
         attribution.is_deleted = True
         attribution.deleted_by = deleted_by
         attribution.deletion_reason = reason
-        attribution.deleted_at = datetime.now(timezone.utc)
+        attribution.deleted_at = datetime.now(UTC)
         await self._db.commit()
         await self._db.refresh(attribution)
         return attribution

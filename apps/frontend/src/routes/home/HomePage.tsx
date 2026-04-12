@@ -34,8 +34,8 @@ function NavLink({ children, to }: { children: React.ReactNode; to?: string }) {
         color: hovered ? "white" : "rgba(255,255,255,0.75)",
         background: hovered ? "rgba(255,255,255,0.07)" : "transparent",
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => { setHovered(true); }}
+      onMouseLeave={() => { setHovered(false); }}
     >
       {children}
     </a>
@@ -405,7 +405,7 @@ export function HomePage() {
       {selectedPlanet && (
         <PlanetDetail
           planet={selectedPlanet}
-          onClose={() => setSelectedPlanet(null)}
+          onClose={() => { setSelectedPlanet(null); }}
           visible={planetSelected}
         />
       )}

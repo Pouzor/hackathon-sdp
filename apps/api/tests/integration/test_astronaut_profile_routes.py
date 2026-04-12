@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from src.core.deps import get_current_astronaut, require_admin
+from src.core.deps import get_current_astronaut
 from src.main import app
 
 
@@ -15,9 +15,9 @@ def make_astronaut(id: int, email: str, roles: list[str], **kwargs: object) -> M
     a.roles = roles
     a.first_name = kwargs.get("first_name", "Jean")
     a.last_name = kwargs.get("last_name", "Dupont")
-    a.photo_url = kwargs.get("photo_url", None)
-    a.hobbies = kwargs.get("hobbies", None)
-    a.client = kwargs.get("client", None)
+    a.photo_url = kwargs.get("photo_url")
+    a.hobbies = kwargs.get("hobbies")
+    a.client = kwargs.get("client")
     a.hire_date = None
     a.planet_id = None
     a.total_points = 100

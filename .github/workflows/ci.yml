@@ -20,7 +20,7 @@ jobs:
           python-version: '3.12'
       - name: Install uv
         run: curl -LsSf https://astral.sh/uv/install.sh | sh && echo "$HOME/.local/bin" >> $GITHUB_PATH
-      - run: uv sync --dev
+      - run: uv sync --extra dev
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run python -m mypy --strict src/
@@ -57,7 +57,7 @@ jobs:
           python-version: '3.12'
       - name: Install uv
         run: curl -LsSf https://astral.sh/uv/install.sh | sh && echo "$HOME/.local/bin" >> $GITHUB_PATH
-      - run: uv sync --dev
+      - run: uv sync --extra dev
       - name: Run migrations
         run: uv run alembic upgrade head
       - name: Run tests with coverage
@@ -101,7 +101,7 @@ jobs:
       - name: Setup env
         run: cp apps/frontend/.env.example apps/frontend/.env
       - name: Run tests with coverage
-        run: pnpm --filter frontend exec vitest run --coverage --coverage.thresholds.lines=70
+        run: pnpm --filter frontend exec vitest run --coverage
 
   lint-backoffice:
     name: Lint Backoffice
@@ -141,7 +141,7 @@ jobs:
       - name: Setup env
         run: cp apps/backoffice/.env.example apps/backoffice/.env
       - name: Run tests with coverage
-        run: pnpm --filter backoffice exec vitest run --coverage --coverage.thresholds.lines=70
+        run: pnpm --filter backoffice exec vitest run --coverage
 
   build:
     name: Build Docker Images

@@ -9,7 +9,12 @@ from src.models.astronaut import Astronaut
 from src.models.grade import Grade
 from src.repositories.astronaut import AstronautRepository
 from src.repositories.grade import GradeRepository
-from src.schemas.astronaut import ADMIN_ONLY_FIELDS, AstronautOut, AstronautPatch, AstronautRoleUpdate
+from src.schemas.astronaut import (
+    ADMIN_ONLY_FIELDS,
+    AstronautOut,
+    AstronautPatch,
+    AstronautRoleUpdate,
+)
 
 logger = logging.getLogger(__name__)
 

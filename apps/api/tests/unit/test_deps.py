@@ -3,7 +3,6 @@ from unittest.mock import MagicMock
 
 import pytest
 from fastapi import HTTPException
-from jose import JWTError
 
 from src.core.deps import get_current_token
 from src.core.security import create_access_token

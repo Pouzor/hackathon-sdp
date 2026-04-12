@@ -8,7 +8,7 @@ Usage :
 
 import asyncio
 import sys
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -157,7 +157,7 @@ SEASON_SCORES: dict[str, int] = {
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 
 def now_utc() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 async def reset_db(session: AsyncSession) -> None:
@@ -284,6 +284,7 @@ async def seed(session: AsyncSession) -> None:
 
     # Update total_points on astronauts
     from sqlalchemy import update
+
     from src.models.astronaut import Astronaut as AstronautModel
     for astro_id, total in points_per_astro.items():
         await session.execute(

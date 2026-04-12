@@ -52,7 +52,7 @@ export function ProfileEditPage() {
       hobbies: values.hobbies || null,
       client: values.client || null,
     });
-    void navigate(`/astronauts/${astronautId ?? ""}`);
+    navigate(`/astronauts/${astronautId ?? ""}`);
   }
 
   if (!astronautId) return null;
@@ -69,7 +69,7 @@ export function ProfileEditPage() {
     <div className="flex min-h-screen w-screen flex-col items-center bg-[#040812] px-5 py-16 text-white">
       <div className="w-full max-w-[480px]">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => { navigate(-1); }}
           className="mb-6 bg-transparent p-0 text-sm text-white/40 hover:text-white/70"
         >
           ← Retour
@@ -134,7 +134,7 @@ export function ProfileEditPage() {
           <div className="mt-2 flex justify-end gap-3">
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => { navigate(-1); }}
               className="rounded-lg border border-white/12 bg-white/6 px-5 py-2.5 text-sm text-white/60 hover:text-white"
             >
               Annuler

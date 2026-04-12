@@ -38,13 +38,13 @@ function AstronautCard({ astronaut, planets }: { astronaut: Astronaut; planets: 
   const planet = findPlanetByApiId(planets, astronaut.planet_id);
   const color = planet?.color ?? "#b8c8e8";
   const blason = planet ? (BLASONS[planet.id] ?? genericPng) : genericPng;
-  const initials = `${astronaut.first_name[0]}${astronaut.last_name[0]}`;
+  const initials = `${astronaut.first_name.charAt(0)}${astronaut.last_name.charAt(0)}`;
 
   return (
     <div
-      onClick={() => navigate(`/astronauts/${astronaut.id}`)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onClick={() => { navigate(`/astronauts/${astronaut.id}`); }}
+      onMouseEnter={() => { setHovered(true); }}
+      onMouseLeave={() => { setHovered(false); }}
       style={{
         position: "relative",
         overflow: "hidden",
@@ -155,7 +155,7 @@ export function AstronautsPage() {
         display: "flex", alignItems: "center", gap: 20,
       }}>
         <button
-          onClick={() => navigate("/")}
+          onClick={() => { navigate("/"); }}
           style={{
             background: "none", border: "none", cursor: "pointer",
             color: "rgba(255,255,255,0.45)", fontSize: 12,
@@ -198,7 +198,7 @@ export function AstronautsPage() {
             type="text"
             placeholder="Rechercher un astronaute…"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); }}
             style={{
               background: "rgba(255,255,255,0.06)",
               border: "1px solid rgba(255,255,255,0.1)",
@@ -219,7 +219,7 @@ export function AstronautsPage() {
             return (
               <button
                 key={f.id}
-                onClick={() => setPlanetSlugFilter(f.id)}
+                onClick={() => { setPlanetSlugFilter(f.id); }}
                 style={{
                   background: active
                     ? (f.color ? `${f.color}20` : "rgba(255,255,255,0.1)")

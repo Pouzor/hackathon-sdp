@@ -134,9 +134,9 @@ async def test_create_planet_conflict_on_duplicate_name(client: AsyncClient) -> 
 
 
 async def test_delete_planet_not_found(client: AsyncClient) -> None:
+    from src.core.deps import get_current_astronaut
     from src.db.session import get_db
     from src.models.astronaut import Astronaut
-    from src.core.deps import get_current_astronaut
 
     mock_db = mock_db_with_planet(None)
     admin_astronaut = MagicMock(spec=Astronaut)

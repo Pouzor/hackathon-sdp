@@ -152,7 +152,6 @@ def test_build_google_auth_url_contains_redirect_uri_and_scope() -> None:
 
 async def test_exchange_code_google_token_error() -> None:
     """Si Google renvoie une erreur sur le token endpoint → HTTPException 401."""
-    import httpx
     from unittest.mock import patch as mock_patch
 
     service = AuthService(MagicMock())

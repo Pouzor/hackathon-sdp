@@ -7,7 +7,7 @@ F-304 : Bonus +25 sur 1ère contribution de la saison
 F-306 : Suppression avec recalcul
 """
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from fastapi import HTTPException

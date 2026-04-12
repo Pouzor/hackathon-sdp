@@ -71,8 +71,8 @@ async def test_get_active_season_none(client: AsyncClient) -> None:
 
 
 async def test_activate_season_not_found(client: AsyncClient) -> None:
-    from src.db.session import get_db
     from src.core.deps import get_current_astronaut
+    from src.db.session import get_db
     from src.models.astronaut import Astronaut
 
     mock_result = MagicMock()
@@ -97,8 +97,8 @@ async def test_activate_season_not_found(client: AsyncClient) -> None:
 
 
 async def test_close_season_requires_active(client: AsyncClient) -> None:
-    from src.db.session import get_db
     from src.core.deps import get_current_astronaut
+    from src.db.session import get_db
     from src.models.astronaut import Astronaut
 
     inactive_season = make_season(is_active=False)
