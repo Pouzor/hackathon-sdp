@@ -25,12 +25,12 @@ async def get_current_token(
         )
     try:
         return verify_token(credentials.credentials)
-    except (JWTError, KeyError, ValueError):
+    except (JWTError, KeyError, ValueError) as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token invalide ou expiré",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from exc
 
 
 async def get_current_astronaut(

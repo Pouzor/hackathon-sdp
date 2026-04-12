@@ -1,4 +1,3 @@
-from typing import Union
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from fastapi.responses import RedirectResponse
@@ -45,7 +44,7 @@ async def google_callback(
     state: str = Query(..., description="State CSRF signé (HMAC)"),
     accept: str = Header(default="text/html"),
     service: AuthService = Depends(_get_auth_service),
-) -> Union[RedirectResponse, TokenResponse]:
+) -> RedirectResponse | TokenResponse:
     """
     Callback Google OAuth.
     - Vérifie la signature CSRF du state
@@ -58,8 +57,8 @@ async def google_callback(
     """
     try:
         origin = verify_oauth_state(state)
-    except ValueError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="State CSRF invalide")
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="State CSRF invalide") from exc
 
     user_info = await service.exchange_code_for_user_info(code)
     service.verify_allowed_domain(user_info)
