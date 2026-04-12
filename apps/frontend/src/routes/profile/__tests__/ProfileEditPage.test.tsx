@@ -49,7 +49,7 @@ describe("ProfileEditPage", () => {
       data: mockAstronaut as never,
       isLoading: false,
       isError: false,
-    } as ReturnType<typeof astronautsApi.useAstronaut>);
+    } as unknown as ReturnType<typeof astronautsApi.useAstronaut>);
     vi.spyOn(astronautsApi, "useUpdateProfile").mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
@@ -70,7 +70,7 @@ describe("ProfileEditPage", () => {
       data: undefined,
       isLoading: true,
       isError: false,
-    } as ReturnType<typeof astronautsApi.useAstronaut>);
+    } as unknown as ReturnType<typeof astronautsApi.useAstronaut>);
     vi.spyOn(astronautsApi, "useUpdateProfile").mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
@@ -89,7 +89,7 @@ describe("ProfileEditPage", () => {
       data: mockAstronaut as never,
       isLoading: false,
       isError: false,
-    } as ReturnType<typeof astronautsApi.useAstronaut>);
+    } as unknown as ReturnType<typeof astronautsApi.useAstronaut>);
     vi.spyOn(astronautsApi, "useUpdateProfile").mockReturnValue({
       mutateAsync,
       isPending: false,
@@ -116,7 +116,7 @@ describe("ProfileEditPage", () => {
       data: mockAstronaut as never,
       isLoading: false,
       isError: false,
-    } as ReturnType<typeof astronautsApi.useAstronaut>);
+    } as unknown as ReturnType<typeof astronautsApi.useAstronaut>);
     vi.spyOn(astronautsApi, "useUpdateProfile").mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,

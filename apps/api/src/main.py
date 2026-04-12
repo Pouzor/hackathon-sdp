@@ -34,8 +34,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.add_exception_handler(404, not_found_handler)  # type: ignore[arg-type]
-app.add_exception_handler(500, internal_error_handler)  # type: ignore[arg-type]
+app.add_exception_handler(404, not_found_handler)
+app.add_exception_handler(500, internal_error_handler)
 
 app.include_router(health_router)
 app.include_router(version_router, prefix="/api/v1")
