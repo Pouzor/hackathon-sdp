@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,9 +14,16 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/planets"
 
     # JWT
-    secret_key: str = "change-me-in-production"
+    secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
+
+    @field_validator("secret_key")
+    @classmethod
+    def validate_secret_key(cls, v: str) -> str:
+        if not v or v in {"change-me-in-production", "secret", ""}:
+            raise ValueError("SECRET_KEY must be set to a secure value in the environment")
+        return v
 
     # Google OAuth — toutes les valeurs viennent du .env
     google_client_id: str = ""

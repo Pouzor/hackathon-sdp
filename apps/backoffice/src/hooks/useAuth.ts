@@ -25,7 +25,7 @@ interface UseAuthReturn {
   logout: () => void;
 }
 
-function decodeJwtPayload(token: string): JwtPayload | null {
+export function decodeJwtPayload(token: string): JwtPayload | null {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;

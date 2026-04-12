@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -38,3 +40,33 @@ def verify_token(token: str) -> TokenPayload:
     """Vérifie le JWT et retourne le payload typé. Lève JWTError si invalide."""
     data = decode_access_token(token)
     return TokenPayload(data)
+
+
+# --- CSRF state helpers ---
+
+def _hmac_sign(message: str) -> str:
+    """Signe un message avec HMAC-SHA256 et la clé secrète."""
+    return hmac.new(settings.secret_key.encode(), message.encode(), hashlib.sha256).hexdigest()
+
+
+def generate_oauth_state(origin: str) -> str:
+    """Génère un state CSRF signé : '{nonce}:{origin}:{hmac}'."""
+    import secrets as _secrets
+    nonce = _secrets.token_urlsafe(24)
+    payload = f"{nonce}:{origin}"
+    sig = _hmac_sign(payload)
+    return f"{payload}:{sig}"
+
+
+def verify_oauth_state(state: str) -> str:
+    """Vérifie la signature CSRF et retourne l'origin. Lève ValueError si invalide."""
+    parts = state.rsplit(":", 1)
+    if len(parts) != 2:
+        raise ValueError("State malformé")
+    payload, sig = parts
+    expected = _hmac_sign(payload)
+    if not hmac.compare_digest(expected, sig):
+        raise ValueError("Signature CSRF invalide")
+    # payload = "{nonce}:{origin}"
+    origin_parts = payload.split(":", 1)
+    return origin_parts[-1] if len(origin_parts) == 2 else "frontend"

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { AUTH_TOKEN_KEY } from "@/hooks/useAuth";
+import { AUTH_TOKEN_KEY, decodeJwtPayload } from "@/hooks/useAuth";
 
 export function AuthCallbackPage() {
   const [searchParams] = useSearchParams();
@@ -9,6 +9,11 @@ export function AuthCallbackPage() {
   useEffect(() => {
     const token = searchParams.get("token");
     if (token) {
+      const payload = decodeJwtPayload(token);
+      if (!payload || payload.exp <= Math.floor(Date.now() / 1000)) {
+        void navigate("/login", { replace: true });
+        return;
+      }
       localStorage.setItem(AUTH_TOKEN_KEY, token);
       void navigate("/", { replace: true });
     } else {
