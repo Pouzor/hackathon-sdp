@@ -5,6 +5,7 @@ import { LoginPage } from "@/routes/auth/LoginPage";
 import { AstronautProfilePage } from "@/routes/astronauts/AstronautProfilePage";
 import { AstronautsPage } from "@/routes/astronauts/AstronautsPage";
 import { HomePage } from "@/routes/home/HomePage";
+import { ProfileEditPage } from "@/routes/profile/ProfileEditPage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/astronauts" element={<AstronautsPage />} />
         <Route path="/astronauts/:id" element={<AstronautProfilePage />} />
+        <Route path="/profile/edit" element={<ProfileEditPage />} />
       </Route>
     </Routes>
   );

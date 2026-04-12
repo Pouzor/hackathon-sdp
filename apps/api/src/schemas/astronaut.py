@@ -28,6 +28,18 @@ class AstronautUpdate(BaseModel):
     client: str | None = Field(None, max_length=255)
 
 
+class AstronautSelfUpdate(BaseModel):
+    """Champs modifiables par l'astronaute lui-même (ou un admin).
+    Tous les champs sont optionnels : seuls les champs fournis sont mis à jour.
+    """
+
+    photo_url: str | None = Field(default=None, max_length=500)
+    hobbies: str | None = Field(default=None, max_length=1000)
+    client: str | None = Field(default=None, max_length=255)
+
+    model_config = {"extra": "ignore"}
+
+
 ALLOWED_ROLES = {"astronaut", "admin"}
 
 

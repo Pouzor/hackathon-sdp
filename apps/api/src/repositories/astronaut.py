@@ -48,6 +48,18 @@ class AstronautRepository:
         await self._db.refresh(astronaut)
         return astronaut
 
+    async def update_profile(
+        self,
+        astronaut: Astronaut,
+        fields: dict[str, object],
+    ) -> Astronaut:
+        """Met à jour les champs de profil fournis (clés de `fields` uniquement)."""
+        for key, value in fields.items():
+            setattr(astronaut, key, value)
+        await self._db.commit()
+        await self._db.refresh(astronaut)
+        return astronaut
+
     async def update_roles(self, astronaut: Astronaut, roles: list[str]) -> Astronaut:
         """Met à jour les rôles d'un astronaute."""
         astronaut.roles = roles
