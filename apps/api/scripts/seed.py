@@ -335,11 +335,8 @@ async def reset_db(session: AsyncSession) -> None:
             "seniority_config",
         }
     )
-    tables = list(_ALLOWED_TABLES)
-    for table in tables:
-        if table not in _ALLOWED_TABLES:
-            raise ValueError(f"Table non autorisée : {table}")
-        # Table name comes from the hardcoded allowlist above — no user input involved
+    for table in _ALLOWED_TABLES:
+        # Table names come exclusively from the hardcoded allowlist — no user input
         await session.execute(text(f"TRUNCATE TABLE {table} RESTART IDENTITY CASCADE"))  # noqa: S608
     await session.commit()
     print("  ✓  Tables vidées")
@@ -392,7 +389,9 @@ async def seed(session: AsyncSession) -> None:
 
     print("  👩‍🚀  Insertion des astronautes…")
     astronaut_map: dict[str, int] = {}
-    for data in ASTRONAUTS_DATA:
+    for astro_data in ASTRONAUTS_DATA:
+        # Copy to avoid mutating the module-level ASTRONAUTS_DATA constant
+        data = dict(astro_data)
         slug = data.pop("planet_slug")
         planet_name = SLUG_TO_NAME[slug]
         astro = Astronaut(
@@ -402,7 +401,6 @@ async def seed(session: AsyncSession) -> None:
         session.add(astro)
         await session.flush()
         astronaut_map[astro.email] = astro.id
-        data["planet_slug"] = slug  # restaure pour idempotence
     await session.commit()
     print(f"     → {len(ASTRONAUTS_DATA)} astronautes créés")
 

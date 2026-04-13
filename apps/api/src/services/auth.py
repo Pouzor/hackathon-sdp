@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 import httpx
 from fastapi import HTTPException, status
 
@@ -23,8 +25,7 @@ class AuthService:
             "state": state,
             "hd": settings.allowed_domain,  # Pré-filtre côté Google
         }
-        query = "&".join(f"{k}={v}" for k, v in params.items())
-        return f"{settings.google_auth_url}?{query}"
+        return f"{settings.google_auth_url}?{urlencode(params)}"
 
     async def exchange_code_for_user_info(self, code: str) -> GoogleUserInfo:
         """Échange le code OAuth contre les infos utilisateur Google."""
