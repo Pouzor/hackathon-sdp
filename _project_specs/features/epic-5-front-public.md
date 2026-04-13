@@ -77,13 +77,14 @@
 
 ---
 
-## F-504 — Page détail planète ✅ DONE (mock front-only)
+## F-504 — Page détail planète ✅ DONE
 
 **Route:** overlay depuis la homepage (clic sur la planète)
 
 **Implémentation :**
 - `apps/frontend/src/components/features/planet-detail/PlanetDetail.tsx`
-- `apps/frontend/src/components/features/planet-detail/mockData.ts`
+- `apps/frontend/src/api/planets.ts` — `usePlanetContributions()` (polling 30s)
+- `apps/frontend/src/api/astronauts.ts` — `useAstronauts(planetId)`
 
 **Acceptance Criteria:**
 - [x] Blason + planète 3D animée (pulse), couleur, total points saison
@@ -91,13 +92,13 @@
 - [x] Historique des trophées (icône, description, date)
 - [x] Timeline des contributions (astronaute, activité, points, bonus)
 - [x] Onglet contributions ouvert par défaut
-- [ ] Connecter à l'API (remplacer mockData par React Query hooks)
-- [ ] Total points recalculé dynamiquement (React Query polling)
-- [ ] Planète inexistante → 404
+- [x] Connecté à l'API (useAstronauts + usePlanetContributions)
+- [x] Total points recalculé dynamiquement (polling 30s via usePlanets)
+- [ ] Planète inexistante → 404 (non applicable : l'overlay reçoit toujours un objet valide)
 
 ---
 
-## F-505 — Page classement / scoreboard ✅ DONE (mock front-only, widget homepage)
+## F-505 — Page classement / scoreboard ✅ DONE
 
 **Implémentation :** widget `Leaderboard` dans `apps/frontend/src/routes/home/HomePage.tsx`
 
@@ -105,5 +106,5 @@
 - [x] 4 planètes `is_competing = true` triées par score, barres de progression
 - [x] Total saison en footer du widget
 - [x] Clic sur une planète du leaderboard ouvre le panneau `PlanetDetail` (même effet que clic sur le système solaire)
+- [x] Connecté à l'API via `useMergedPlanets()` → `usePlanets()` (polling 30s)
 - [ ] Pas de page dédiée `/scoreboard` pour l'instant (acceptable MVP)
-- [ ] Connecter à l'API (React Query, polling 30s)

@@ -6,6 +6,7 @@ export function usePlanets() {
   return useQuery({
     queryKey: ["planets"],
     queryFn: () => apiClient.get<Planet[]>("/planets"),
+    refetchInterval: 30_000,
   });
 }
 
@@ -22,5 +23,6 @@ export function usePlanetContributions(planetId: number | null) {
     queryFn: () =>
       apiClient.get<PointAttribution[]>(`/point-attributions?planet_id=${String(planetId)}`),
     enabled: planetId !== null,
+    refetchInterval: 30_000,
   });
 }
