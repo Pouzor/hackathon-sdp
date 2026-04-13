@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { UserX } from "lucide-react";
 import {
   useAstronauts,
   usePlanets,
@@ -23,12 +24,22 @@ function PlanetSelect({
     const planet = planets.find((p) => p.id === astronaut.planet_id);
     return (
       <button
-        onClick={() => {
-          setEditing(true);
-        }}
-        className="px-2 py-0.5 text-xs text-space-300 hover:bg-space-500 hover:text-neon-cyan transition-colors"
+        onClick={() => { setEditing(true); }}
+        title="Cliquer pour modifier la planète"
+        className={`flex items-center gap-1.5 px-2 py-0.5 text-xs rounded border transition-colors ${
+          planet
+            ? "border-transparent text-space-300 hover:bg-space-500 hover:text-neon-cyan"
+            : "border-neon-gold/30 bg-neon-gold/10 text-neon-gold hover:bg-neon-gold/20"
+        }`}
       >
-        {planet?.name ?? "—"}
+        {planet ? (
+          planet.name
+        ) : (
+          <>
+            <UserX size={11} />
+            Non assigné
+          </>
+        )}
       </button>
     );
   }
@@ -72,7 +83,9 @@ export function AstronautsAdminPage() {
         `${a.first_name} ${a.last_name} ${a.email}`.toLowerCase().includes(q),
       );
     }
-    if (filterPlanet !== "all") {
+    if (filterPlanet === "none") {
+      list = list.filter((a) => a.planet_id === null);
+    } else if (filterPlanet !== "all") {
       const pid = parseInt(filterPlanet, 10);
       list = list.filter((a) => a.planet_id === pid);
     }
@@ -112,6 +125,7 @@ export function AstronautsAdminPage() {
           className="border border-space-500 bg-space-800 px-3 py-2 text-sm text-slate-200 outline-none focus:border-neon-cyan/50 transition-colors"
         >
           <option value="all">Toutes les planètes</option>
+          <option value="none">— Sans planète</option>
           {planets.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
