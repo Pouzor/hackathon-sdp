@@ -84,7 +84,7 @@ async def update_planet(
     planet = await repo.get_by_id(planet_id)
     if planet is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Planète introuvable")
-    updates = {k: v for k, v in body.model_dump().items() if v is not None}
+    updates = body.model_dump(exclude_unset=True)
     planet = await repo.update(planet, **updates)
     active = await season_repo.get_active()
     return await _enrich(planet, season_repo, active.id if active else None)

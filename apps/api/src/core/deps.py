@@ -16,8 +16,18 @@ bearer_scheme = HTTPBearer(auto_error=False)
 # Simple TTL cache to avoid a DB round-trip on every authenticated request.
 # Keyed by (astronaut_id, token_exp) so entries are invalidated when the token rotates.
 # TTL capped at 60 s so role/planet changes propagate within a minute.
+# Max-size evicts the oldest entry when full to prevent unbounded memory growth.
 _AUTH_CACHE_TTL = 60.0
+_AUTH_CACHE_MAX = 1000
 _astronaut_cache: dict[tuple[int, int], tuple[Astronaut, float]] = {}
+
+
+def _cache_set(key: tuple[int, int], value: tuple[Astronaut, float]) -> None:
+    if len(_astronaut_cache) >= _AUTH_CACHE_MAX:
+        # Evict oldest entry (insertion-ordered dict)
+        oldest = next(iter(_astronaut_cache))
+        del _astronaut_cache[oldest]
+    _astronaut_cache[key] = value
 
 
 async def get_current_token(
@@ -60,7 +70,7 @@ async def get_current_astronaut(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token invalide ou expiré",
         )
-    _astronaut_cache[cache_key] = (result, now + _AUTH_CACHE_TTL)
+    _cache_set(cache_key, (result, now + _AUTH_CACHE_TTL))
     return result
 
 

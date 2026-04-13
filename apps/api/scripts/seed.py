@@ -322,18 +322,25 @@ def now_utc() -> datetime:
 async def reset_db(session: AsyncSession) -> None:
     """Vide toutes les tables dans le bon ordre (FK oblige)."""
     print("  🗑  Suppression des données existantes…")
-    tables = [
-        "point_attributions",
-        "season_planet_scores",
-        "astronauts",
-        "activities",
-        "grades",
-        "seasons",
-        "planets",
-        "seniority_config",
-    ]
+    # Allowlist of tables safe to truncate — never interpolate user input here
+    _ALLOWED_TABLES = frozenset(
+        {
+            "point_attributions",
+            "season_planet_scores",
+            "astronauts",
+            "activities",
+            "grades",
+            "seasons",
+            "planets",
+            "seniority_config",
+        }
+    )
+    tables = list(_ALLOWED_TABLES)
     for table in tables:
-        await session.execute(text(f"TRUNCATE TABLE {table} RESTART IDENTITY CASCADE"))
+        if table not in _ALLOWED_TABLES:
+            raise ValueError(f"Table non autorisée : {table}")
+        # Table name comes from the hardcoded allowlist above — no user input involved
+        await session.execute(text(f"TRUNCATE TABLE {table} RESTART IDENTITY CASCADE"))  # noqa: S608
     await session.commit()
     print("  ✓  Tables vidées")
 

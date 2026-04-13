@@ -47,6 +47,11 @@ class AuthService:
                 )
             token_data = token_response.json()
             access_token = token_data.get("access_token")
+            if not access_token:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token Google absent ou invalide",
+                )
 
             # 2. Récupérer les infos utilisateur
             userinfo_response = await client.get(

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAstronauts, useUpdateRoles, type AstronautOut } from "@/api/astronauts";
+import { useAuth } from "@/hooks/useAuth";
 
 function RolesBadge({ roles }: { roles: string[] }) {
   const isAdmin = roles.includes("admin");
@@ -53,20 +54,8 @@ export function RolesPage() {
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const [pendingRoles, setPendingRoles] = useState<string[] | null>(null);
 
-  // Identifie l'admin courant via le token JWT dans localStorage
-  const currentUserId: number | null = (() => {
-    try {
-      const token = localStorage.getItem("auth_token");
-      if (!token) return null;
-      const parts = token.split(".");
-      if (parts.length < 2) return null;
-      const b64 = (parts[1] ?? "").replace(/-/g, "+").replace(/_/g, "/");
-      const payload = JSON.parse(atob(b64)) as { astronaut_id?: number };
-      return payload.astronaut_id ?? null;
-    } catch {
-      return null;
-    }
-  })();
+  const { user } = useAuth();
+  const currentUserId = user?.astronaut_id ?? null;
 
   function handleToggle(astronaut: AstronautOut) {
     const isAdmin = astronaut.roles.includes("admin");
