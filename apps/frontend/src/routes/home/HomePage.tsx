@@ -59,7 +59,7 @@ function NavBar() {
     queryKey: ["point-attributions", "astronaut", astronautId],
     queryFn: () =>
       apiClient.get<PointAttribution[]>(`/point-attributions?astronaut_id=${astronautId ?? 0}`),
-    enabled: astronautId !== undefined,
+    enabled: !!astronautId,
   });
   return (
     <div
@@ -238,15 +238,14 @@ function Leaderboard({ planets, onPlanetClick }: { planets: PlanetData[]; onPlan
                 background: isFirst ? `rgba(${hexToRgb(planet.color)}, 0.06)` : "transparent",
                 borderLeft: isFirst ? `2px solid ${planet.color}` : "2px solid transparent",
               }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLElement).style.background =
-                  `rgba(${hexToRgb(planet.color)}, 0.08)`)
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLElement).style.background = isFirst
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = `rgba(${hexToRgb(planet.color)}, 0.08)`;
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = isFirst
                   ? `rgba(${hexToRgb(planet.color)}, 0.06)`
-                  : "transparent")
-              }
+                  : "transparent";
+              }}
             >
               {/* Rank + name */}
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
@@ -341,9 +340,11 @@ function Leaderboard({ planets, onPlanetClick }: { planets: PlanetData[]; onPlan
 }
 
 function hexToRgb(hex: string): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
+  const clean = hex.startsWith("#") ? hex.slice(1) : hex;
+  if (!/^[0-9A-Fa-f]{6}$/.test(clean)) return "0,0,0";
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
   return `${r},${g},${b}`;
 }
 
