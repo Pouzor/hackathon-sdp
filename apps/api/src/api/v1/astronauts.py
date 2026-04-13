@@ -25,6 +25,13 @@ UPLOAD_DIR = Path("uploads/avatars")
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 Mo
 
+# Magic bytes signatures pour validation du contenu réel
+MAGIC_BYTES: dict[str, list[bytes]] = {
+    "image/jpeg": [b"\xff\xd8\xff"],
+    "image/png": [b"\x89PNG"],
+    "image/webp": [b"RIFF"],
+}
+
 router = APIRouter(prefix="/astronauts", tags=["astronauts"])
 
 
@@ -140,18 +147,35 @@ async def upload_astronaut_photo(
             detail="Fichier trop volumineux (max 5 Mo)",
         )
 
+    # Validation magic bytes — le Content-Type header est attacker-controlled
+    content_type = file.content_type or ""
+    signatures = MAGIC_BYTES.get(content_type, [])
+    if not signatures or not any(contents.startswith(sig) for sig in signatures):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Contenu du fichier invalide.",
+        )
+
     target = await astronaut_repo.get_by_id(astronaut_id)
     if target is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Astronaute introuvable")
 
+    # Mémoriser l'ancienne photo pour nettoyage après mise à jour
+    old_photo_url: str | None = target.photo_url
+
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    ext = "jpg" if file.content_type == "image/jpeg" else file.content_type.split("/")[1]
+    ext = "jpg" if content_type == "image/jpeg" else content_type.split("/")[1]
     filename = f"avatar_{astronaut_id}_{int(time.time())}.{ext}"
     await asyncio.to_thread((UPLOAD_DIR / filename).write_bytes, contents)
 
     photo_url = f"/uploads/avatars/{filename}"
 
     updated = await astronaut_repo.update_profile(target, {"photo_url": photo_url})
+
+    # Supprimer l'ancien fichier après succès de la mise à jour
+    if old_photo_url and old_photo_url.startswith("/uploads/avatars/"):
+        old_path = Path(old_photo_url.lstrip("/"))
+        await asyncio.to_thread(lambda: old_path.unlink(missing_ok=True))
     logger.info(
         "photo_uploaded by=%s astronaut_id=%s filename=%s",
         current.email,
