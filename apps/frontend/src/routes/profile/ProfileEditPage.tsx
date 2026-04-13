@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import { useAstronaut, useUpdateProfile } from "@/api/astronauts";
 import { AvatarUpload } from "@/components/features/AvatarUpload";
-import type { AstronautOut } from "@/api/types";
+import type { Astronaut as AstronautOut } from "@/api/types";
 
 const schema = z.object({
   hobbies: z.string().max(1000).nullable(),

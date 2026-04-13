@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { apiClient, getAvatarUrl } from "@/lib/apiClient";
-import type { AstronautOut } from "@/api/types";
+import type { Astronaut as AstronautOut } from "@/api/types";
 
 /**
  * Recadre l'image au carré centré et la renvoie en JPEG 400×400.
