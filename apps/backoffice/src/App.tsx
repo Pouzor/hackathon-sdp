@@ -6,6 +6,10 @@ import { AuthCallbackPage } from "@/routes/auth/AuthCallbackPage";
 import { RolesPage } from "@/routes/roles/RolesPage";
 import { AstronautsAdminPage } from "@/routes/astronauts/AstronautsAdminPage";
 import { AttributionPage } from "@/routes/attributions/AttributionPage";
+import { PlanetsAdminPage } from "@/routes/planets/PlanetsAdminPage";
+import { SeasonsAdminPage } from "@/routes/seasons/SeasonsAdminPage";
+import { GradesAdminPage } from "@/routes/grades/GradesAdminPage";
+import { ActivitiesAdminPage } from "@/routes/activities/ActivitiesAdminPage";
 
 function App() {
   return (
@@ -33,6 +37,10 @@ function App() {
           <Route path="astronauts" element={<AstronautsAdminPage />} />
           <Route path="roles" element={<RolesPage />} />
           <Route path="attributions/new" element={<AttributionPage />} />
+          <Route path="planets" element={<PlanetsAdminPage />} />
+          <Route path="seasons" element={<SeasonsAdminPage />} />
+          <Route path="grades" element={<GradesAdminPage />} />
+          <Route path="activities" element={<ActivitiesAdminPage />} />
         </Route>
       </Route>
     </Routes>

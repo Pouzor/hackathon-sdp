@@ -1,8 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
-import type { AstronautOut, PlanetOut, ActivityOut, PointAttributionOut } from "shared-types";
+import type {
+  AstronautOut,
+  PlanetOut,
+  ActivityOut,
+  PointAttributionOut,
+  SeasonOut,
+  GradeOut,
+} from "shared-types";
 
-export type { AstronautOut, PlanetOut, ActivityOut, PointAttributionOut };
+export type { AstronautOut, PlanetOut, ActivityOut, PointAttributionOut, SeasonOut, GradeOut };
 
 export function useAstronauts() {
   return useQuery<AstronautOut[]>({
@@ -54,6 +61,131 @@ export function useUpdateAstronaut() {
     },
   });
 }
+
+// ── Planets ──────────────────────────────────────────────────────────────────
+
+export function useUpdatePlanet() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...fields }: Partial<PlanetOut> & { id: number }) =>
+      apiClient.patch<PlanetOut>(`/planets/${id}`, fields),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "planets"] });
+    },
+  });
+}
+
+// ── Seasons ───────────────────────────────────────────────────────────────────
+
+export function useSeasons() {
+  return useQuery<SeasonOut[]>({
+    queryKey: ["admin", "seasons"],
+    queryFn: () => apiClient.get<SeasonOut[]>("/seasons"),
+  });
+}
+
+export function useCreateSeason() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { name: string; start_date: string }) =>
+      apiClient.post<SeasonOut>("/seasons", body),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "seasons"] });
+    },
+  });
+}
+
+export function useActivateSeason() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => apiClient.post<SeasonOut>(`/seasons/${id}/activate`, {}),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "seasons"] });
+    },
+  });
+}
+
+export function useCloseSeason() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => apiClient.post<SeasonOut>(`/seasons/${id}/close`, {}),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "seasons"] });
+    },
+  });
+}
+
+// ── Grades ────────────────────────────────────────────────────────────────────
+
+export function useGrades() {
+  return useQuery<GradeOut[]>({
+    queryKey: ["admin", "grades"],
+    queryFn: () => apiClient.get<GradeOut[]>("/grades"),
+  });
+}
+
+export function useCreateGrade() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { name: string; threshold_points: number; order: number }) =>
+      apiClient.post<GradeOut>("/grades", body),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "grades"] });
+    },
+  });
+}
+
+export function useUpdateGrade() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...fields }: Partial<GradeOut> & { id: number }) =>
+      apiClient.patch<GradeOut>(`/grades/${id}`, fields),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "grades"] });
+    },
+  });
+}
+
+export function useDeleteGrade() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => apiClient.delete<void>(`/grades/${id}`),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "grades"] });
+    },
+  });
+}
+
+// ── Activities ────────────────────────────────────────────────────────────────
+
+export function useCreateActivity() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      name: string;
+      base_points: number;
+      category: string;
+      is_collaborative: boolean;
+      allow_multiple_assignees: boolean;
+    }) => apiClient.post<ActivityOut>("/activities", body),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "activities"] });
+    },
+  });
+}
+
+export function useUpdateActivity() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...fields }: Partial<ActivityOut> & { id: number }) =>
+      apiClient.patch<ActivityOut>(`/activities/${id}`, fields),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "activities"] });
+    },
+  });
+}
+
+// ── Attributions ──────────────────────────────────────────────────────────────
 
 export function useCreateAttribution() {
   const qc = useQueryClient();

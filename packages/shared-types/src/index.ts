@@ -13,3 +13,5 @@ export type PlanetOut = components["schemas"]["PlanetOut"];
 export type ActivityOut = components["schemas"]["ActivityOut"];
 export type PointAttributionOut = components["schemas"]["PointAttributionOut"];
 export type AstronautMe = components["schemas"]["AstronautMe"];
+export type SeasonOut = components["schemas"]["SeasonOut"];
+export type GradeOut = components["schemas"]["GradeOut"];
