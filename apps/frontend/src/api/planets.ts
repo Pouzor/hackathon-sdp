@@ -14,6 +14,7 @@ export function usePlanet(id: number) {
   return useQuery({
     queryKey: ["planets", id],
     queryFn: () => apiClient.get<Planet>(`/planets/${id}`),
+    enabled: id !== 0,
   });
 }
 

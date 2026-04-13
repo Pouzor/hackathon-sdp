@@ -105,7 +105,7 @@ function Leaderboard({ planets, onPlanetClick }: { planets: PlanetData[]; onPlan
                     textAlign: "center",
                   }}
                 >
-                  {RANK_ICONS[i]}
+                  {RANK_ICONS[i] ?? String(i + 1)}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div

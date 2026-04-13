@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import { useAstronaut, useUpdateProfile } from "@/api/astronauts";
+import { usePlanet } from "@/api/planets";
 import { AvatarUpload } from "@/components/features/AvatarUpload";
 import type { Astronaut } from "@/api/types";
 
@@ -21,6 +22,7 @@ export function ProfileEditPage() {
   const astronautId = user?.astronaut_id;
 
   const { data: astronaut, isLoading } = useAstronaut(astronautId ?? 0);
+  const { data: planet } = usePlanet(astronaut?.planet_id ?? 0);
   const updateProfile = useUpdateProfile(astronautId ?? 0);
   const [currentPhotoUrl, setCurrentPhotoUrl] = useState<string | null | undefined>(undefined);
 
@@ -87,7 +89,7 @@ export function ProfileEditPage() {
               astronautId={astronautId}
               currentPhotoUrl={currentPhotoUrl}
               initials={`${astronaut.first_name.charAt(0)}${astronaut.last_name.charAt(0)}`}
-              color="#00c8ff"
+              color={planet?.color_hex ?? "#00c8ff"}
               onUploaded={handlePhotoUploaded}
             />
             <p className="text-xs text-white/30">Cliquer pour changer la photo</p>
