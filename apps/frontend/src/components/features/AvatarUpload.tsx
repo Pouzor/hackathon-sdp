@@ -90,7 +90,7 @@ export function AvatarUpload({
       const form = new FormData();
       form.append("file", cropped, "avatar.jpg");
       const updated = await apiClient.upload<AstronautOut>(
-        `/api/v1/astronauts/${astronautId}/photo`,
+        `/astronauts/${astronautId}/photo`,
         form,
       );
       onUploaded(updated);
