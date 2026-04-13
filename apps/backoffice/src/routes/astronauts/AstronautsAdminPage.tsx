@@ -1,7 +1,17 @@
 import { useState, useMemo } from "react";
-import { useAstronauts, usePlanets, useUpdateAstronaut, type AstronautOut, type PlanetOut } from "@/api/astronauts";
+import {
+  useAstronauts,
+  usePlanets,
+  useUpdateAstronaut,
+  type AstronautOut,
+  type PlanetOut,
+} from "@/api/astronauts";
 
-function PlanetSelect({ astronaut, planets, onSave }: {
+function PlanetSelect({
+  astronaut,
+  planets,
+  onSave,
+}: {
   astronaut: AstronautOut;
   planets: PlanetOut[];
   onSave: (planetId: number | null) => void;
@@ -13,7 +23,9 @@ function PlanetSelect({ astronaut, planets, onSave }: {
     const planet = planets.find((p) => p.id === astronaut.planet_id);
     return (
       <button
-        onClick={() => setEditing(true)}
+        onClick={() => {
+          setEditing(true);
+        }}
         className="rounded px-2 py-0.5 text-xs text-white/60 hover:bg-white/10 hover:text-white"
       >
         {planet?.name ?? "—"}
@@ -25,7 +37,9 @@ function PlanetSelect({ astronaut, planets, onSave }: {
     <select
       autoFocus
       value={value}
-      onChange={(e) => setValue(e.target.value)}
+      onChange={(e) => {
+        setValue(e.target.value);
+      }}
       onBlur={() => {
         setEditing(false);
         const parsed = value === "" ? null : parseInt(value, 10);
@@ -35,7 +49,9 @@ function PlanetSelect({ astronaut, planets, onSave }: {
     >
       <option value="">— Aucune —</option>
       {planets.map((p) => (
-        <option key={p.id} value={p.id}>{p.name}</option>
+        <option key={p.id} value={p.id}>
+          {p.name}
+        </option>
       ))}
     </select>
   );
@@ -78,17 +94,23 @@ export function AstronautsAdminPage() {
           type="search"
           placeholder="Rechercher par nom ou email…"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+          }}
           className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
         />
         <select
           value={filterPlanet}
-          onChange={(e) => setFilterPlanet(e.target.value)}
+          onChange={(e) => {
+            setFilterPlanet(e.target.value);
+          }}
           className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
         >
           <option value="all">Toutes les planètes</option>
           {planets.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
           ))}
         </select>
       </div>
@@ -118,18 +140,20 @@ export function AstronautsAdminPage() {
                     astronaut={a}
                     planets={planets}
                     onSave={(planetId) => {
-                      void updateAstronaut.mutate({ id: a.id, planet_id: planetId });
+                      updateAstronaut.mutate({ id: a.id, planet_id: planetId });
                     }}
                   />
                 </td>
                 <td className="px-4 py-3 text-gray-500">{a.grade_name ?? "—"}</td>
                 <td className="px-4 py-3 text-right font-mono text-gray-700">{a.total_points}</td>
                 <td className="px-4 py-3">
-                  <span className={`rounded px-2 py-0.5 text-xs font-medium ${
-                    a.roles.includes("admin")
-                      ? "bg-amber-100 text-amber-700"
-                      : "bg-gray-100 text-gray-600"
-                  }`}>
+                  <span
+                    className={`rounded px-2 py-0.5 text-xs font-medium ${
+                      a.roles.includes("admin")
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
                     {a.roles.includes("admin") ? "Admin" : "Astronaute"}
                   </span>
                 </td>

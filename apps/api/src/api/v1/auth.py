@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -58,7 +57,9 @@ async def google_callback(
     try:
         origin = verify_oauth_state(state)
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="State CSRF invalide") from exc
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="State CSRF invalide"
+        ) from exc
 
     user_info = await service.exchange_code_for_user_info(code)
     service.verify_allowed_domain(user_info)

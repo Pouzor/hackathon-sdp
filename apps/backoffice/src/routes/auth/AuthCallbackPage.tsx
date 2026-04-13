@@ -11,13 +11,13 @@ export function AuthCallbackPage() {
     if (token) {
       const payload = decodeJwtPayload(token);
       if (!payload || payload.exp <= Math.floor(Date.now() / 1000)) {
-        void navigate("/login", { replace: true });
+        navigate("/login", { replace: true });
         return;
       }
       localStorage.setItem(AUTH_TOKEN_KEY, token);
-      void navigate("/", { replace: true });
+      navigate("/", { replace: true });
     } else {
-      void navigate("/login", { replace: true });
+      navigate("/login", { replace: true });
     }
   }, [searchParams, navigate]);
 

@@ -73,7 +73,9 @@ export function useAuth(): UseAuthReturn {
       }
     }
     window.addEventListener("storage", onStorage);
-    return () => { window.removeEventListener("storage", onStorage); };
+    return () => {
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   const logout = useCallback(() => {

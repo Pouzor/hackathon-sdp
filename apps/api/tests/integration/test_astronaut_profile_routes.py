@@ -1,4 +1,5 @@
 """Tests d'intégration pour PATCH /astronauts/{id} (F-202)."""
+
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -44,7 +45,9 @@ async def test_patch_profile_self_update(client: AsyncClient) -> None:
     from src.api.v1.astronauts import _astronaut_repo, _grade_repo
 
     user = make_astronaut(2, "user@eleven-labs.com", ["astronaut"])
-    updated = make_astronaut(2, "user@eleven-labs.com", ["astronaut"], hobbies="music", client="Acme")
+    updated = make_astronaut(
+        2, "user@eleven-labs.com", ["astronaut"], hobbies="music", client="Acme"
+    )
 
     mock_repo = MagicMock()
     mock_repo.get_by_id = AsyncMock(return_value=user)
@@ -74,7 +77,9 @@ async def test_patch_profile_admin_updates_other(client: AsyncClient) -> None:
 
     admin = make_astronaut(1, "admin@eleven-labs.com", ["astronaut", "admin"])
     target = make_astronaut(3, "target@eleven-labs.com", ["astronaut"])
-    updated = make_astronaut(3, "target@eleven-labs.com", ["astronaut"], photo_url="https://example.com/photo.jpg")
+    updated = make_astronaut(
+        3, "target@eleven-labs.com", ["astronaut"], photo_url="https://example.com/photo.jpg"
+    )
 
     mock_repo = MagicMock()
     mock_repo.get_by_id = AsyncMock(return_value=target)

@@ -1,4 +1,5 @@
 """Tests d'intégration pour les routes /grades."""
+
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -18,23 +19,27 @@ def make_grade(id: int = 1) -> MagicMock:
 
 
 def admin_token() -> str:
-    return create_access_token({
-        "sub": "1",
-        "email": "admin@eleven-labs.com",
-        "astronaut_id": 1,
-        "roles": ["astronaut", "admin"],
-        "planet_id": 1,
-    })
+    return create_access_token(
+        {
+            "sub": "1",
+            "email": "admin@eleven-labs.com",
+            "astronaut_id": 1,
+            "roles": ["astronaut", "admin"],
+            "planet_id": 1,
+        }
+    )
 
 
 def user_token() -> str:
-    return create_access_token({
-        "sub": "2",
-        "email": "user@eleven-labs.com",
-        "astronaut_id": 2,
-        "roles": ["astronaut"],
-        "planet_id": 1,
-    })
+    return create_access_token(
+        {
+            "sub": "2",
+            "email": "user@eleven-labs.com",
+            "astronaut_id": 2,
+            "roles": ["astronaut"],
+            "planet_id": 1,
+        }
+    )
 
 
 @pytest.fixture
@@ -58,6 +63,7 @@ def mock_db_with_grade(grade: MagicMock | None = None) -> AsyncMock:
 
 async def test_list_grades_public(client: AsyncClient) -> None:
     from src.db.session import get_db
+
     mock_db = mock_db_with_grade(make_grade())
     app.dependency_overrides[get_db] = lambda: (yield mock_db)
 

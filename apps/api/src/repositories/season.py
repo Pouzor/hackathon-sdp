@@ -38,9 +38,7 @@ class SeasonRepository:
         await self._db.refresh(season)
         return season
 
-    async def get_or_create_planet_score(
-        self, season_id: int, planet_id: int
-    ) -> SeasonPlanetScore:
+    async def get_or_create_planet_score(self, season_id: int, planet_id: int) -> SeasonPlanetScore:
         result = await self._db.execute(
             select(SeasonPlanetScore).where(
                 SeasonPlanetScore.season_id == season_id,
@@ -54,16 +52,12 @@ class SeasonRepository:
             await self._db.flush()
         return score
 
-    async def increment_planet_score(
-        self, season_id: int, planet_id: int, points: int
-    ) -> None:
+    async def increment_planet_score(self, season_id: int, planet_id: int, points: int) -> None:
         score = await self.get_or_create_planet_score(season_id, planet_id)
         score.points += points
         await self._db.commit()
 
-    async def decrement_planet_score(
-        self, season_id: int, planet_id: int, points: int
-    ) -> None:
+    async def decrement_planet_score(self, season_id: int, planet_id: int, points: int) -> None:
         score = await self.get_or_create_planet_score(season_id, planet_id)
         score.points = max(0, score.points - points)
         await self._db.commit()

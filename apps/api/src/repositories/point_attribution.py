@@ -20,9 +20,7 @@ class PointAttributionRepository:
         )
         return int(result.scalar() or 0)
 
-    async def count_by_astronaut_and_season(
-        self, astronaut_id: int, season_id: int
-    ) -> int:
+    async def count_by_astronaut_and_season(self, astronaut_id: int, season_id: int) -> int:
         """Nombre d'attributions pour un astronaute dans une saison donnée."""
         result = await self._db.execute(
             select(func.count()).where(

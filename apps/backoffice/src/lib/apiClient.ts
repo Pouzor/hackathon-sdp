@@ -1,7 +1,8 @@
 // Auth token stocké en localStorage — trade-off accepté (CLAUDE.md §5, httpOnly cookie = future work)
 import { AUTH_TOKEN_KEY } from "@/hooks/useAuth";
 
-const BASE_URL = import.meta.env.VITE_API_URL as string | undefined ?? "http://localhost:8000/api/v1";
+const BASE_URL =
+  (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:8000/api/v1";
 
 function authHeaders(): Record<string, string> {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
@@ -19,6 +20,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     throw new Error("Session expirée — redirection vers /login");
   }
   if (!res.ok) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const detail = await res.json().catch(() => ({ detail: res.statusText }));
     throw new Error((detail as { detail?: string }).detail ?? res.statusText);
   }

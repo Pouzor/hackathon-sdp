@@ -20,7 +20,16 @@ function wrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
-const mockAstronaut: astronautsApi.ProfileUpdatePayload & { id: number; email: string; first_name: string; last_name: string; photo_url: string | null; roles: string[]; planet_id: number | null; total_points: number } = {
+const mockAstronaut: astronautsApi.ProfileUpdatePayload & {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  photo_url: string | null;
+  roles: string[];
+  planet_id: number | null;
+  total_points: number;
+} = {
   id: 2,
   email: "user@eleven-labs.com",
   first_name: "Bob",
@@ -37,7 +46,12 @@ describe("ProfileEditPage", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     vi.spyOn(useAuthModule, "useAuth").mockReturnValue({
-      user: { email: "user@eleven-labs.com", astronaut_id: 2, roles: ["astronaut"], planet_id: null },
+      user: {
+        email: "user@eleven-labs.com",
+        astronaut_id: 2,
+        roles: ["astronaut"],
+        planet_id: null,
+      },
       isAuthenticated: true,
       isAdmin: false,
       logout: vi.fn(),

@@ -30,4 +30,3 @@ export function useMe() {
     staleTime: 5 * 60 * 1000,
   });
 }
-

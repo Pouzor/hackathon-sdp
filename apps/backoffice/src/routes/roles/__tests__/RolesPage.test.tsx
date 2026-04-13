@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi, beforeEach } from "vitest";
@@ -68,7 +68,7 @@ describe("RolesPage", () => {
 
     render(<RolesPage />, { wrapper });
 
-    expect(screen.getByText("alice admin", { exact: false }) ?? screen.getByText("Alice Admin")).toBeInTheDocument();
+    expect(screen.getByText("alice admin", { exact: false })).toBeInTheDocument();
     expect(screen.getByText("bob@eleven-labs.com")).toBeInTheDocument();
     expect(screen.getAllByText("Admin").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Astronaute").length).toBeGreaterThanOrEqual(1);

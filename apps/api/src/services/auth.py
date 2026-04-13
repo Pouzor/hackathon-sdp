@@ -85,10 +85,12 @@ class AuthService:
 
     def create_jwt(self, astronaut: Astronaut) -> str:
         """Crée un JWT avec les claims de l'astronaute."""
-        return create_access_token({
-            "sub": str(astronaut.id),
-            "email": astronaut.email,
-            "astronaut_id": astronaut.id,
-            "roles": astronaut.roles,
-            "planet_id": astronaut.planet_id,
-        })
+        return create_access_token(
+            {
+                "sub": str(astronaut.id),
+                "email": astronaut.email,
+                "astronaut_id": astronaut.id,
+                "roles": astronaut.roles,
+                "planet_id": astronaut.planet_id,
+            }
+        )

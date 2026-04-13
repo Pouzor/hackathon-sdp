@@ -47,10 +47,7 @@ export function AdminLayout() {
         {/* User info + logout */}
         <div className="border-t px-4 py-3">
           <p className="truncate text-xs font-medium text-gray-700">{user?.email}</p>
-          <button
-            onClick={logout}
-            className="mt-1 text-xs text-gray-400 hover:text-red-500"
-          >
+          <button onClick={logout} className="mt-1 text-xs text-gray-400 hover:text-red-500">
             Se déconnecter
           </button>
         </div>

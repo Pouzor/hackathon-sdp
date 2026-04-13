@@ -1,4 +1,5 @@
 """Tests d'intégration pour les routes /activities."""
+
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -21,23 +22,27 @@ def make_activity(id: int = 1) -> MagicMock:
 
 
 def admin_token() -> str:
-    return create_access_token({
-        "sub": "1",
-        "email": "admin@eleven-labs.com",
-        "astronaut_id": 1,
-        "roles": ["astronaut", "admin"],
-        "planet_id": 1,
-    })
+    return create_access_token(
+        {
+            "sub": "1",
+            "email": "admin@eleven-labs.com",
+            "astronaut_id": 1,
+            "roles": ["astronaut", "admin"],
+            "planet_id": 1,
+        }
+    )
 
 
 def user_token() -> str:
-    return create_access_token({
-        "sub": "2",
-        "email": "user@eleven-labs.com",
-        "astronaut_id": 2,
-        "roles": ["astronaut"],
-        "planet_id": 1,
-    })
+    return create_access_token(
+        {
+            "sub": "2",
+            "email": "user@eleven-labs.com",
+            "astronaut_id": 2,
+            "roles": ["astronaut"],
+            "planet_id": 1,
+        }
+    )
 
 
 @pytest.fixture
@@ -60,6 +65,7 @@ def mock_db_with_activity(activity: MagicMock | None = None) -> AsyncMock:
 
 async def test_list_activities_public(client: AsyncClient) -> None:
     from src.db.session import get_db
+
     mock_db = mock_db_with_activity(make_activity())
     app.dependency_overrides[get_db] = lambda: (yield mock_db)
 
@@ -72,6 +78,7 @@ async def test_list_activities_public(client: AsyncClient) -> None:
 
 async def test_get_activity_not_found(client: AsyncClient) -> None:
     from src.db.session import get_db
+
     mock_db = mock_db_with_activity(None)
     app.dependency_overrides[get_db] = lambda: (yield mock_db)
 
@@ -83,6 +90,7 @@ async def test_get_activity_not_found(client: AsyncClient) -> None:
 
 async def test_get_activity_found(client: AsyncClient) -> None:
     from src.db.session import get_db
+
     mock_db = mock_db_with_activity(make_activity())
     app.dependency_overrides[get_db] = lambda: (yield mock_db)
 
@@ -104,7 +112,13 @@ async def test_create_activity_requires_admin(client: AsyncClient) -> None:
 
     response = await client.post(
         "/api/v1/activities",
-        json={"name": "Nouvelle", "base_points": 50, "category": "talk", "is_collaborative": False, "allow_multiple_assignees": False},
+        json={
+            "name": "Nouvelle",
+            "base_points": 50,
+            "category": "talk",
+            "is_collaborative": False,
+            "allow_multiple_assignees": False,
+        },
         headers={"Authorization": f"Bearer {user_token()}"},
     )
     app.dependency_overrides.clear()
@@ -130,7 +144,13 @@ async def test_create_activity_as_admin(client: AsyncClient) -> None:
     with patch.object(ActivityRepository, "create", new=AsyncMock(return_value=new_activity)):
         response = await client.post(
             "/api/v1/activities",
-            json={"name": "Nouveau Talk", "base_points": 60, "category": "talk", "is_collaborative": False, "allow_multiple_assignees": False},
+            json={
+                "name": "Nouveau Talk",
+                "base_points": 60,
+                "category": "talk",
+                "is_collaborative": False,
+                "allow_multiple_assignees": False,
+            },
             headers={"Authorization": f"Bearer {admin_token()}"},
         )
     app.dependency_overrides.clear()

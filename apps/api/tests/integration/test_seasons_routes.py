@@ -1,4 +1,5 @@
 """Tests d'intégration pour les routes /seasons."""
+
 from datetime import date
 from unittest.mock import AsyncMock, MagicMock
 
@@ -10,13 +11,15 @@ from src.main import app
 
 
 def admin_token() -> str:
-    return create_access_token({
-        "sub": "1",
-        "email": "admin@eleven-labs.com",
-        "astronaut_id": 1,
-        "roles": ["astronaut", "admin"],
-        "planet_id": 1,
-    })
+    return create_access_token(
+        {
+            "sub": "1",
+            "email": "admin@eleven-labs.com",
+            "astronaut_id": 1,
+            "roles": ["astronaut", "admin"],
+            "planet_id": 1,
+        }
+    )
 
 
 def make_season(id: int = 1, is_active: bool = True) -> MagicMock:

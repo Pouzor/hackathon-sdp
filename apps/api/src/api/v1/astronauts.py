@@ -96,7 +96,12 @@ async def update_astronaut_profile(
         all_fields = {k: v for k, v in all_fields.items() if k not in ADMIN_ONLY_FIELDS}
 
     updated = await astronaut_repo.update_profile(target, all_fields)
-    logger.info("profile_updated by=%s target_id=%s fields=%s", current.email, astronaut_id, list(all_fields.keys()))
+    logger.info(
+        "profile_updated by=%s target_id=%s fields=%s",
+        current.email,
+        astronaut_id,
+        list(all_fields.keys()),
+    )
 
     grades = await grade_repo.get_all()
     return _enrich(updated, _resolve_grade(updated.total_points, grades))

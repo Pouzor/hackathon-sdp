@@ -32,15 +32,11 @@ class PointAttribution(Base):
     first_ever_multiplier_applied: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False
     )
-    first_season_bonus_applied: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False
-    )
+    first_season_bonus_applied: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     # Soft delete pour audit
     is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    deleted_by: Mapped[int | None] = mapped_column(
-        ForeignKey("astronauts.id", ondelete="SET NULL")
-    )
+    deleted_by: Mapped[int | None] = mapped_column(ForeignKey("astronauts.id", ondelete="SET NULL"))
     deletion_reason: Mapped[str | None] = mapped_column(String(500))
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 

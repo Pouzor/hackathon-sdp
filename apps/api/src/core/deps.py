@@ -69,7 +69,9 @@ async def require_admin(
 ) -> Astronaut:
     """Vérifie que l'astronaute a le rôle admin."""
     if "admin" not in astronaut.roles:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Accès réservé aux admins")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Accès réservé aux admins"
+        )
     return astronaut
 
 

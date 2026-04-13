@@ -47,6 +47,7 @@ def verify_token(token: str) -> TokenPayload:
 
 # --- CSRF state helpers ---
 
+
 def _hmac_sign(message: str) -> str:
     """Signe un message avec HMAC-SHA256 et la clé secrète."""
     return hmac.new(settings.secret_key.encode(), message.encode(), hashlib.sha256).hexdigest()

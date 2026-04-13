@@ -65,7 +65,9 @@ async def create_planet(
 ) -> PlanetOut:
     existing = await repo.get_by_name(body.name)
     if existing is not None:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Nom de planète déjà utilisé")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Nom de planète déjà utilisé"
+        )
     planet = await repo.create(**body.model_dump())
     active = await season_repo.get_active()
     return await _enrich(planet, season_repo, active.id if active else None)

@@ -29,7 +29,7 @@ export function decodeJwtPayload(token: string): JwtPayload | null {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
-    const b64 = parts[1]!.replace(/-/g, "+").replace(/_/g, "/");
+    const b64 = (parts[1] ?? "").replace(/-/g, "+").replace(/_/g, "/");
     const padded = b64.padEnd(b64.length + ((4 - (b64.length % 4)) % 4), "=");
     return JSON.parse(atob(padded)) as JwtPayload;
   } catch {

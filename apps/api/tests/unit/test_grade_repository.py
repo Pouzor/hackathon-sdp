@@ -1,4 +1,5 @@
 """Tests unitaires pour GradeRepository.get_for_points."""
+
 from unittest.mock import AsyncMock, MagicMock
 
 from src.repositories.grade import GradeRepository

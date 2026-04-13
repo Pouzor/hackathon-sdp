@@ -28,14 +28,21 @@ function NavLink({ children, to }: { children: React.ReactNode; to?: string }) {
   return (
     <a
       href="#"
-      onClick={(e) => { e.preventDefault(); if (to) navigate(to); }}
+      onClick={(e) => {
+        e.preventDefault();
+        if (to) navigate(to);
+      }}
       style={{
         ...NAV_LINK,
         color: hovered ? "white" : "rgba(255,255,255,0.75)",
         background: hovered ? "rgba(255,255,255,0.07)" : "transparent",
       }}
-      onMouseEnter={() => { setHovered(true); }}
-      onMouseLeave={() => { setHovered(false); }}
+      onMouseEnter={() => {
+        setHovered(true);
+      }}
+      onMouseLeave={() => {
+        setHovered(false);
+      }}
     >
       {children}
     </a>
@@ -55,10 +62,10 @@ function NavBar() {
         borderRadius: 12,
         border: "1px solid rgba(255,255,255,0.07)",
         boxShadow: [
-          "0 8px 32px rgba(0,0,0,0.6)",          // outer depth
+          "0 8px 32px rgba(0,0,0,0.6)", // outer depth
           "inset 0 1px 0 rgba(255,255,255,0.06)", // top bevel highlight
-          "inset 0 -1px 0 rgba(0,0,0,0.4)",       // bottom inner shadow
-          "inset 2px 0 8px rgba(0,0,0,0.3)",      // left inner depth
+          "inset 0 -1px 0 rgba(0,0,0,0.4)", // bottom inner shadow
+          "inset 2px 0 8px rgba(0,0,0,0.3)", // left inner depth
         ].join(", "),
         padding: "4px 6px",
       }}
@@ -85,23 +92,38 @@ function NavBar() {
           borderRadius: 8,
           background: "rgba(0,0,0,0.4)",
           border: "1px solid rgba(255,255,255,0.06)",
-          boxShadow: [
-            "inset 0 2px 6px rgba(0,0,0,0.6)",
-            "inset 0 1px 0 rgba(0,0,0,0.8)",
-          ].join(", "),
+          boxShadow: ["inset 0 2px 6px rgba(0,0,0,0.6)", "inset 0 1px 0 rgba(0,0,0,0.8)"].join(
+            ", ",
+          ),
           cursor: "pointer",
         }}
       >
         {/* Star icon */}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-          <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase", lineHeight: 1 }}>
+          <span
+            style={{
+              color: "rgba(255,255,255,0.45)",
+              fontSize: 9,
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              lineHeight: 1,
+            }}
+          >
             Mes points
           </span>
-          <span style={{ color: "#fbbf24", fontSize: 15, fontWeight: 800, lineHeight: 1, fontFamily: "'Arial Black', Arial, sans-serif" }}>
+          <span
+            style={{
+              color: "#fbbf24",
+              fontSize: 15,
+              fontWeight: 800,
+              lineHeight: 1,
+              fontFamily: "'Arial Black', Arial, sans-serif",
+            }}
+          >
             {ME.points.toLocaleString()}
           </span>
         </div>
@@ -128,9 +150,7 @@ function NavBar() {
 const RANK_ICONS = ["👑", "🥈", "🥉", "4"];
 
 function Leaderboard({ planets }: { planets: PlanetData[] }) {
-  const competing = [...planets]
-    .filter((p) => p.isCompeting)
-    .sort((a, b) => b.score - a.score);
+  const competing = [...planets].filter((p) => p.isCompeting).sort((a, b) => b.score - a.score);
 
   const max = competing[0]?.score ?? 1;
 
@@ -165,7 +185,7 @@ function Leaderboard({ planets }: { planets: PlanetData[] }) {
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
           </svg>
           <span
             style={{
@@ -179,7 +199,14 @@ function Leaderboard({ planets }: { planets: PlanetData[] }) {
             Classement
           </span>
         </div>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, margin: "4px 0 0", letterSpacing: "0.1em" }}>
+        <p
+          style={{
+            color: "rgba(255,255,255,0.3)",
+            fontSize: 10,
+            margin: "4px 0 0",
+            letterSpacing: "0.1em",
+          }}
+        >
           Saison 2026
         </p>
       </div>
@@ -200,16 +227,25 @@ function Leaderboard({ planets }: { planets: PlanetData[] }) {
                 borderLeft: isFirst ? `2px solid ${planet.color}` : "2px solid transparent",
               }}
               onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLElement).style.background = `rgba(${hexToRgb(planet.color)}, 0.08)`)
+                ((e.currentTarget as HTMLElement).style.background =
+                  `rgba(${hexToRgb(planet.color)}, 0.08)`)
               }
               onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLElement).style.background =
-                  isFirst ? `rgba(${hexToRgb(planet.color)}, 0.06)` : "transparent")
+                ((e.currentTarget as HTMLElement).style.background = isFirst
+                  ? `rgba(${hexToRgb(planet.color)}, 0.06)`
+                  : "transparent")
               }
             >
               {/* Rank + name */}
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                <span style={{ fontSize: i === 0 ? 16 : 12, lineHeight: 1, minWidth: 18, textAlign: "center" }}>
+                <span
+                  style={{
+                    fontSize: i === 0 ? 16 : 12,
+                    lineHeight: 1,
+                    minWidth: 18,
+                    textAlign: "center",
+                  }}
+                >
                   {RANK_ICONS[i]}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -274,7 +310,14 @@ function Leaderboard({ planets }: { planets: PlanetData[] }) {
           alignItems: "center",
         }}
       >
-        <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+        <span
+          style={{
+            color: "rgba(255,255,255,0.3)",
+            fontSize: 10,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+          }}
+        >
           Total saison
         </span>
         <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11, fontWeight: 600 }}>
@@ -405,7 +448,9 @@ export function HomePage() {
       {selectedPlanet && (
         <PlanetDetail
           planet={selectedPlanet}
-          onClose={() => { setSelectedPlanet(null); }}
+          onClose={() => {
+            setSelectedPlanet(null);
+          }}
           visible={planetSelected}
         />
       )}

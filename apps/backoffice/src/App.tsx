@@ -17,7 +17,14 @@ function App() {
       {/* Routes protégées admin */}
       <Route element={<RequireAdmin />}>
         <Route path="/" element={<AdminLayout />}>
-          <Route index element={<div className="text-gray-500 text-sm">Tableau de bord — bienvenue dans le back-office.</div>} />
+          <Route
+            index
+            element={
+              <div className="text-sm text-gray-500">
+                Tableau de bord — bienvenue dans le back-office.
+              </div>
+            }
+          />
           <Route path="astronauts" element={<AstronautsAdminPage />} />
           <Route path="roles" element={<RolesPage />} />
           <Route path="attributions/new" element={<AttributionPage />} />

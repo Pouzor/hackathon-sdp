@@ -41,8 +41,10 @@ export function Sun() {
           return (
             <line
               key={i}
-              x1={x1} y1={y1}
-              x2={x2} y2={y2}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
               stroke="#ffd700"
               strokeWidth={i % 3 === 0 ? "2.5" : "1.5"}
               strokeOpacity="0.7"
@@ -62,8 +64,10 @@ export function Sun() {
           return (
             <line
               key={i}
-              x1={x1} y1={y1}
-              x2={x2} y2={y2}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
               stroke="#ff6000"
               strokeWidth="1"
               strokeOpacity="0.5"
@@ -85,7 +89,8 @@ export function Sun() {
 
       {/* E11 label */}
       <text
-        x="0" y="5"
+        x="0"
+        y="5"
         textAnchor="middle"
         dominantBaseline="middle"
         fontFamily="'Arial Black', Arial, sans-serif"

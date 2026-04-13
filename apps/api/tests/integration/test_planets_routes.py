@@ -1,4 +1,5 @@
 """Tests d'intégration pour les routes /planets."""
+
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -21,23 +22,27 @@ def make_planet(id: int = 1, name: str = "Mars") -> MagicMock:
 
 
 def admin_token() -> str:
-    return create_access_token({
-        "sub": "1",
-        "email": "admin@eleven-labs.com",
-        "astronaut_id": 1,
-        "roles": ["astronaut", "admin"],
-        "planet_id": 1,
-    })
+    return create_access_token(
+        {
+            "sub": "1",
+            "email": "admin@eleven-labs.com",
+            "astronaut_id": 1,
+            "roles": ["astronaut", "admin"],
+            "planet_id": 1,
+        }
+    )
 
 
 def user_token() -> str:
-    return create_access_token({
-        "sub": "2",
-        "email": "user@eleven-labs.com",
-        "astronaut_id": 2,
-        "roles": ["astronaut"],
-        "planet_id": 1,
-    })
+    return create_access_token(
+        {
+            "sub": "2",
+            "email": "user@eleven-labs.com",
+            "astronaut_id": 2,
+            "roles": ["astronaut"],
+            "planet_id": 1,
+        }
+    )
 
 
 @pytest.fixture
@@ -64,6 +69,7 @@ def mock_db_with_planet(planet: MagicMock | None = None) -> AsyncMock:
 async def test_list_planets_public(client: AsyncClient) -> None:
     """GET /planets est public (pas de token requis)."""
     from src.db.session import get_db
+
     mock_db = mock_db_with_planet(make_planet())
     app.dependency_overrides[get_db] = lambda: (yield mock_db)
 
@@ -76,6 +82,7 @@ async def test_list_planets_public(client: AsyncClient) -> None:
 
 async def test_get_planet_not_found(client: AsyncClient) -> None:
     from src.db.session import get_db
+
     mock_db = mock_db_with_planet(None)
     app.dependency_overrides[get_db] = lambda: (yield mock_db)
 
@@ -120,6 +127,7 @@ async def test_create_planet_conflict_on_duplicate_name(client: AsyncClient) -> 
         yield mock_db
 
     from src.core.deps import get_current_astronaut
+
     app.dependency_overrides[get_db] = override_get_db
     app.dependency_overrides[get_current_astronaut] = lambda: admin_astronaut
 

@@ -38,6 +38,7 @@ class Settings(BaseSettings):
         if not v:
             raise ValueError("Google OAuth credentials (client_id / client_secret) must be set")
         return v
+
     google_redirect_uri: str = "http://localhost:8000/api/v1/auth/google/callback"
     google_auth_url: str = "https://accounts.google.com/o/oauth2/v2/auth"
     google_token_url: str = "https://oauth2.googleapis.com/token"

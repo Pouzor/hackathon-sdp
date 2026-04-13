@@ -1,4 +1,5 @@
 """Tests d'intégration pour les endpoints de santé."""
+
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -51,6 +52,7 @@ async def test_health_ready_with_db(client: AsyncClient) -> None:
             yield mock_session
 
         from src.db.session import get_db
+
         app.dependency_overrides[get_db] = override_get_db
 
         response = await client.get("/health/ready")

@@ -44,7 +44,12 @@ describe("RequireAdmin", () => {
 
   it("shows access denied when authenticated but not admin", () => {
     mockUseAuth.mockReturnValue({
-      user: { email: "jean@eleven-labs.com", astronaut_id: 1, roles: ["astronaut"], planet_id: null },
+      user: {
+        email: "jean@eleven-labs.com",
+        astronaut_id: 1,
+        roles: ["astronaut"],
+        planet_id: null,
+      },
       isAuthenticated: true,
       isAdmin: false,
       logout: vi.fn(),

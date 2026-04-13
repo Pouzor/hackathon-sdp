@@ -75,6 +75,7 @@ def make_attribution(id: int = 1, points: int = 40, astronaut_id: int = 1) -> Ma
 
 # ─── Validation ─────────────────────────────────────────────────────────────
 
+
 async def test_no_active_season_raises_400() -> None:
     service, _ = make_service()
     service._season_repo.get_active = AsyncMock(return_value=None)
@@ -123,6 +124,7 @@ async def test_astronaut_without_planet_raises_400() -> None:
 
 # ─── F-302 : Multi-assignee ──────────────────────────────────────────────────
 
+
 async def test_multiple_astronauts_non_collaborative_raises_400() -> None:
     service, _ = make_service()
     service._season_repo.get_active = AsyncMock(return_value=make_season())
@@ -136,6 +138,7 @@ async def test_multiple_astronauts_non_collaborative_raises_400() -> None:
 
 
 # ─── F-301 : Attribution de base ────────────────────────────────────────────
+
 
 async def test_basic_attribution_uses_activity_base_points() -> None:
     service, mock_db = make_service()
@@ -171,6 +174,7 @@ async def test_basic_attribution_uses_activity_base_points() -> None:
 
 
 # ─── F-303 : Multiplicateur ×2 sur 1ère contribution ever ───────────────────
+
 
 async def test_first_ever_contribution_applies_multiplier() -> None:
     service, mock_db = make_service()
@@ -227,6 +231,7 @@ async def test_second_contribution_no_multiplier() -> None:
 
 # ─── F-304 : Bonus +25 sur 1ère contribution de la saison ───────────────────
 
+
 async def test_first_season_contribution_adds_bonus() -> None:
     service, mock_db = make_service()
     mock_db.commit = AsyncMock()
@@ -282,6 +287,7 @@ async def test_second_season_contribution_no_bonus() -> None:
 
 # ─── Cas combiné : 1ère ever + 1ère saison ──────────────────────────────────
 
+
 async def test_first_ever_and_first_season_cumulates_both() -> None:
     """1ère contribution ever ET 1ère de la saison : ×2 puis +25."""
     service, mock_db = make_service()
@@ -313,6 +319,7 @@ async def test_first_ever_and_first_season_cumulates_both() -> None:
 
 # ─── F-302 : Co-auteurs reçoivent chacun le total ───────────────────────────
 
+
 async def test_collaborative_each_coauthor_gets_full_points() -> None:
     """Article à deux : chaque auteur reçoit 40 pts (pas de split)."""
     service, mock_db = make_service()
@@ -328,9 +335,7 @@ async def test_collaborative_each_coauthor_gets_full_points() -> None:
 
     service._season_repo.get_active = AsyncMock(return_value=season)
     service._activity_repo.get_by_id = AsyncMock(return_value=activity)
-    service._astronaut_repo.get_by_id = AsyncMock(
-        side_effect=[astronaut1, astronaut2]
-    )
+    service._astronaut_repo.get_by_id = AsyncMock(side_effect=[astronaut1, astronaut2])
     service._pa_repo.count_by_astronaut = AsyncMock(return_value=5)
     service._pa_repo.count_by_astronaut_and_season = AsyncMock(return_value=2)
     service._pa_repo.create = AsyncMock(side_effect=[attribution1, attribution2])
@@ -349,6 +354,7 @@ async def test_collaborative_each_coauthor_gets_full_points() -> None:
 
 
 # ─── F-306 : Suppression avec recalcul ──────────────────────────────────────
+
 
 async def test_delete_attribution_decrements_totals() -> None:
     service, mock_db = make_service()
@@ -400,6 +406,7 @@ async def test_delete_missing_attribution_raises_404() -> None:
 
 
 # ─── Grades ─────────────────────────────────────────────────────────────────
+
 
 async def test_custom_points_override_base_points() -> None:
     """Points personnalisés overrident les base_points de l'activité."""

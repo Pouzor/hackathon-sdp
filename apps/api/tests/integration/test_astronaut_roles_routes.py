@@ -1,4 +1,5 @@
 """Tests d'intégration pour PATCH /astronauts/{id}/roles (F-104)."""
+
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -53,7 +54,9 @@ async def test_patch_roles_promote_to_admin(client: AsyncClient) -> None:
 
     mock_repo = MagicMock()
     mock_repo.get_by_id = AsyncMock(return_value=target)
-    mock_repo.update_roles = AsyncMock(return_value=make_astronaut(2, "target@eleven-labs.com", ["astronaut", "admin"]))
+    mock_repo.update_roles = AsyncMock(
+        return_value=make_astronaut(2, "target@eleven-labs.com", ["astronaut", "admin"])
+    )
 
     mock_grade_repo = MagicMock()
     mock_grade_repo.get_all = AsyncMock(return_value=[])

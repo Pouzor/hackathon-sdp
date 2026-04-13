@@ -18,14 +18,19 @@ export function HQPlanet({ size }: { size: number }) {
         </radialGradient>
         <filter id={`hqGlow-${uid}`}>
           <feGaussianBlur stdDeviation="2" result="blur" />
-          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
         </filter>
       </defs>
 
       {/* Equatorial ring */}
       <ellipse
-        cx="0" cy="0"
-        rx={r + 8} ry={4}
+        cx="0"
+        cy="0"
+        rx={r + 8}
+        ry={4}
         fill="none"
         stroke="#c0d0f0"
         strokeWidth="2"
@@ -37,14 +42,22 @@ export function HQPlanet({ size }: { size: number }) {
 
       {/* Cloud bands */}
       <ellipse cx="0" cy={-r * 0.3} rx={r * 0.7} ry={r * 0.12} fill="white" opacity="0.12" />
-      <ellipse cx="0" cy={r * 0.2}  rx={r * 0.55} ry={r * 0.1}  fill="white" opacity="0.08" />
+      <ellipse cx="0" cy={r * 0.2} rx={r * 0.55} ry={r * 0.1} fill="white" opacity="0.08" />
 
       {/* Highlight */}
-      <ellipse cx={-r * 0.3} cy={-r * 0.35} rx={r * 0.28} ry={r * 0.2} fill="white" opacity="0.25" />
+      <ellipse
+        cx={-r * 0.3}
+        cy={-r * 0.35}
+        rx={r * 0.28}
+        ry={r * 0.2}
+        fill="white"
+        opacity="0.25"
+      />
 
       {/* HQ text */}
       <text
-        x="0" y="1"
+        x="0"
+        y="1"
         textAnchor="middle"
         dominantBaseline="middle"
         fontFamily="Arial, sans-serif"
