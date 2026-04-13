@@ -17,34 +17,28 @@ function NavLink({ children, to }: { children: React.ReactNode; to?: string }) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   return (
-    <a
-      role="button"
-      tabIndex={0}
-      onClick={(e) => {
-        e.preventDefault();
-        if (to) navigate(to);
-      }}
-      onKeyDown={(e) => {
-        if ((e.key === "Enter" || e.key === " ") && to) navigate(to);
-      }}
+    <button
+      type="button"
+      onClick={() => { if (to) navigate(to); }}
+      disabled={!to}
       style={{
         color: hovered ? "white" : "rgba(255,255,255,0.75)",
         background: hovered ? "rgba(255,255,255,0.07)" : "transparent",
         fontSize: 13,
         letterSpacing: "0.08em",
         textTransform: "uppercase",
-        cursor: "pointer",
+        cursor: to ? "pointer" : "default",
         padding: "6px 12px",
         borderRadius: 6,
         transition: "color 0.2s, background 0.2s",
         whiteSpace: "nowrap",
-        textDecoration: "none",
+        border: "none",
       }}
       onMouseEnter={() => { setHovered(true); }}
       onMouseLeave={() => { setHovered(false); }}
     >
       {children}
-    </a>
+    </button>
   );
 }
 

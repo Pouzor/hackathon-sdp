@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { apiClient, getAvatarUrl } from "@/lib/apiClient";
-import type { Astronaut as AstronautOut } from "@/api/types";
+import type { Astronaut } from "@/api/types";
 
 /**
  * Recadre l'image au carré centré et la renvoie en JPEG 400×400.
@@ -45,7 +45,7 @@ interface AvatarUploadProps {
   currentPhotoUrl: string | null | undefined;
   initials: string;
   color: string;
-  onUploaded: (astronaut: AstronautOut) => void;
+  onUploaded: (astronaut: Astronaut) => void;
 }
 
 export function AvatarUpload({
@@ -62,11 +62,22 @@ export function AvatarUpload({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  // Cleanup object URL on unmount or when previewUrl changes
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   const avatarSrc = getAvatarUrl(currentPhotoUrl);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError("Image trop lourde (max 10 Mo)");
+      return;
+    }
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     setPendingFile(file);
@@ -89,7 +100,7 @@ export function AvatarUpload({
       const cropped = await centerCrop(pendingFile);
       const form = new FormData();
       form.append("file", cropped, "avatar.jpg");
-      const updated = await apiClient.upload<AstronautOut>(
+      const updated = await apiClient.upload<Astronaut>(
         `/astronauts/${astronautId}/photo`,
         form,
       );
@@ -109,9 +120,11 @@ export function AvatarUpload({
         style={{ position: "relative", display: "inline-block" }}
         onMouseEnter={() => { setHovering(true); }}
         onMouseLeave={() => { setHovering(false); }}
-        onClick={() => { inputRef.current?.click(); }}
       >
-        <div
+        <button
+          type="button"
+          onClick={() => { inputRef.current?.click(); }}
+          aria-label="Modifier la photo de profil"
           style={{
             width: 100,
             height: 100,
@@ -126,6 +139,7 @@ export function AvatarUpload({
             alignItems: "center",
             justifyContent: "center",
             position: "relative",
+            padding: 0,
           }}
         >
           {avatarSrc ? (
@@ -172,7 +186,7 @@ export function AvatarUpload({
               ✏<br />Modifier
             </span>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Input fichier caché */}

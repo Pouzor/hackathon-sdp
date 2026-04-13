@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import { useAstronaut, useUpdateProfile } from "@/api/astronauts";
 import { AvatarUpload } from "@/components/features/AvatarUpload";
-import type { Astronaut as AstronautOut } from "@/api/types";
+import type { Astronaut } from "@/api/types";
 
 const schema = z.object({
   hobbies: z.string().max(1000).nullable(),
@@ -38,13 +38,13 @@ export function ProfileEditPage() {
     if (astronaut) {
       setCurrentPhotoUrl(astronaut.photo_url ?? null);
       reset({
-        hobbies: (astronaut as { hobbies?: string | null }).hobbies ?? "",
-        client: (astronaut as { client?: string | null }).client ?? "",
+        hobbies: astronaut.hobbies ?? "",
+        client: astronaut.client ?? "",
       });
     }
   }, [astronaut, reset]);
 
-  function handlePhotoUploaded(updated: AstronautOut) {
+  function handlePhotoUploaded(updated: Astronaut) {
     setCurrentPhotoUrl(updated.photo_url ?? null);
   }
 
