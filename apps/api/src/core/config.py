@@ -54,5 +54,8 @@ class Settings(BaseSettings):
     frontend_url: str = "http://localhost:5173"
     backoffice_url: str = "http://localhost:5174"
 
+    # Uploads
+    upload_dir: str = "uploads"
+
 
 settings = Settings()  # type: ignore[call-arg]  # pydantic-settings populates required fields from env

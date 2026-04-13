@@ -51,5 +51,6 @@ app.include_router(grades_router, prefix="/api/v1")
 app.include_router(point_attributions_router, prefix="/api/v1")
 
 # Fichiers uploadés (avatars, etc.)
-os.makedirs("uploads/avatars", exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+from pathlib import Path as _Path
+_Path(settings.upload_dir + "/avatars").mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")

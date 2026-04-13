@@ -6,6 +6,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.config import settings
 from src.core.deps import CurrentAdmin, CurrentAstronaut
 from src.db.session import get_db
 from src.models.astronaut import Astronaut
@@ -21,16 +22,20 @@ from src.schemas.astronaut import (
 
 logger = logging.getLogger(__name__)
 
-UPLOAD_DIR = Path("uploads/avatars")
+UPLOAD_DIR = Path(settings.upload_dir) / "avatars"
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 Mo
 
 # Magic bytes signatures pour validation du contenu réel
-MAGIC_BYTES: dict[str, list[bytes]] = {
-    "image/jpeg": [b"\xff\xd8\xff"],
-    "image/png": [b"\x89PNG"],
-    "image/webp": [b"RIFF"],
-}
+# WebP : RIFF aux octets 0-3 ET WEBP aux octets 8-11 (WAV/AVI partagent RIFF)
+def _is_valid_magic(content_type: str, contents: bytes) -> bool:
+    if content_type == "image/jpeg":
+        return contents[:3] == b"\xff\xd8\xff"
+    if content_type == "image/png":
+        return contents[:4] == b"\x89PNG"
+    if content_type == "image/webp":
+        return contents[:4] == b"RIFF" and contents[8:12] == b"WEBP"
+    return False
 
 router = APIRouter(prefix="/astronauts", tags=["astronauts"])
 
@@ -149,8 +154,7 @@ async def upload_astronaut_photo(
 
     # Validation magic bytes — le Content-Type header est attacker-controlled
     content_type = file.content_type or ""
-    signatures = MAGIC_BYTES.get(content_type, [])
-    if not signatures or not any(contents.startswith(sig) for sig in signatures):
+    if not _is_valid_magic(content_type, contents):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Contenu du fichier invalide.",

@@ -129,7 +129,7 @@ export function AstronautProfilePage() {
   const { data: contributions = [] } = useQuery({
     queryKey: ["point-attributions", "astronaut", astronautId],
     queryFn: () =>
-      apiClient.get<PointAttribution[]>(`/point-attributions?astronaut_id=${astronautId}`),
+      apiClient.get<PointAttribution[]>(`/api/v1/point-attributions?astronaut_id=${astronautId}`),
     enabled: !isNaN(astronautId),
   });
 
