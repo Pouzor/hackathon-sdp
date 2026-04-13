@@ -49,9 +49,12 @@ export const apiClient = {
   upload: <T>(path: string, body: FormData) => uploadFile<T>(path, body),
 };
 
+/** Origine du serveur (sans le path /api/v1) pour résoudre les fichiers statiques. */
+const SERVER_ORIGIN = new URL(BASE_URL).origin;
+
 /** Résout une photo_url stockée en BDD vers une URL absolue affichable. */
 export function getAvatarUrl(photoUrl: string | null | undefined): string | null {
   if (!photoUrl) return null;
-  if (photoUrl.startsWith("/")) return `${BASE_URL}${photoUrl}`;
+  if (photoUrl.startsWith("/")) return `${SERVER_ORIGIN}${photoUrl}`;
   return photoUrl;
 }
