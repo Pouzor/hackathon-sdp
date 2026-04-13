@@ -10,9 +10,9 @@ export function AuthCallbackPage() {
     const token = searchParams.get("token");
     if (token) {
       localStorage.setItem(AUTH_TOKEN_KEY, token);
-      void navigate("/", { replace: true });
+      navigate("/", { replace: true });
     } else {
-      void navigate("/login", { replace: true });
+      navigate("/login", { replace: true });
     }
   }, [searchParams, navigate]);
 

@@ -46,7 +46,29 @@
       "Bash(git:*)",
       "mcp__plugin_context-mode_context-mode__ctx_search",
       "Bash(pnpm test:*)",
-      "Bash(pnpm coverage:*)"
+      "Bash(pnpm coverage:*)",
+      "Bash(uv run python -c ':*)",
+      "Bash(echo \"Exit: $?\")",
+      "Read(//private/tmp/**)",
+      "Bash(cp /tmp/openapi.json /Users/remyjardinet/Documents/Sites/hackathon-sdp/packages/shared-types/openapi.json)",
+      "Bash(pnpm exec:*)",
+      "Bash(uv add:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(sed -n '20,30p' /Users/remyjardinet/Documents/Sites/hackathon-sdp/apps/frontend/src/api/planets.ts)",
+      "Bash(sed -n '25,32p' /Users/remyjardinet/Documents/Sites/hackathon-sdp/apps/frontend/src/components/features/planet-detail/PlanetDetail.tsx)",
+      "Bash(sed -n '36,42p' /Users/remyjardinet/Documents/Sites/hackathon-sdp/apps/frontend/src/hooks/useAuth.ts)",
+      "Bash(sed -n '1,25p' /Users/remyjardinet/Documents/Sites/hackathon-sdp/apps/frontend/src/lib/apiClient.ts)",
+      "Bash(sed -n '98,105p' /Users/remyjardinet/Documents/Sites/hackathon-sdp/apps/frontend/src/routes/astronauts/AstronautProfilePage.tsx)",
+      "Bash(pnpm --filter backoffice exec vitest run --reporter=verbose)",
+      "Bash(pnpm --filter backoffice exec vitest run --coverage)",
+      "Bash(pnpm --filter frontend exec vitest run --coverage)",
+      "Bash(pnpm --filter frontend exec prettier --write .)",
+      "Bash(pnpm --filter backoffice exec prettier --write .)",
+      "Bash(pnpm --filter backoffice lint)",
+      "Bash(pnpm --filter backoffice lint -- --fix)",
+      "Bash(pnpm --filter backoffice exec prettier --check .)",
+      "Bash(pnpm --filter frontend lint)",
+      "Bash(pnpm --filter frontend exec prettier --check .)"
     ]
   }
 }

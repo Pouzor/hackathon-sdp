@@ -14,9 +14,7 @@ export function useMergedPlanets(): { planets: PlanetData[]; isLoading: boolean 
   const planets: PlanetData[] = PLANET_CONFIG.map((config) => {
     if (!apiPlanets) return config;
 
-    const apiPlanet = apiPlanets.find(
-      (p) => p.name.toLowerCase() === config.name.toLowerCase()
-    );
+    const apiPlanet = apiPlanets.find((p) => p.name.toLowerCase() === config.name.toLowerCase());
     if (!apiPlanet) return config;
 
     return {

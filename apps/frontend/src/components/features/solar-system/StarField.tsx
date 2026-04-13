@@ -46,11 +46,7 @@ export function StarField() {
         const alpha =
           0.4 +
           0.6 *
-            (0.5 +
-              0.5 *
-                Math.sin(
-                  (time / star.twinkleSpeed) * Math.PI * 2 + star.twinkleOffset
-                ));
+            (0.5 + 0.5 * Math.sin((time / star.twinkleSpeed) * Math.PI * 2 + star.twinkleOffset));
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
@@ -69,7 +65,7 @@ export function StarField() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 pointer-events-none"
+      className="pointer-events-none absolute inset-0"
       style={{ zIndex: 0 }}
     />
   );

@@ -1,9 +1,9 @@
 """Tests unitaires pour les dépendances FastAPI."""
+
 from unittest.mock import MagicMock
 
 import pytest
 from fastapi import HTTPException
-from jose import JWTError
 
 from src.core.deps import get_current_token
 from src.core.security import create_access_token
@@ -14,7 +14,7 @@ async def test_get_current_token_missing_credentials() -> None:
     with pytest.raises(HTTPException) as exc:
         await get_current_token(None)
     assert exc.value.status_code == 401
-    assert "manquant" in exc.value.detail
+    assert "invalide" in exc.value.detail
 
 
 async def test_get_current_token_invalid_token() -> None:
@@ -28,12 +28,14 @@ async def test_get_current_token_invalid_token() -> None:
 
 async def test_get_current_token_valid() -> None:
     """Token valide → payload retourné."""
-    token = create_access_token({
-        "sub": "1",
-        "email": "x@eleven-labs.com",
-        "astronaut_id": 1,
-        "roles": ["astronaut"],
-    })
+    token = create_access_token(
+        {
+            "sub": "1",
+            "email": "x@eleven-labs.com",
+            "astronaut_id": 1,
+            "roles": ["astronaut"],
+        }
+    )
     credentials = MagicMock()
     credentials.credentials = token
     payload = await get_current_token(credentials)
@@ -41,6 +43,7 @@ async def test_get_current_token_valid() -> None:
 
 
 # ─── require_admin ──────────────────────────────────────────────────────────
+
 
 async def test_require_admin_raises_403_for_astronaut() -> None:
     """Un astronaute sans rôle admin → 403."""

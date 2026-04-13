@@ -10,21 +10,19 @@ export function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      void navigate("/", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
   function handleGoogleLogin() {
-    window.location.href = `${API_URL}/api/v1/auth/google`;
+    window.location.href = `${API_URL}/auth/google`;
   }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950">
       <div className="flex flex-col items-center gap-8 rounded-2xl border border-white/10 bg-white/5 px-10 py-12 shadow-xl backdrop-blur">
         <div className="flex flex-col items-center gap-2">
-          <span className="text-4xl font-bold tracking-tight text-white">
-            Site des Planètes
-          </span>
+          <span className="text-4xl font-bold tracking-tight text-white">Site des Planètes</span>
           <span className="text-sm text-white/50">Eleven Labs — Espace interne</span>
         </div>
 
@@ -53,9 +51,7 @@ export function LoginPage() {
           Se connecter avec Google
         </button>
 
-        <p className="text-xs text-white/30">
-          Accès réservé aux comptes @eleven-labs.com
-        </p>
+        <p className="text-xs text-white/30">Accès réservé aux comptes @eleven-labs.com</p>
       </div>
     </div>
   );

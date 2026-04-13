@@ -1,3 +1,4 @@
+import time
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -12,6 +13,22 @@ from src.repositories.astronaut import AstronautRepository
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
+# Simple TTL cache to avoid a DB round-trip on every authenticated request.
+# Keyed by (astronaut_id, token_exp) so entries are invalidated when the token rotates.
+# TTL capped at 60 s so role/planet changes propagate within a minute.
+# Max-size evicts the oldest entry when full to prevent unbounded memory growth.
+_AUTH_CACHE_TTL = 60.0
+_AUTH_CACHE_MAX = 1000
+_astronaut_cache: dict[tuple[int, int], tuple[Astronaut, float]] = {}
+
+
+def _cache_set(key: tuple[int, int], value: tuple[Astronaut, float]) -> None:
+    if len(_astronaut_cache) >= _AUTH_CACHE_MAX:
+        # Evict oldest entry (insertion-ordered dict)
+        oldest = next(iter(_astronaut_cache))
+        del _astronaut_cache[oldest]
+    _astronaut_cache[key] = value
+
 
 async def get_current_token(
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
@@ -20,29 +37,41 @@ async def get_current_token(
     if credentials is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token manquant",
+            detail="Token invalide ou expiré",
             headers={"WWW-Authenticate": "Bearer"},
         )
     try:
         return verify_token(credentials.credentials)
-    except (JWTError, KeyError, ValueError):
+    except (JWTError, KeyError, ValueError) as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token invalide ou expiré",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from exc
 
 
 async def get_current_astronaut(
     token: Annotated[TokenPayload, Depends(get_current_token)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> Astronaut:
-    """Charge l'astronaute depuis la BDD à partir du JWT."""
+    """Charge l'astronaute depuis la BDD à partir du JWT (avec cache TTL court)."""
+    now = time.monotonic()
+    cache_key = (token.astronaut_id, token.exp if token.exp is not None else 0)
+    cached = _astronaut_cache.get(cache_key)
+    if cached is not None:
+        astronaut, expires_at = cached
+        if now < expires_at:
+            return astronaut
+
     repo = AstronautRepository(db)
-    astronaut = await repo.get_by_id(token.astronaut_id)
-    if astronaut is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Astronaute introuvable")
-    return astronaut
+    result = await repo.get_by_id(token.astronaut_id)
+    if result is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token invalide ou expiré",
+        )
+    _cache_set(cache_key, (result, now + _AUTH_CACHE_TTL))
+    return result
 
 
 async def require_admin(
@@ -50,7 +79,9 @@ async def require_admin(
 ) -> Astronaut:
     """Vérifie que l'astronaute a le rôle admin."""
     if "admin" not in astronaut.roles:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Accès réservé aux admins")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Accès réservé aux admins"
+        )
     return astronaut
 
 

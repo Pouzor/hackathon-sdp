@@ -52,7 +52,7 @@ export function ProfileEditPage() {
       hobbies: values.hobbies || null,
       client: values.client || null,
     });
-    void navigate(`/astronauts/${astronautId ?? ""}`);
+    navigate(`/astronauts/${astronautId ?? ""}`);
   }
 
   if (!astronautId) return null;
@@ -69,7 +69,9 @@ export function ProfileEditPage() {
     <div className="flex min-h-screen w-screen flex-col items-center bg-[#040812] px-5 py-16 text-white">
       <div className="w-full max-w-[480px]">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            navigate(-1);
+          }}
           className="mb-6 bg-transparent p-0 text-sm text-white/40 hover:text-white/70"
         >
           ← Retour
@@ -85,7 +87,12 @@ export function ProfileEditPage() {
           </div>
         )}
 
-        <form onSubmit={(e) => { void handleSubmit(onSubmit)(e); }} className="flex flex-col gap-5">
+        <form
+          onSubmit={(e) => {
+            void handleSubmit(onSubmit)(e);
+          }}
+          className="flex flex-col gap-5"
+        >
           <div>
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/50">
               Photo (URL)
@@ -94,7 +101,7 @@ export function ProfileEditPage() {
               {...register("photo_url")}
               type="url"
               placeholder="https://…"
-              className="w-full rounded-lg border border-white/12 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/20"
+              className="border-white/12 w-full rounded-lg border bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/20"
             />
             {errors.photo_url && (
               <p className="mt-1 text-xs text-red-400">{errors.photo_url.message}</p>
@@ -109,7 +116,7 @@ export function ProfileEditPage() {
               {...register("hobbies")}
               rows={3}
               placeholder="Tes centres d'intérêt…"
-              className="w-full resize-y rounded-lg border border-white/12 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/20"
+              className="border-white/12 w-full resize-y rounded-lg border bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/20"
             />
             {errors.hobbies && (
               <p className="mt-1 text-xs text-red-400">{errors.hobbies.message}</p>
@@ -124,18 +131,18 @@ export function ProfileEditPage() {
               {...register("client")}
               type="text"
               placeholder="Nom du client"
-              className="w-full rounded-lg border border-white/12 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/20"
+              className="border-white/12 w-full rounded-lg border bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/20"
             />
-            {errors.client && (
-              <p className="mt-1 text-xs text-red-400">{errors.client.message}</p>
-            )}
+            {errors.client && <p className="mt-1 text-xs text-red-400">{errors.client.message}</p>}
           </div>
 
           <div className="mt-2 flex justify-end gap-3">
             <button
               type="button"
-              onClick={() => navigate(-1)}
-              className="rounded-lg border border-white/12 bg-white/6 px-5 py-2.5 text-sm text-white/60 hover:text-white"
+              onClick={() => {
+                navigate(-1);
+              }}
+              className="border-white/12 bg-white/6 rounded-lg border px-5 py-2.5 text-sm text-white/60 hover:text-white"
             >
               Annuler
             </button>

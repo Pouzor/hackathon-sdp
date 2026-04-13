@@ -1,4 +1,5 @@
 """Tests d'intégration pour les routes /seasons."""
+
 from datetime import date
 from unittest.mock import AsyncMock, MagicMock
 
@@ -10,13 +11,15 @@ from src.main import app
 
 
 def admin_token() -> str:
-    return create_access_token({
-        "sub": "1",
-        "email": "admin@eleven-labs.com",
-        "astronaut_id": 1,
-        "roles": ["astronaut", "admin"],
-        "planet_id": 1,
-    })
+    return create_access_token(
+        {
+            "sub": "1",
+            "email": "admin@eleven-labs.com",
+            "astronaut_id": 1,
+            "roles": ["astronaut", "admin"],
+            "planet_id": 1,
+        }
+    )
 
 
 def make_season(id: int = 1, is_active: bool = True) -> MagicMock:
@@ -71,8 +74,8 @@ async def test_get_active_season_none(client: AsyncClient) -> None:
 
 
 async def test_activate_season_not_found(client: AsyncClient) -> None:
-    from src.db.session import get_db
     from src.core.deps import get_current_astronaut
+    from src.db.session import get_db
     from src.models.astronaut import Astronaut
 
     mock_result = MagicMock()
@@ -97,8 +100,8 @@ async def test_activate_season_not_found(client: AsyncClient) -> None:
 
 
 async def test_close_season_requires_active(client: AsyncClient) -> None:
-    from src.db.session import get_db
     from src.core.deps import get_current_astronaut
+    from src.db.session import get_db
     from src.models.astronaut import Astronaut
 
     inactive_season = make_season(is_active=False)

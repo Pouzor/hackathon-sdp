@@ -19,11 +19,11 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh && echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      - run: uv sync --dev
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh && echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - run: uv sync --extra dev
       - run: uv run ruff check .
       - run: uv run ruff format --check .
-      - run: uv run mypy --strict src/
+      - run: uv run python -m mypy --strict src/
 
   test-backend:
     name: Test Backend
@@ -44,27 +44,28 @@ jobs:
     defaults:
       run:
         working-directory: apps/api
+    env:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/planets_test
+      SECRET_KEY: ci-secret-key-for-testing-purposes-minimum-32-chars
+      GOOGLE_CLIENT_ID: fake-client-id-for-ci-tests
+      GOOGLE_CLIENT_SECRET: fake-client-secret-for-ci-tests
+      DEBUG: "true"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh && echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      - run: uv sync --dev
-      - run: uv run alembic upgrade head
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/planets_test
-      - run: uv run pytest --cov=src --cov-fail-under=80
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/planets_test
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh && echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - run: uv sync --extra dev
+      - name: Run migrations
+        run: uv run alembic upgrade head
+      - name: Run tests with coverage
+        run: uv run python -m pytest --cov=src --cov-report=term-missing --cov-fail-under=80
 
   lint-frontend:
     name: Lint Frontend
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -73,17 +74,20 @@ jobs:
       - uses: pnpm/action-setup@v3
         with:
           version: 9
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm prettier --check .
-      - run: pnpm tsc --noEmit
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Setup env
+        run: cp apps/frontend/.env.example apps/frontend/.env
+      - name: Lint
+        run: pnpm --filter frontend lint
+      - name: Prettier check
+        run: pnpm --filter frontend exec prettier --check .
+      - name: Type check
+        run: pnpm --filter frontend exec tsc --noEmit
 
   test-frontend:
     name: Test Frontend
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -92,15 +96,16 @@ jobs:
       - uses: pnpm/action-setup@v3
         with:
           version: 9
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test --coverage --coverage.thresholds.lines=70
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Setup env
+        run: cp apps/frontend/.env.example apps/frontend/.env
+      - name: Run tests with coverage
+        run: pnpm --filter frontend exec vitest run --coverage
 
   lint-backoffice:
     name: Lint Backoffice
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/backoffice
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -109,17 +114,20 @@ jobs:
       - uses: pnpm/action-setup@v3
         with:
           version: 9
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm prettier --check .
-      - run: pnpm tsc --noEmit
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Setup env
+        run: cp apps/backoffice/.env.example apps/backoffice/.env
+      - name: Lint
+        run: pnpm --filter backoffice lint
+      - name: Prettier check
+        run: pnpm --filter backoffice exec prettier --check .
+      - name: Type check
+        run: pnpm --filter backoffice exec tsc --noEmit
 
   test-backoffice:
     name: Test Backoffice
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/backoffice
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -128,8 +136,12 @@ jobs:
       - uses: pnpm/action-setup@v3
         with:
           version: 9
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test --coverage --coverage.thresholds.lines=70
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Setup env
+        run: cp apps/backoffice/.env.example apps/backoffice/.env
+      - name: Run tests with coverage
+        run: pnpm --filter backoffice exec vitest run --coverage
 
   build:
     name: Build Docker Images

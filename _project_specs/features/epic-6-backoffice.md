@@ -140,6 +140,49 @@
 
 ---
 
+## F-610 — Synchronisation des astronautes depuis Google Workspace
+
+**Route:** bouton dans F-603 (gestion des astronautes)
+
+**Description:** L'admin connecté peut déclencher une synchronisation depuis l'annuaire Google Workspace Eleven Labs. Les utilisateurs du domaine `@eleven-labs.com` sont importés automatiquement (création si inexistant, mise à jour si déjà présent).
+
+**Prérequis :**
+- Activer **Admin SDK API** dans Google Cloud Console
+- Ajouter le scope `https://www.googleapis.com/auth/admin.directory.user.readonly` à l'OAuth app
+- Le compte qui déclenche la synchro doit être admin Google Workspace
+
+**Backend :**
+- Endpoint `POST /api/v1/admin/sync-google-users` (admin uniquement)
+- Utilise le token Google de l'admin connecté (stocker le `access_token` Google au moment du callback OAuth)
+- Appelle `GET https://admin.googleapis.com/admin/directory/v1/users?domain=eleven-labs.com&maxResults=500`
+- Pour chaque utilisateur : `upsert` en BDD (email comme clé, met à jour `first_name`, `last_name`, `photo_url`)
+- Retourne un résumé : `{ created: N, updated: N, skipped: N }`
+
+**Frontend (backoffice) :**
+- Bouton "Synchroniser avec Google" dans la page `/astronauts`
+- Dialog de confirmation avant lancement
+- Affiche le résumé après synchro (X créés, Y mis à jour)
+
+**Acceptance Criteria:**
+- [ ] Scope `admin.directory.user.readonly` ajouté au flow OAuth
+- [ ] `access_token` Google stocké temporairement côté backend (session ou BDD)
+- [ ] `POST /api/v1/admin/sync-google-users` : upsert tous les users du domaine
+- [ ] Utilisateurs désactivés dans Google Workspace ignorés (`suspended: true`)
+- [ ] Non-admin → 403
+- [ ] Token Google expiré → 401 avec message explicite ("Reconnectez-vous pour synchroniser")
+- [ ] Résumé affiché côté front
+
+**Test Cases:**
+| Cas | Attendu |
+|-----|---------|
+| 1er import | Tous les users créés, `roles: ["astronaut"]` par défaut |
+| 2e import | Mise à jour `photo_url`/`first_name`, pas de doublon |
+| User suspendu Google | Ignoré (pas créé, pas mis à jour) |
+| Non-admin | 403 |
+| Token expiré | 401 + message "Reconnectez-vous" |
+
+---
+
 ## F-609 — Interface "Présence aux events"
 
 **Route:** `/events/:id/attendance`

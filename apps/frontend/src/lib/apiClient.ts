@@ -1,4 +1,5 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const BASE_URL: string = import.meta.env.VITE_API_URL;
 if (!BASE_URL) throw new Error("VITE_API_URL is not defined — copy .env.example to .env");
 
 // Auth token stored in localStorage per CLAUDE.md §5 (httpOnly cookie migration is future work).
@@ -16,8 +17,9 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     ...options,
   });
   if (!res.ok) {
-    const detail = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error((detail as { detail?: string }).detail ?? res.statusText);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const detail: { detail?: string } = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(detail.detail ?? res.statusText);
   }
   return res.json() as Promise<T>;
 }

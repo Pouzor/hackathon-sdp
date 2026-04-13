@@ -24,11 +24,17 @@ export function RaccoonPlanet({ size }: { size: number }) {
         </radialGradient>
         <filter id={`raccoonGlow-${uid}`}>
           <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
         </filter>
         <filter id={`mjolnirGlow-${uid}`}>
           <feGaussianBlur stdDeviation="2" result="blur" />
-          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
         </filter>
       </defs>
 
@@ -40,7 +46,7 @@ export function RaccoonPlanet({ size }: { size: number }) {
 
       {/* Planet surface — darker amber bands */}
       <ellipse cx="0" cy={-r * 0.25} rx={r * 0.7} ry={r * 0.12} fill="#92400e" opacity="0.4" />
-      <ellipse cx="0" cy={r * 0.2}   rx={r * 0.55} ry={r * 0.1}  fill="#78350f" opacity="0.35" />
+      <ellipse cx="0" cy={r * 0.2} rx={r * 0.55} ry={r * 0.1} fill="#78350f" opacity="0.35" />
 
       {/* Crater / dark spots */}
       <circle cx={r * 0.4} cy={-r * 0.3} r={r * 0.12} fill="#78350f" opacity="0.5" />
@@ -74,14 +80,23 @@ export function RaccoonPlanet({ size }: { size: number }) {
       {/* Raccoon mask — subtle dark band across planet equator */}
       <ellipse cx="0" cy="0" rx={r} ry={r * 0.22} fill="#3d1f00" opacity="0.18" />
       <circle cx={-r * 0.25} cy={-r * 0.05} r={r * 0.14} fill="#3d1f00" opacity="0.15" />
-      <circle cx={r * 0.25}  cy={-r * 0.05} r={r * 0.14} fill="#3d1f00" opacity="0.15" />
+      <circle cx={r * 0.25} cy={-r * 0.05} r={r * 0.14} fill="#3d1f00" opacity="0.15" />
 
       {/* Highlight */}
-      <ellipse cx={-r * 0.3} cy={-r * 0.35} rx={r * 0.3} ry={r * 0.22} fill="white" opacity="0.18" />
+      <ellipse
+        cx={-r * 0.3}
+        cy={-r * 0.35}
+        rx={r * 0.3}
+        ry={r * 0.22}
+        fill="white"
+        opacity="0.18"
+      />
 
       {/* Mjölnir orbiting the planet */}
-      <g style={{ animation: "mjolnirOrbit 6s linear infinite", transformOrigin: "0 0" }}
-         filter={`url(#mjolnirGlow-${uid})`}>
+      <g
+        style={{ animation: "mjolnirOrbit 6s linear infinite", transformOrigin: "0 0" }}
+        filter={`url(#mjolnirGlow-${uid})`}
+      >
         {/* Mjolnir shape at the orbit point */}
         <g transform={`translate(${r + 18}, 0)`}>
           {/* Hammerhead */}

@@ -15,71 +15,113 @@ body {
 
 /* ── Orbit animation ─────────────────────────────────────────────────────── */
 @keyframes orbitSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Sun ─────────────────────────────────────────────────────────────────── */
 @keyframes sunPulse {
-  0%, 100% {
-    filter:
-      drop-shadow(0 0 12px #ff9500)
-      drop-shadow(0 0 28px rgba(255, 120, 0, 0.6));
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px #ff9500) drop-shadow(0 0 28px rgba(255, 120, 0, 0.6));
   }
   50% {
-    filter:
-      drop-shadow(0 0 22px #ff9500)
-      drop-shadow(0 0 55px rgba(255, 60, 0, 0.8));
+    filter: drop-shadow(0 0 22px #ff9500) drop-shadow(0 0 55px rgba(255, 60, 0, 0.8));
   }
 }
 
 @keyframes coronaSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes coronaSpinReverse {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(-360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
 }
 
 /* ── Planets ─────────────────────────────────────────────────────────────── */
 @keyframes planetSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes mjolnirOrbit {
-  from { transform: rotate(0deg) translateX(38px) rotate(0deg); }
-  to   { transform: rotate(360deg) translateX(38px) rotate(-360deg); }
+  from {
+    transform: rotate(0deg) translateX(38px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(38px) rotate(-360deg);
+  }
 }
 
 @keyframes nyanRainbow {
-  from { stroke-dashoffset: 0; }
-  to   { stroke-dashoffset: -314; }
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -314;
+  }
 }
 
 /* ── Asteroids ───────────────────────────────────────────────────────────── */
 @keyframes asteroidDrift {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Planet detail ───────────────────────────────────────────────────────── */
 @keyframes planetFloat {
-  0%, 100% { transform: translateY(0px);  }
-  50%       { transform: translateY(-12px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
 @keyframes planetPulse {
-  0%, 100% { transform: scale(1);    }
-  50%       { transform: scale(1.18); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.18);
+  }
 }
 
 /* ── Stars ───────────────────────────────────────────────────────────────── */
 @keyframes twinkle {
-  0%, 100% { opacity: 1;   transform: scale(1);   }
-  50%       { opacity: 0.2; transform: scale(0.6); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.2;
+    transform: scale(0.6);
+  }
 }
 
 /* ── Tooltip ─────────────────────────────────────────────────────────────── */
@@ -89,7 +131,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   background: rgba(4, 8, 18, 0.9);
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: white;
   padding: 4px 10px;
   border-radius: 6px;

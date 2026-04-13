@@ -1,10 +1,11 @@
 """Tests d'intégration pour les routes d'authentification."""
+
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from src.core.security import create_access_token
+from src.core.security import create_access_token, generate_oauth_state
 from src.main import app
 
 
@@ -18,7 +19,9 @@ async def test_google_login_redirects(client: AsyncClient) -> None:
     """GET /auth/google doit rediriger vers Google."""
     with patch("src.api.v1.auth._get_auth_service") as mock_factory:
         mock_service = MagicMock()
-        mock_service.build_google_auth_url.return_value = "https://accounts.google.com/o/oauth2/v2/auth?test=1"
+        mock_service.build_google_auth_url.return_value = (
+            "https://accounts.google.com/o/oauth2/v2/auth?test=1"
+        )
         mock_factory.return_value = mock_service
 
         response = await client.get("/api/v1/auth/google", follow_redirects=False)
@@ -62,8 +65,9 @@ async def test_google_callback_redirects_to_frontend(client: AsyncClient) -> Non
 
     app.dependency_overrides[_get_auth_service] = lambda: mock_service
 
+    valid_state = generate_oauth_state("frontend")
     response = await client.get(
-        "/api/v1/auth/google/callback?code=valid-code&state=state123",
+        f"/api/v1/auth/google/callback?code=valid-code&state={valid_state}",
         follow_redirects=False,
     )
     app.dependency_overrides.clear()
@@ -98,8 +102,9 @@ async def test_google_callback_forbidden_domain(client: AsyncClient) -> None:
 
     app.dependency_overrides[_get_auth_service] = lambda: mock_service
 
+    valid_state = generate_oauth_state("frontend")
     response = await client.get(
-        "/api/v1/auth/google/callback?code=ext-code&state=state123",
+        f"/api/v1/auth/google/callback?code=ext-code&state={valid_state}",
         follow_redirects=False,
     )
     app.dependency_overrides.clear()
@@ -112,13 +117,15 @@ async def test_me_with_valid_token(client: AsyncClient) -> None:
     from src.db.session import get_db
     from src.models.astronaut import Astronaut
 
-    token = create_access_token({
-        "sub": "1",
-        "email": "jean@eleven-labs.com",
-        "astronaut_id": 1,
-        "roles": ["astronaut"],
-        "planet_id": None,
-    })
+    token = create_access_token(
+        {
+            "sub": "1",
+            "email": "jean@eleven-labs.com",
+            "astronaut_id": 1,
+            "roles": ["astronaut"],
+            "planet_id": None,
+        }
+    )
 
     mock_astronaut = Astronaut(
         id=1,
@@ -133,7 +140,9 @@ async def test_me_with_valid_token(client: AsyncClient) -> None:
 
     async def override_db():
         mock_db = AsyncMock()
-        mock_db.execute = AsyncMock(return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=mock_astronaut)))
+        mock_db.execute = AsyncMock(
+            return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=mock_astronaut))
+        )
         yield mock_db
 
     app.dependency_overrides[get_db] = override_db

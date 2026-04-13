@@ -5,16 +5,16 @@ Revises:
 Create Date: 2026-04-10
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision: str = "001"
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -115,8 +115,18 @@ def upgrade() -> None:
     op.create_table(
         "season_planet_scores",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("season_id", sa.Integer(), sa.ForeignKey("seasons.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("planet_id", sa.Integer(), sa.ForeignKey("planets.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "season_id",
+            sa.Integer(),
+            sa.ForeignKey("seasons.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        sa.Column(
+            "planet_id",
+            sa.Integer(),
+            sa.ForeignKey("planets.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("points", sa.Integer(), nullable=False, server_default="0"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("season_id", "planet_id", name="uq_season_planet"),
@@ -126,17 +136,51 @@ def upgrade() -> None:
     op.create_table(
         "point_attributions",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("astronaut_id", sa.Integer(), sa.ForeignKey("astronauts.id", ondelete="RESTRICT"), nullable=False),
-        sa.Column("planet_id", sa.Integer(), sa.ForeignKey("planets.id", ondelete="RESTRICT"), nullable=False),
-        sa.Column("activity_id", sa.Integer(), sa.ForeignKey("activities.id", ondelete="RESTRICT"), nullable=False),
-        sa.Column("season_id", sa.Integer(), sa.ForeignKey("seasons.id", ondelete="RESTRICT"), nullable=False),
-        sa.Column("awarded_by", sa.Integer(), sa.ForeignKey("astronauts.id", ondelete="RESTRICT"), nullable=False),
+        sa.Column(
+            "astronaut_id",
+            sa.Integer(),
+            sa.ForeignKey("astronauts.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
+        sa.Column(
+            "planet_id",
+            sa.Integer(),
+            sa.ForeignKey("planets.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
+        sa.Column(
+            "activity_id",
+            sa.Integer(),
+            sa.ForeignKey("activities.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
+        sa.Column(
+            "season_id",
+            sa.Integer(),
+            sa.ForeignKey("seasons.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
+        sa.Column(
+            "awarded_by",
+            sa.Integer(),
+            sa.ForeignKey("astronauts.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("points", sa.Integer(), nullable=False),
         sa.Column("comment", sa.Text(), nullable=True),
-        sa.Column("first_ever_multiplier_applied", sa.Boolean(), nullable=False, server_default="false"),
-        sa.Column("first_season_bonus_applied", sa.Boolean(), nullable=False, server_default="false"),
+        sa.Column(
+            "first_ever_multiplier_applied", sa.Boolean(), nullable=False, server_default="false"
+        ),
+        sa.Column(
+            "first_season_bonus_applied", sa.Boolean(), nullable=False, server_default="false"
+        ),
         sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="false"),
-        sa.Column("deleted_by", sa.Integer(), sa.ForeignKey("astronauts.id", ondelete="SET NULL"), nullable=True),
+        sa.Column(
+            "deleted_by",
+            sa.Integer(),
+            sa.ForeignKey("astronauts.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
         sa.Column("deletion_reason", sa.String(500), nullable=True),
         sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column(

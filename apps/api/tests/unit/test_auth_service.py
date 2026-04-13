@@ -1,4 +1,5 @@
 """Tests unitaires pour AuthService — règles métier critiques."""
+
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -28,6 +29,7 @@ def make_user_info(**kwargs: object) -> GoogleUserInfo:
 
 
 # ─── Domaine autorisé ───────────────────────────────────────────────────────
+
 
 def test_verify_allowed_domain_ok() -> None:
     service = make_service()
@@ -60,6 +62,7 @@ def test_verify_allowed_domain_blocked_wrong_email_no_hd() -> None:
 
 
 # ─── Création astronaute ────────────────────────────────────────────────────
+
 
 async def test_get_or_create_returns_existing() -> None:
     repo = MagicMock()
@@ -95,6 +98,7 @@ async def test_get_or_create_creates_on_first_login() -> None:
 
 # ─── Création JWT ───────────────────────────────────────────────────────────
 
+
 def test_create_jwt_contains_expected_claims() -> None:
     from src.core.security import decode_access_token
 
@@ -116,6 +120,7 @@ def test_create_jwt_contains_expected_claims() -> None:
 
 
 # ─── URL Google ─────────────────────────────────────────────────────────────
+
 
 def test_build_google_auth_url_contains_client_id() -> None:
     with patch("src.services.auth.settings") as mock_settings:
@@ -150,9 +155,9 @@ def test_build_google_auth_url_contains_redirect_uri_and_scope() -> None:
 
 # ─── exchange_code_for_user_info ────────────────────────────────────────────
 
+
 async def test_exchange_code_google_token_error() -> None:
     """Si Google renvoie une erreur sur le token endpoint → HTTPException 401."""
-    import httpx
     from unittest.mock import patch as mock_patch
 
     service = AuthService(MagicMock())

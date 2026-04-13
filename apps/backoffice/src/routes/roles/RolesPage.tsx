@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAstronauts, useUpdateRoles, type AstronautOut } from "@/api/astronauts";
+import { useAuth } from "@/hooks/useAuth";
 
 function RolesBadge({ roles }: { roles: string[] }) {
   const isAdmin = roles.includes("admin");
@@ -29,9 +30,7 @@ function ToggleButton({
   const isSelf = astronaut.id === currentUserId;
 
   if (isSelf && isAdmin) {
-    return (
-      <span className="text-xs text-white/30 italic">Vous-même</span>
-    );
+    return <span className="text-xs italic text-white/30">Vous-même</span>;
   }
 
   return (
@@ -55,18 +54,8 @@ export function RolesPage() {
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const [pendingRoles, setPendingRoles] = useState<string[] | null>(null);
 
-  // Identifie l'admin courant via le token JWT dans localStorage
-  const currentUserId: number | null = (() => {
-    try {
-      const token = localStorage.getItem("auth_token");
-      if (!token) return null;
-      const b64 = token.split(".")[1]!.replace(/-/g, "+").replace(/_/g, "/");
-      const payload = JSON.parse(atob(b64)) as { astronaut_id?: number };
-      return payload.astronaut_id ?? null;
-    } catch {
-      return null;
-    }
-  })();
+  const { user } = useAuth();
+  const currentUserId = user?.astronaut_id ?? null;
 
   function handleToggle(astronaut: AstronautOut) {
     const isAdmin = astronaut.roles.includes("admin");
@@ -81,24 +70,21 @@ export function RolesPage() {
     if (confirmId === null || pendingRoles === null) return;
     updateRoles.mutate(
       { id: confirmId, roles: pendingRoles },
-      { onSettled: () => { setConfirmId(null); setPendingRoles(null); } },
+      {
+        onSettled: () => {
+          setConfirmId(null);
+          setPendingRoles(null);
+        },
+      },
     );
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-16 text-white/40">
-        Chargement…
-      </div>
-    );
+    return <div className="flex items-center justify-center p-16 text-white/40">Chargement…</div>;
   }
 
   if (isError) {
-    return (
-      <div className="p-8 text-red-400">
-        Erreur lors du chargement des astronautes.
-      </div>
-    );
+    return <div className="p-8 text-red-400">Erreur lors du chargement des astronautes.</div>;
   }
 
   return (
@@ -116,9 +102,12 @@ export function RolesPage() {
             <p className="mb-6 text-sm text-white/50">
               Nouveaux rôles : {pendingRoles?.join(", ")}
             </p>
-            <div className="flex gap-3 justify-end">
+            <div className="flex justify-end gap-3">
               <button
-                onClick={() => { setConfirmId(null); setPendingRoles(null); }}
+                onClick={() => {
+                  setConfirmId(null);
+                  setPendingRoles(null);
+                }}
                 className="rounded px-4 py-2 text-sm text-white/60 hover:text-white"
               >
                 Annuler
@@ -147,10 +136,7 @@ export function RolesPage() {
           </thead>
           <tbody>
             {astronauts.map((a) => (
-              <tr
-                key={a.id}
-                className="border-b border-white/5 hover:bg-white/3 text-white/80"
-              >
+              <tr key={a.id} className="hover:bg-white/3 border-b border-white/5 text-white/80">
                 <td className="px-4 py-3 font-medium">
                   {a.first_name} {a.last_name}
                 </td>
@@ -162,7 +148,9 @@ export function RolesPage() {
                   <ToggleButton
                     astronaut={a}
                     currentUserId={currentUserId}
-                    onToggle={() => handleToggle(a)}
+                    onToggle={() => {
+                      handleToggle(a);
+                    }}
                     isLoading={updateRoles.isPending && confirmId === a.id}
                   />
                 </td>

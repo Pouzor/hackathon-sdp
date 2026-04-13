@@ -1,10 +1,11 @@
 """Tests d'intégration pour PATCH /astronauts/{id} (F-202)."""
+
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from src.core.deps import get_current_astronaut, require_admin
+from src.core.deps import get_current_astronaut
 from src.main import app
 
 
@@ -15,9 +16,9 @@ def make_astronaut(id: int, email: str, roles: list[str], **kwargs: object) -> M
     a.roles = roles
     a.first_name = kwargs.get("first_name", "Jean")
     a.last_name = kwargs.get("last_name", "Dupont")
-    a.photo_url = kwargs.get("photo_url", None)
-    a.hobbies = kwargs.get("hobbies", None)
-    a.client = kwargs.get("client", None)
+    a.photo_url = kwargs.get("photo_url")
+    a.hobbies = kwargs.get("hobbies")
+    a.client = kwargs.get("client")
     a.hire_date = None
     a.planet_id = None
     a.total_points = 100
@@ -44,7 +45,9 @@ async def test_patch_profile_self_update(client: AsyncClient) -> None:
     from src.api.v1.astronauts import _astronaut_repo, _grade_repo
 
     user = make_astronaut(2, "user@eleven-labs.com", ["astronaut"])
-    updated = make_astronaut(2, "user@eleven-labs.com", ["astronaut"], hobbies="music", client="Acme")
+    updated = make_astronaut(
+        2, "user@eleven-labs.com", ["astronaut"], hobbies="music", client="Acme"
+    )
 
     mock_repo = MagicMock()
     mock_repo.get_by_id = AsyncMock(return_value=user)
@@ -74,7 +77,9 @@ async def test_patch_profile_admin_updates_other(client: AsyncClient) -> None:
 
     admin = make_astronaut(1, "admin@eleven-labs.com", ["astronaut", "admin"])
     target = make_astronaut(3, "target@eleven-labs.com", ["astronaut"])
-    updated = make_astronaut(3, "target@eleven-labs.com", ["astronaut"], photo_url="https://example.com/photo.jpg")
+    updated = make_astronaut(
+        3, "target@eleven-labs.com", ["astronaut"], photo_url="https://example.com/photo.jpg"
+    )
 
     mock_repo = MagicMock()
     mock_repo.get_by_id = AsyncMock(return_value=target)

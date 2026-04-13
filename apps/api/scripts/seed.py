@@ -8,7 +8,7 @@ Usage :
 
 import asyncio
 import sys
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -64,117 +64,280 @@ PLANETS = [
 ]
 
 GRADES = [
-    {"name": "Recrue",        "threshold_points": 0,    "order": 1},
-    {"name": "Cadet",         "threshold_points": 100,  "order": 2},
-    {"name": "Explorateur",   "threshold_points": 300,  "order": 3},
-    {"name": "Navigateur",    "threshold_points": 600,  "order": 4},
-    {"name": "Commandant",    "threshold_points": 1000, "order": 5},
-    {"name": "Amiral",        "threshold_points": 2000, "order": 6},
+    {"name": "Recrue", "threshold_points": 0, "order": 1},
+    {"name": "Cadet", "threshold_points": 100, "order": 2},
+    {"name": "Explorateur", "threshold_points": 300, "order": 3},
+    {"name": "Navigateur", "threshold_points": 600, "order": 4},
+    {"name": "Commandant", "threshold_points": 1000, "order": 5},
+    {"name": "Amiral", "threshold_points": 2000, "order": 6},
 ]
 
 ACTIVITIES = [
-    {"name": "Talk interne",           "base_points": 50,  "category": "knowledge", "is_collaborative": False, "allow_multiple_assignees": True},
-    {"name": "Article de blog",        "base_points": 75,  "category": "knowledge", "is_collaborative": False, "allow_multiple_assignees": True},
-    {"name": "Conférence externe",     "base_points": 100, "category": "knowledge", "is_collaborative": False, "allow_multiple_assignees": True},
-    {"name": "Podcast",                "base_points": 60,  "category": "knowledge", "is_collaborative": False, "allow_multiple_assignees": True},
-    {"name": "Open source contribution", "base_points": 80, "category": "tech",     "is_collaborative": False, "allow_multiple_assignees": False},
-    {"name": "Hackathon",              "base_points": 120, "category": "tech",      "is_collaborative": True,  "allow_multiple_assignees": True},
-    {"name": "Recrutement (cooptation)", "base_points": 150, "category": "people",  "is_collaborative": False, "allow_multiple_assignees": False},
-    {"name": "Mentorat",               "base_points": 40,  "category": "people",   "is_collaborative": False, "allow_multiple_assignees": False},
-    {"name": "Organisation d'événement", "base_points": 90, "category": "community", "is_collaborative": True, "allow_multiple_assignees": True},
-    {"name": "Participation forum interne", "base_points": 20, "category": "community", "is_collaborative": False, "allow_multiple_assignees": False},
+    {
+        "name": "Talk interne",
+        "base_points": 50,
+        "category": "knowledge",
+        "is_collaborative": False,
+        "allow_multiple_assignees": True,
+    },
+    {
+        "name": "Article de blog",
+        "base_points": 75,
+        "category": "knowledge",
+        "is_collaborative": False,
+        "allow_multiple_assignees": True,
+    },
+    {
+        "name": "Conférence externe",
+        "base_points": 100,
+        "category": "knowledge",
+        "is_collaborative": False,
+        "allow_multiple_assignees": True,
+    },
+    {
+        "name": "Podcast",
+        "base_points": 60,
+        "category": "knowledge",
+        "is_collaborative": False,
+        "allow_multiple_assignees": True,
+    },
+    {
+        "name": "Open source contribution",
+        "base_points": 80,
+        "category": "tech",
+        "is_collaborative": False,
+        "allow_multiple_assignees": False,
+    },
+    {
+        "name": "Hackathon",
+        "base_points": 120,
+        "category": "tech",
+        "is_collaborative": True,
+        "allow_multiple_assignees": True,
+    },
+    {
+        "name": "Recrutement (cooptation)",
+        "base_points": 150,
+        "category": "people",
+        "is_collaborative": False,
+        "allow_multiple_assignees": False,
+    },
+    {
+        "name": "Mentorat",
+        "base_points": 40,
+        "category": "people",
+        "is_collaborative": False,
+        "allow_multiple_assignees": False,
+    },
+    {
+        "name": "Organisation d'événement",
+        "base_points": 90,
+        "category": "community",
+        "is_collaborative": True,
+        "allow_multiple_assignees": True,
+    },
+    {
+        "name": "Participation forum interne",
+        "base_points": 20,
+        "category": "community",
+        "is_collaborative": False,
+        "allow_multiple_assignees": False,
+    },
 ]
 
 # Astronautes fictifs — un admin + plusieurs par planète
 ASTRONAUTS_DATA = [
     # Admin
-    {"email": "admin@eleven-labs.com", "first_name": "Admin", "last_name": "Système",
-     "hobbies": "Configurer des bases de données", "client": None,
-     "hire_date": date(2020, 1, 6), "roles": ["astronaut", "admin"], "planet_slug": "hq"},
+    {
+        "email": "admin@eleven-labs.com",
+        "first_name": "Admin",
+        "last_name": "Système",
+        "hobbies": "Configurer des bases de données",
+        "client": None,
+        "hire_date": date(2020, 1, 6),
+        "roles": ["astronaut", "admin"],
+        "planet_slug": "hq",
+    },
     # HQ
-    {"email": "lea.martin@eleven-labs.com",   "first_name": "Léa",    "last_name": "Martin",
-     "hobbies": "Yoga, lecture", "client": None,
-     "hire_date": date(2021, 3, 15), "roles": ["astronaut"], "planet_slug": "hq"},
+    {
+        "email": "lea.martin@eleven-labs.com",
+        "first_name": "Léa",
+        "last_name": "Martin",
+        "hobbies": "Yoga, lecture",
+        "client": None,
+        "hire_date": date(2021, 3, 15),
+        "roles": ["astronaut"],
+        "planet_slug": "hq",
+    },
     # Duck Invaders
-    {"email": "tom.bernard@eleven-labs.com",  "first_name": "Tom",    "last_name": "Bernard",
-     "hobbies": "Gaming, escalade", "client": "Natixis",
-     "hire_date": date(2019, 9, 2), "roles": ["astronaut"], "planet_slug": "duck"},
-    {"email": "chloe.dupont@eleven-labs.com", "first_name": "Chloé",  "last_name": "Dupont",
-     "hobbies": "Photographie, vélo", "client": "SNCF",
-     "hire_date": date(2022, 1, 10), "roles": ["astronaut"], "planet_slug": "duck"},
-    {"email": "hugo.petit@eleven-labs.com",   "first_name": "Hugo",   "last_name": "Petit",
-     "hobbies": "Guitare, randonnée", "client": "BNP",
-     "hire_date": date(2020, 6, 1), "roles": ["astronaut"], "planet_slug": "duck"},
+    {
+        "email": "tom.bernard@eleven-labs.com",
+        "first_name": "Tom",
+        "last_name": "Bernard",
+        "hobbies": "Gaming, escalade",
+        "client": "Natixis",
+        "hire_date": date(2019, 9, 2),
+        "roles": ["astronaut"],
+        "planet_slug": "duck",
+    },
+    {
+        "email": "chloe.dupont@eleven-labs.com",
+        "first_name": "Chloé",
+        "last_name": "Dupont",
+        "hobbies": "Photographie, vélo",
+        "client": "SNCF",
+        "hire_date": date(2022, 1, 10),
+        "roles": ["astronaut"],
+        "planet_slug": "duck",
+    },
+    {
+        "email": "hugo.petit@eleven-labs.com",
+        "first_name": "Hugo",
+        "last_name": "Petit",
+        "hobbies": "Guitare, randonnée",
+        "client": "BNP",
+        "hire_date": date(2020, 6, 1),
+        "roles": ["astronaut"],
+        "planet_slug": "duck",
+    },
     # SchizoCats
-    {"email": "alice.leroy@eleven-labs.com",  "first_name": "Alice",  "last_name": "Leroy",
-     "hobbies": "Danse contemporaine, origami", "client": "Canal+",
-     "hire_date": date(2023, 2, 20), "roles": ["astronaut"], "planet_slug": "cats"},
-    {"email": "maxime.roux@eleven-labs.com",  "first_name": "Maxime", "last_name": "Roux",
-     "hobbies": "Football, cuisine", "client": "Engie",
-     "hire_date": date(2021, 11, 8), "roles": ["astronaut"], "planet_slug": "cats"},
-    {"email": "sarah.moreau@eleven-labs.com", "first_name": "Sarah",  "last_name": "Moreau",
-     "hobbies": "Peinture, jeux de société", "client": "Société Générale",
-     "hire_date": date(2022, 9, 5), "roles": ["astronaut"], "planet_slug": "cats"},
+    {
+        "email": "alice.leroy@eleven-labs.com",
+        "first_name": "Alice",
+        "last_name": "Leroy",
+        "hobbies": "Danse contemporaine, origami",
+        "client": "Canal+",
+        "hire_date": date(2023, 2, 20),
+        "roles": ["astronaut"],
+        "planet_slug": "cats",
+    },
+    {
+        "email": "maxime.roux@eleven-labs.com",
+        "first_name": "Maxime",
+        "last_name": "Roux",
+        "hobbies": "Football, cuisine",
+        "client": "Engie",
+        "hire_date": date(2021, 11, 8),
+        "roles": ["astronaut"],
+        "planet_slug": "cats",
+    },
+    {
+        "email": "sarah.moreau@eleven-labs.com",
+        "first_name": "Sarah",
+        "last_name": "Moreau",
+        "hobbies": "Peinture, jeux de société",
+        "client": "Société Générale",
+        "hire_date": date(2022, 9, 5),
+        "roles": ["astronaut"],
+        "planet_slug": "cats",
+    },
     # Donut Factory
-    {"email": "julien.simon@eleven-labs.com", "first_name": "Julien", "last_name": "Simon",
-     "hobbies": "Triathlon, lecture SF", "client": "Fnac",
-     "hire_date": date(2018, 4, 12), "roles": ["astronaut"], "planet_slug": "donut"},
-    {"email": "emma.garcia@eleven-labs.com",  "first_name": "Emma",   "last_name": "Garcia",
-     "hobbies": "Cinéma, tennis", "client": "Decathlon",
-     "hire_date": date(2023, 6, 26), "roles": ["astronaut"], "planet_slug": "donut"},
-    {"email": "lucas.thomas@eleven-labs.com", "first_name": "Lucas",  "last_name": "Thomas",
-     "hobbies": "Skateboard, podcast tech", "client": "Carrefour",
-     "hire_date": date(2021, 7, 19), "roles": ["astronaut"], "planet_slug": "donut"},
+    {
+        "email": "julien.simon@eleven-labs.com",
+        "first_name": "Julien",
+        "last_name": "Simon",
+        "hobbies": "Triathlon, lecture SF",
+        "client": "Fnac",
+        "hire_date": date(2018, 4, 12),
+        "roles": ["astronaut"],
+        "planet_slug": "donut",
+    },
+    {
+        "email": "emma.garcia@eleven-labs.com",
+        "first_name": "Emma",
+        "last_name": "Garcia",
+        "hobbies": "Cinéma, tennis",
+        "client": "Decathlon",
+        "hire_date": date(2023, 6, 26),
+        "roles": ["astronaut"],
+        "planet_slug": "donut",
+    },
+    {
+        "email": "lucas.thomas@eleven-labs.com",
+        "first_name": "Lucas",
+        "last_name": "Thomas",
+        "hobbies": "Skateboard, podcast tech",
+        "client": "Carrefour",
+        "hire_date": date(2021, 7, 19),
+        "roles": ["astronaut"],
+        "planet_slug": "donut",
+    },
     # Raccoons of Asgard
-    {"email": "noemie.blanc@eleven-labs.com", "first_name": "Noémie", "last_name": "Blanc",
-     "hobbies": "Aquarelle, course à pied", "client": "TotalEnergies",
-     "hire_date": date(2020, 2, 3), "roles": ["astronaut"], "planet_slug": "raccoon"},
-    {"email": "remi.noir@eleven-labs.com",    "first_name": "Rémi",   "last_name": "Noir",
-     "hobbies": "Musique électronique, surf", "client": "AXA",
-     "hire_date": date(2019, 5, 27), "roles": ["astronaut"], "planet_slug": "raccoon"},
-    {"email": "camille.david@eleven-labs.com","first_name": "Camille","last_name": "David",
-     "hobbies": "Volleyball, dessin", "client": "Capgemini",
-     "hire_date": date(2022, 4, 4), "roles": ["astronaut"], "planet_slug": "raccoon"},
+    {
+        "email": "noemie.blanc@eleven-labs.com",
+        "first_name": "Noémie",
+        "last_name": "Blanc",
+        "hobbies": "Aquarelle, course à pied",
+        "client": "TotalEnergies",
+        "hire_date": date(2020, 2, 3),
+        "roles": ["astronaut"],
+        "planet_slug": "raccoon",
+    },
+    {
+        "email": "remi.noir@eleven-labs.com",
+        "first_name": "Rémi",
+        "last_name": "Noir",
+        "hobbies": "Musique électronique, surf",
+        "client": "AXA",
+        "hire_date": date(2019, 5, 27),
+        "roles": ["astronaut"],
+        "planet_slug": "raccoon",
+    },
+    {
+        "email": "camille.david@eleven-labs.com",
+        "first_name": "Camille",
+        "last_name": "David",
+        "hobbies": "Volleyball, dessin",
+        "client": "Capgemini",
+        "hire_date": date(2022, 4, 4),
+        "roles": ["astronaut"],
+        "planet_slug": "raccoon",
+    },
 ]
 
 # Slug → nom de planète (pour résolution à l'insertion)
 SLUG_TO_NAME = {
-    "hq":      "HQ",
-    "duck":    "Duck Invaders",
-    "cats":    "SchizoCats",
-    "donut":   "Donut Factory",
+    "hq": "HQ",
+    "duck": "Duck Invaders",
+    "cats": "SchizoCats",
+    "donut": "Donut Factory",
     "raccoon": "Raccoons of Asgard",
 }
 
 # Scores initiaux par planète (saison active)
 SEASON_SCORES: dict[str, int] = {
-    "Duck Invaders":        1240,
-    "SchizoCats":           980,
-    "Donut Factory":        1560,
-    "Raccoons of Asgard":   820,
+    "Duck Invaders": 1240,
+    "SchizoCats": 980,
+    "Donut Factory": 1560,
+    "Raccoons of Asgard": 820,
 }
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 
+
 def now_utc() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 async def reset_db(session: AsyncSession) -> None:
     """Vide toutes les tables dans le bon ordre (FK oblige)."""
     print("  🗑  Suppression des données existantes…")
-    tables = [
-        "point_attributions",
-        "season_planet_scores",
-        "astronauts",
-        "activities",
-        "grades",
-        "seasons",
-        "planets",
-        "seniority_config",
-    ]
-    for table in tables:
-        await session.execute(text(f"TRUNCATE TABLE {table} RESTART IDENTITY CASCADE"))
+    # Allowlist of tables safe to truncate — never interpolate user input here
+    _ALLOWED_TABLES = frozenset(
+        {
+            "point_attributions",
+            "season_planet_scores",
+            "astronauts",
+            "activities",
+            "grades",
+            "seasons",
+            "planets",
+            "seniority_config",
+        }
+    )
+    for table in _ALLOWED_TABLES:
+        # Table names come exclusively from the hardcoded allowlist — no user input
+        await session.execute(text(f"TRUNCATE TABLE {table} RESTART IDENTITY CASCADE"))  # noqa: S608
     await session.commit()
     print("  ✓  Tables vidées")
 
@@ -226,7 +389,9 @@ async def seed(session: AsyncSession) -> None:
 
     print("  👩‍🚀  Insertion des astronautes…")
     astronaut_map: dict[str, int] = {}
-    for data in ASTRONAUTS_DATA:
+    for astro_data in ASTRONAUTS_DATA:
+        # Copy to avoid mutating the module-level ASTRONAUTS_DATA constant
+        data = dict(astro_data)
         slug = data.pop("planet_slug")
         planet_name = SLUG_TO_NAME[slug]
         astro = Astronaut(
@@ -236,7 +401,6 @@ async def seed(session: AsyncSession) -> None:
         session.add(astro)
         await session.flush()
         astronaut_map[astro.email] = astro.id
-        data["planet_slug"] = slug  # restaure pour idempotence
     await session.commit()
     print(f"     → {len(ASTRONAUTS_DATA)} astronautes créés")
 
@@ -244,25 +408,25 @@ async def seed(session: AsyncSession) -> None:
     admin_id = astronaut_map["admin@eleven-labs.com"]
     attributions = [
         # Duck Invaders
-        ("tom.bernard@eleven-labs.com",  "Duck Invaders", 0, 100, False, False),
-        ("chloe.dupont@eleven-labs.com", "Duck Invaders", 1, 150, True,  False),
-        ("hugo.petit@eleven-labs.com",   "Duck Invaders", 2, 50,  False, True),
-        ("tom.bernard@eleven-labs.com",  "Duck Invaders", 5, 120, False, False),
-        ("chloe.dupont@eleven-labs.com", "Duck Invaders", 3, 60,  False, False),
+        ("tom.bernard@eleven-labs.com", "Duck Invaders", 0, 100, False, False),
+        ("chloe.dupont@eleven-labs.com", "Duck Invaders", 1, 150, True, False),
+        ("hugo.petit@eleven-labs.com", "Duck Invaders", 2, 50, False, True),
+        ("tom.bernard@eleven-labs.com", "Duck Invaders", 5, 120, False, False),
+        ("chloe.dupont@eleven-labs.com", "Duck Invaders", 3, 60, False, False),
         # SchizoCats
-        ("alice.leroy@eleven-labs.com",  "SchizoCats",    0, 100, False, False),
-        ("maxime.roux@eleven-labs.com",  "SchizoCats",    4, 80,  False, False),
-        ("sarah.moreau@eleven-labs.com", "SchizoCats",    1, 75,  True,  False),
+        ("alice.leroy@eleven-labs.com", "SchizoCats", 0, 100, False, False),
+        ("maxime.roux@eleven-labs.com", "SchizoCats", 4, 80, False, False),
+        ("sarah.moreau@eleven-labs.com", "SchizoCats", 1, 75, True, False),
         # Donut Factory
-        ("julien.simon@eleven-labs.com", "Donut Factory", 2, 50,  False, False),
-        ("emma.garcia@eleven-labs.com",  "Donut Factory", 6, 150, False, False),
+        ("julien.simon@eleven-labs.com", "Donut Factory", 2, 50, False, False),
+        ("emma.garcia@eleven-labs.com", "Donut Factory", 6, 150, False, False),
         ("lucas.thomas@eleven-labs.com", "Donut Factory", 0, 100, False, False),
-        ("julien.simon@eleven-labs.com", "Donut Factory", 9, 20,  False, False),
-        ("emma.garcia@eleven-labs.com",  "Donut Factory", 7, 40,  False, False),
+        ("julien.simon@eleven-labs.com", "Donut Factory", 9, 20, False, False),
+        ("emma.garcia@eleven-labs.com", "Donut Factory", 7, 40, False, False),
         # Raccoons of Asgard
-        ("noemie.blanc@eleven-labs.com", "Raccoons of Asgard", 3, 60,  False, False),
-        ("remi.noir@eleven-labs.com",    "Raccoons of Asgard", 0, 100, True,  False),
-        ("camille.david@eleven-labs.com","Raccoons of Asgard", 1, 75,  False, True),
+        ("noemie.blanc@eleven-labs.com", "Raccoons of Asgard", 3, 60, False, False),
+        ("remi.noir@eleven-labs.com", "Raccoons of Asgard", 0, 100, True, False),
+        ("camille.david@eleven-labs.com", "Raccoons of Asgard", 1, 75, False, True),
     ]
     # Compute total_points per astronaut
     points_per_astro: dict[int, int] = {}
@@ -284,12 +448,12 @@ async def seed(session: AsyncSession) -> None:
 
     # Update total_points on astronauts
     from sqlalchemy import update
+
     from src.models.astronaut import Astronaut as AstronautModel
+
     for astro_id, total in points_per_astro.items():
         await session.execute(
-            update(AstronautModel)
-            .where(AstronautModel.id == astro_id)
-            .values(total_points=total)
+            update(AstronautModel).where(AstronautModel.id == astro_id).values(total_points=total)
         )
     await session.commit()
     print(f"     → {len(attributions)} attributions créées")
@@ -307,6 +471,7 @@ async def seed(session: AsyncSession) -> None:
 
 
 # ─── Entrypoint ──────────────────────────────────────────────────────────────
+
 
 async def main() -> None:
     do_reset = "--reset" in sys.argv

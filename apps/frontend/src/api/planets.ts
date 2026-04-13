@@ -20,7 +20,7 @@ export function usePlanetContributions(planetId: number | null) {
   return useQuery({
     queryKey: ["point-attributions", "planet", planetId],
     queryFn: () =>
-      apiClient.get<PointAttribution[]>(`/point-attributions?planet_id=${planetId}`),
+      apiClient.get<PointAttribution[]>(`/point-attributions?planet_id=${String(planetId)}`),
     enabled: planetId !== null,
   });
 }

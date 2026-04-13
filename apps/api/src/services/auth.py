@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 import httpx
 from fastapi import HTTPException, status
 
@@ -23,8 +25,7 @@ class AuthService:
             "state": state,
             "hd": settings.allowed_domain,  # Pré-filtre côté Google
         }
-        query = "&".join(f"{k}={v}" for k, v in params.items())
-        return f"{settings.google_auth_url}?{query}"
+        return f"{settings.google_auth_url}?{urlencode(params)}"
 
     async def exchange_code_for_user_info(self, code: str) -> GoogleUserInfo:
         """Échange le code OAuth contre les infos utilisateur Google."""
@@ -47,6 +48,11 @@ class AuthService:
                 )
             token_data = token_response.json()
             access_token = token_data.get("access_token")
+            if not access_token:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token Google absent ou invalide",
+                )
 
             # 2. Récupérer les infos utilisateur
             userinfo_response = await client.get(
@@ -85,10 +91,12 @@ class AuthService:
 
     def create_jwt(self, astronaut: Astronaut) -> str:
         """Crée un JWT avec les claims de l'astronaute."""
-        return create_access_token({
-            "sub": str(astronaut.id),
-            "email": astronaut.email,
-            "astronaut_id": astronaut.id,
-            "roles": astronaut.roles,
-            "planet_id": astronaut.planet_id,
-        })
+        return create_access_token(
+            {
+                "sub": str(astronaut.id),
+                "email": astronaut.email,
+                "astronaut_id": astronaut.id,
+                "roles": astronaut.roles,
+                "planet_id": astronaut.planet_id,
+            }
+        )

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi, beforeEach } from "vitest";
@@ -14,16 +14,22 @@ function wrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
-const mockAstronauts: astronautsApi.AstronautOut[] = [
+const mockAstronauts = [
   {
     id: 1,
     email: "admin@eleven-labs.com",
     first_name: "Alice",
     last_name: "Admin",
     photo_url: null,
+    hobbies: null,
+    client: null,
+    hire_date: null,
     roles: ["astronaut", "admin"],
     planet_id: 1,
     total_points: 500,
+    grade_name: null,
+    created_at: "2024-01-01T00:00:00",
+    updated_at: "2024-01-01T00:00:00",
   },
   {
     id: 2,
@@ -31,11 +37,17 @@ const mockAstronauts: astronautsApi.AstronautOut[] = [
     first_name: "Bob",
     last_name: "Dupont",
     photo_url: null,
+    hobbies: null,
+    client: null,
+    hire_date: null,
     roles: ["astronaut"],
     planet_id: 2,
     total_points: 100,
+    grade_name: null,
+    created_at: "2024-01-01T00:00:00",
+    updated_at: "2024-01-01T00:00:00",
   },
-];
+] satisfies astronautsApi.AstronautOut[];
 
 describe("RolesPage", () => {
   beforeEach(() => {
@@ -56,7 +68,7 @@ describe("RolesPage", () => {
 
     render(<RolesPage />, { wrapper });
 
-    expect(screen.getByText("alice admin", { exact: false }) ?? screen.getByText("Alice Admin")).toBeInTheDocument();
+    expect(screen.getByText("alice admin", { exact: false })).toBeInTheDocument();
     expect(screen.getByText("bob@eleven-labs.com")).toBeInTheDocument();
     expect(screen.getAllByText("Admin").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Astronaute").length).toBeGreaterThanOrEqual(1);

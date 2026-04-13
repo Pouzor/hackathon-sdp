@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,9 +20,7 @@ class PointAttributionRepository:
         )
         return int(result.scalar() or 0)
 
-    async def count_by_astronaut_and_season(
-        self, astronaut_id: int, season_id: int
-    ) -> int:
+    async def count_by_astronaut_and_season(self, astronaut_id: int, season_id: int) -> int:
         """Nombre d'attributions pour un astronaute dans une saison donnée."""
         result = await self._db.execute(
             select(func.count()).where(
@@ -82,7 +80,7 @@ class PointAttributionRepository:
         attribution.is_deleted = True
         attribution.deleted_by = deleted_by
         attribution.deletion_reason = reason
-        attribution.deleted_at = datetime.now(timezone.utc)
+        attribution.deleted_at = datetime.now(UTC)
         await self._db.commit()
         await self._db.refresh(attribution)
         return attribution
