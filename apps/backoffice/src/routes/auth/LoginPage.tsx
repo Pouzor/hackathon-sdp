@@ -17,18 +17,38 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950">
-      <div className="flex flex-col items-center gap-8 rounded-2xl border border-white/10 bg-white/5 px-10 py-12 shadow-xl">
-        <div className="flex flex-col items-center gap-2 text-center">
-          <span className="text-3xl font-bold tracking-tight text-white">Back-office</span>
-          <span className="text-sm text-white/50">Site des Planètes — Eleven Labs</span>
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-space-900 dot-grid font-exo overflow-hidden">
+      {/* Background glow */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="h-[500px] w-[500px] rounded-full bg-neon-cyan/5 blur-3xl" />
+      </div>
+
+      {/* Card */}
+      <div className="relative z-10 cyber-corner flex flex-col items-center gap-8 bg-space-800 border border-space-500 px-10 py-12">
+        {/* Header */}
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="h-px w-10 bg-neon-cyan/40" />
+            <span className="font-orbitron text-[10px] tracking-widest text-neon-cyan uppercase">
+              Eleven Labs
+            </span>
+            <div className="h-px w-10 bg-neon-cyan/40" />
+          </div>
+          <h1 className="font-orbitron text-2xl font-bold tracking-tight text-slate-100">
+            Mission Control
+          </h1>
+          <p className="text-sm text-space-300">Back-office administration</p>
         </div>
 
+        {/* Separator */}
+        <div className="w-full h-px bg-space-500" />
+
+        {/* Login button */}
         <button
           onClick={handleLogin}
-          className="flex items-center gap-3 rounded-lg border border-white/20 bg-white px-6 py-3 text-sm font-medium text-gray-800 shadow transition hover:bg-gray-100"
+          className="flex items-center gap-3 border border-space-400 bg-space-700 px-6 py-3 text-sm font-medium text-slate-200 transition hover:border-neon-cyan/40 hover:bg-space-600 hover:text-white"
         >
-          <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
               fill="#4285F4"
@@ -49,7 +69,7 @@ export function LoginPage() {
           Se connecter avec Google
         </button>
 
-        <p className="text-xs text-white/30">Accès réservé aux admins @eleven-labs.com</p>
+        <p className="text-xs text-space-300">Accès réservé aux admins @eleven-labs.com</p>
       </div>
     </div>
   );

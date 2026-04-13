@@ -82,17 +82,19 @@ export function AttributionPage() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="mb-6 text-xl font-semibold text-gray-900">Attribuer des points</h1>
+      <h1 className="mb-6 font-orbitron text-base font-semibold tracking-wide text-slate-100">
+        ATTRIBUTION DE POINTS
+      </h1>
 
       {success && (
-        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+        <div className="mb-6 border border-neon-green/30 bg-neon-green/10 px-4 py-3 text-sm text-neon-green">
           ✓ {success.count} attribution{success.count > 1 ? "s" : ""} créée
           {success.count > 1 ? "s" : ""} — {success.points} points attribués.
           <button
             onClick={() => {
               setSuccess(null);
             }}
-            className="ml-3 underline"
+            className="ml-3 underline hover:no-underline"
           >
             Nouvelle attribution
           </button>
@@ -100,7 +102,7 @@ export function AttributionPage() {
       )}
 
       {error && (
-        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-6 border border-neon-red/30 bg-neon-red/10 px-4 py-3 text-sm text-neon-red">
           {error}
         </div>
       )}
@@ -113,7 +115,9 @@ export function AttributionPage() {
       >
         {/* Sélection activité */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Activité *</label>
+          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-space-300">
+            Activité *
+          </label>
           <select
             value={activityId ?? ""}
             onChange={(e) => {
@@ -121,7 +125,7 @@ export function AttributionPage() {
               setSelectedAstronautIds([]);
               setCustomPoints("");
             }}
-            className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500"
+            className="w-full border border-space-500 bg-space-800 px-3 py-2.5 text-sm text-slate-200 outline-none focus:border-neon-cyan/50 transition-colors"
           >
             <option value="">Choisir une activité…</option>
             {activities
@@ -133,7 +137,7 @@ export function AttributionPage() {
               ))}
           </select>
           {activity && (
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-space-300">
               Catégorie : {activity.category} ·{" "}
               {activity.allow_multiple_assignees
                 ? "Multi-assignees autorisé"
@@ -145,10 +149,10 @@ export function AttributionPage() {
         {/* Sélection astronaute(s) */}
         {activity && (
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-space-300">
               Astronaute{isCollaborative ? "s" : ""} *
               {selectedAstronautIds.length > 0 && (
-                <span className="ml-2 text-xs font-normal text-blue-600">
+                <span className="ml-2 text-xs font-normal normal-case text-neon-cyan">
                   {selectedAstronautIds.length} sélectionné
                   {selectedAstronautIds.length > 1 ? "s" : ""}
                 </span>
@@ -161,9 +165,9 @@ export function AttributionPage() {
               onChange={(e) => {
                 setAstronautSearch(e.target.value);
               }}
-              className="mb-2 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
+              className="mb-2 w-full border border-space-500 bg-space-800 px-3 py-2 text-sm text-slate-200 placeholder:text-space-300 outline-none focus:border-neon-cyan/50 transition-colors"
             />
-            <div className="max-h-52 overflow-y-auto rounded-lg border border-gray-200">
+            <div className="max-h-52 overflow-y-auto border border-space-500">
               {filteredAstronauts.map((a) => {
                 const selected = selectedAstronautIds.includes(a.id);
                 return (
@@ -173,17 +177,27 @@ export function AttributionPage() {
                     onClick={() => {
                       toggleAstronaut(a.id);
                     }}
-                    className={`flex w-full items-center gap-3 border-b border-gray-100 px-3 py-2.5 text-left text-sm last:border-0 hover:bg-gray-50 ${selected ? "bg-blue-50" : ""}`}
+                    className={`flex w-full items-center gap-3 border-b border-space-600 px-3 py-2.5 text-left text-sm last:border-0 transition-colors ${
+                      selected
+                        ? "bg-neon-cyan/10 hover:bg-neon-cyan/15"
+                        : "bg-space-800 hover:bg-space-700"
+                    }`}
                   >
                     <span
-                      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border text-xs ${selected ? "border-blue-500 bg-blue-500 text-white" : "border-gray-300"}`}
+                      className={`flex h-4 w-4 shrink-0 items-center justify-center border text-xs ${
+                        selected
+                          ? "border-neon-cyan bg-neon-cyan text-space-900"
+                          : "border-space-400 bg-transparent"
+                      }`}
                     >
                       {selected ? "✓" : ""}
                     </span>
-                    <span className="font-medium text-gray-900">
+                    <span className={`font-medium ${selected ? "text-neon-cyan" : "text-slate-200"}`}>
                       {a.first_name} {a.last_name}
                     </span>
-                    <span className="ml-auto text-xs text-gray-400">{a.total_points} pts</span>
+                    <span className="ml-auto font-mono text-xs text-space-300">
+                      {a.total_points} pts
+                    </span>
                   </button>
                 );
               })}
@@ -196,10 +210,10 @@ export function AttributionPage() {
           <>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-space-300">
                   Points personnalisés
-                  <span className="ml-1 text-xs font-normal text-gray-400">
-                    (laisser vide = {activity.base_points} pts)
+                  <span className="ml-1 text-xs font-normal normal-case text-space-300">
+                    (défaut : {activity.base_points} pts)
                   </span>
                 </label>
                 <input
@@ -210,13 +224,13 @@ export function AttributionPage() {
                     setCustomPoints(e.target.value);
                   }}
                   placeholder={activity.base_points.toString()}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                  className="w-full border border-space-500 bg-space-800 px-3 py-2 text-sm text-slate-200 outline-none focus:border-neon-cyan/50 transition-colors"
                 />
               </div>
               <div className="flex flex-col justify-end">
-                <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-blue-800">
-                  <span className="text-xs text-blue-500">Points estimés par astronaute</span>
-                  <div className="mt-0.5 font-bold">
+                <div className="border border-neon-cyan/20 bg-neon-cyan/5 px-3 py-2 text-sm">
+                  <span className="text-xs text-space-300">Points estimés / astronaute</span>
+                  <div className="mt-0.5 font-orbitron font-bold text-neon-cyan">
                     {(() => {
                       const p = pointsPreview(
                         activity,
@@ -227,15 +241,17 @@ export function AttributionPage() {
                       return `${p.base} pts`;
                     })()}
                   </div>
-                  <div className="text-xs text-blue-400">
-                    ×2 si 1ère contribution ever · +25 si 1ère de saison
+                  <div className="text-xs text-space-300">
+                    ×2 si 1ère ever · +25 si 1ère saison
                   </div>
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">Commentaire</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-space-300">
+                Commentaire
+              </label>
               <textarea
                 rows={2}
                 value={comment}
@@ -243,7 +259,7 @@ export function AttributionPage() {
                   setComment(e.target.value);
                 }}
                 placeholder="Contexte, lien, détails…"
-                className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                className="w-full resize-none border border-space-500 bg-space-800 px-3 py-2 text-sm text-slate-200 placeholder:text-space-300 outline-none focus:border-neon-cyan/50 transition-colors"
               />
             </div>
 
@@ -253,14 +269,14 @@ export function AttributionPage() {
                 onClick={() => {
                   navigate("/");
                 }}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                className="border border-space-500 px-4 py-2 text-sm text-space-300 hover:border-space-400 hover:text-slate-200 transition-colors"
               >
                 Annuler
               </button>
               <button
                 type="submit"
                 disabled={createAttribution.isPending}
-                className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                className="flex-1 border border-neon-cyan/40 bg-neon-cyan/10 px-4 py-2 text-sm font-semibold text-neon-cyan hover:bg-neon-cyan/20 disabled:opacity-50 transition-colors"
               >
                 {createAttribution.isPending
                   ? "Attribution en cours…"

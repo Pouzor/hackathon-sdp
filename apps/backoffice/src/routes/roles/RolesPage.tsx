@@ -6,8 +6,10 @@ function RolesBadge({ roles }: { roles: string[] }) {
   const isAdmin = roles.includes("admin");
   return (
     <span
-      className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${
-        isAdmin ? "bg-amber-900/40 text-amber-300" : "bg-slate-700 text-slate-300"
+      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium border ${
+        isAdmin
+          ? "border-neon-gold/30 bg-neon-gold/10 text-neon-gold"
+          : "border-space-400 bg-space-600 text-space-200"
       }`}
     >
       {isAdmin ? "Admin" : "Astronaute"}
@@ -30,17 +32,17 @@ function ToggleButton({
   const isSelf = astronaut.id === currentUserId;
 
   if (isSelf && isAdmin) {
-    return <span className="text-xs italic text-white/30">Vous-même</span>;
+    return <span className="text-xs italic text-space-300">Vous-même</span>;
   }
 
   return (
     <button
       onClick={onToggle}
       disabled={isLoading}
-      className={`rounded px-3 py-1 text-xs font-medium transition disabled:opacity-50 ${
+      className={`border px-3 py-1 text-xs font-medium transition disabled:opacity-50 ${
         isAdmin
-          ? "bg-red-900/30 text-red-400 hover:bg-red-900/50"
-          : "bg-green-900/30 text-green-400 hover:bg-green-900/50"
+          ? "border-neon-red/30 bg-neon-red/10 text-neon-red hover:bg-neon-red/20"
+          : "border-neon-green/30 bg-neon-green/10 text-neon-green hover:bg-neon-green/20"
       }`}
     >
       {isLoading ? "…" : isAdmin ? "Retirer admin" : "Promouvoir admin"}
@@ -80,27 +82,35 @@ export function RolesPage() {
   }
 
   if (isLoading) {
-    return <div className="flex items-center justify-center p-16 text-white/40">Chargement…</div>;
+    return (
+      <div className="flex items-center justify-center p-16 text-space-300">Chargement…</div>
+    );
   }
 
   if (isError) {
-    return <div className="p-8 text-red-400">Erreur lors du chargement des astronautes.</div>;
+    return <div className="p-8 text-neon-red">Erreur lors du chargement des astronautes.</div>;
   }
 
   return (
-    <div className="p-8">
-      <h1 className="mb-6 text-2xl font-bold text-white">Gestion des rôles</h1>
+    <div>
+      <h1 className="mb-6 font-orbitron text-base font-semibold tracking-wide text-slate-100">
+        GESTION DES RÔLES
+      </h1>
 
       {/* Dialog de confirmation */}
       {confirmId !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="rounded-xl border border-white/10 bg-gray-900 p-6 shadow-xl">
-            <p className="mb-4 text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-space-950/80 backdrop-blur-sm">
+          <div className="cyber-corner bg-space-800 border border-space-500 p-6 shadow-neon-cyan w-full max-w-md">
+            <p className="mb-4 text-slate-200">
               Confirmer la modification des rôles de{" "}
-              <strong>{astronauts.find((a) => a.id === confirmId)?.email}</strong> ?
+              <strong className="text-neon-cyan">
+                {astronauts.find((a) => a.id === confirmId)?.email}
+              </strong>{" "}
+              ?
             </p>
-            <p className="mb-6 text-sm text-white/50">
-              Nouveaux rôles : {pendingRoles?.join(", ")}
+            <p className="mb-6 text-sm text-space-300">
+              Nouveaux rôles :{" "}
+              <span className="text-slate-200">{pendingRoles?.join(", ")}</span>
             </p>
             <div className="flex justify-end gap-3">
               <button
@@ -108,14 +118,14 @@ export function RolesPage() {
                   setConfirmId(null);
                   setPendingRoles(null);
                 }}
-                className="rounded px-4 py-2 text-sm text-white/60 hover:text-white"
+                className="px-4 py-2 text-sm text-space-300 hover:text-slate-200 transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={confirmToggle}
                 disabled={updateRoles.isPending}
-                className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+                className="border border-neon-cyan/40 bg-neon-cyan/10 px-4 py-2 text-sm font-medium text-neon-cyan hover:bg-neon-cyan/20 disabled:opacity-50 transition-colors"
               >
                 {updateRoles.isPending ? "Mise à jour…" : "Confirmer"}
               </button>
@@ -124,23 +134,34 @@ export function RolesPage() {
         </div>
       )}
 
-      <div className="overflow-hidden rounded-lg border border-white/10">
+      <div className="overflow-hidden border border-space-500 cyber-corner">
         <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-white/10 bg-white/5 text-left text-xs font-medium uppercase text-white/40">
-              <th className="px-4 py-3">Astronaute</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Rôle actuel</th>
-              <th className="px-4 py-3">Action</th>
+          <thead className="bg-space-800">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-space-300">
+                Astronaute
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-space-300">
+                Email
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-space-300">
+                Rôle actuel
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-space-300">
+                Action
+              </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="bg-space-700">
             {astronauts.map((a) => (
-              <tr key={a.id} className="hover:bg-white/3 border-b border-white/5 text-white/80">
-                <td className="px-4 py-3 font-medium">
+              <tr
+                key={a.id}
+                className="border-t border-space-600 hover:bg-space-600 transition-colors"
+              >
+                <td className="px-4 py-3 font-medium text-slate-100">
                   {a.first_name} {a.last_name}
                 </td>
-                <td className="px-4 py-3 text-white/50">{a.email}</td>
+                <td className="px-4 py-3 text-space-300">{a.email}</td>
                 <td className="px-4 py-3">
                   <RolesBadge roles={a.roles} />
                 </td>
@@ -158,7 +179,7 @@ export function RolesPage() {
             ))}
             {astronauts.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-white/30">
+                <td colSpan={4} className="px-4 py-8 text-center text-space-300">
                   Aucun astronaute trouvé.
                 </td>
               </tr>

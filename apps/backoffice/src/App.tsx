@@ -20,8 +20,13 @@ function App() {
           <Route
             index
             element={
-              <div className="text-sm text-gray-500">
-                Tableau de bord — bienvenue dans le back-office.
+              <div className="flex flex-col gap-2">
+                <h1 className="font-orbitron text-base font-semibold tracking-wide text-slate-100">
+                  TABLEAU DE BORD
+                </h1>
+                <p className="text-sm text-space-300">
+                  Bienvenue dans le back-office — Site des Planètes.
+                </p>
               </div>
             }
           />

@@ -1,3 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-space-900 text-slate-200 font-exo;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-space-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-space-500 rounded;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neon-cyan;
+  }
+
+  select option {
+    @apply bg-space-800 text-slate-200;
+  }
+}
+
+@layer utilities {
+  .dot-grid {
+    background-image: radial-gradient(circle, rgba(0, 200, 255, 0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .cyber-corner {
+    position: relative;
+  }
+
+  .cyber-corner::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 10px;
+    height: 10px;
+    border-top: 2px solid #00c8ff;
+    border-left: 2px solid #00c8ff;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .cyber-corner::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    border-bottom: 2px solid #00c8ff;
+    border-right: 2px solid #00c8ff;
+    pointer-events: none;
+    z-index: 1;
+  }
+}
