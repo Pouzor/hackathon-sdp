@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import time
 from pathlib import Path
@@ -142,7 +143,7 @@ async def upload_astronaut_photo(
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     ext = "jpg" if file.content_type == "image/jpeg" else file.content_type.split("/")[1]
     filename = f"avatar_{astronaut_id}_{int(time.time())}.{ext}"
-    (UPLOAD_DIR / filename).write_bytes(contents)
+    await asyncio.to_thread((UPLOAD_DIR / filename).write_bytes, contents)
 
     photo_url = f"/uploads/avatars/{filename}"
     target = await astronaut_repo.get_by_id(astronaut_id)
