@@ -1,6 +1,8 @@
 import logging
+import time
+from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.deps import CurrentAdmin, CurrentAstronaut
@@ -17,6 +19,10 @@ from src.schemas.astronaut import (
 )
 
 logger = logging.getLogger(__name__)
+
+UPLOAD_DIR = Path("uploads/avatars")
+ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 Mo
 
 router = APIRouter(prefix="/astronauts", tags=["astronauts"])
 
@@ -101,6 +107,54 @@ async def update_astronaut_profile(
         current.email,
         astronaut_id,
         list(all_fields.keys()),
+    )
+
+    grades = await grade_repo.get_all()
+    return _enrich(updated, _resolve_grade(updated.total_points, grades))
+
+
+@router.post("/{astronaut_id}/photo", response_model=AstronautOut)
+async def upload_astronaut_photo(
+    astronaut_id: int,
+    current: CurrentAstronaut,
+    file: UploadFile = File(...),
+    astronaut_repo: AstronautRepository = Depends(_astronaut_repo),
+    grade_repo: GradeRepository = Depends(_grade_repo),
+) -> AstronautOut:
+    """Upload une photo de profil (multipart/form-data). JPEG, PNG ou WebP, max 5 Mo."""
+    is_admin = "admin" in current.roles
+    if current.id != astronaut_id and not is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Accès refusé")
+
+    if file.content_type not in ALLOWED_CONTENT_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Format non supporté. Utilisez JPEG, PNG ou WebP.",
+        )
+
+    contents = await file.read()
+    if len(contents) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="Fichier trop volumineux (max 5 Mo)",
+        )
+
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    ext = "jpg" if file.content_type == "image/jpeg" else file.content_type.split("/")[1]
+    filename = f"avatar_{astronaut_id}_{int(time.time())}.{ext}"
+    (UPLOAD_DIR / filename).write_bytes(contents)
+
+    photo_url = f"/uploads/avatars/{filename}"
+    target = await astronaut_repo.get_by_id(astronaut_id)
+    if target is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Astronaute introuvable")
+
+    updated = await astronaut_repo.update_profile(target, {"photo_url": photo_url})
+    logger.info(
+        "photo_uploaded by=%s astronaut_id=%s filename=%s",
+        current.email,
+        astronaut_id,
+        filename,
     )
 
     grades = await grade_repo.get_all()

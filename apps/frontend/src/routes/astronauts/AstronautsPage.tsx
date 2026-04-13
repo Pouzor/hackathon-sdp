@@ -4,6 +4,7 @@ import { useAstronauts } from "@/api/astronauts";
 import { useMergedPlanets } from "@/api/useMergedPlanets";
 import type { Astronaut } from "@/api/types";
 import { type PlanetData } from "@/components/features/solar-system/SolarSystem";
+import { getAvatarUrl } from "@/lib/apiClient";
 
 import canardPng from "../../../img/blasons/Canard.png";
 import chatPng from "../../../img/blasons/Chat.png";
@@ -101,9 +102,18 @@ function AstronautCard({ astronaut, planets }: { astronaut: Astronaut; planets: 
             fontSize: 14,
             fontWeight: 700,
             color,
+            overflow: "hidden",
           }}
         >
-          {initials}
+          {getAvatarUrl(astronaut.photo_url) ? (
+            <img
+              src={getAvatarUrl(astronaut.photo_url)!}
+              alt={initials}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            initials
+          )}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ color: "white", fontSize: 14, fontWeight: 700 }}>

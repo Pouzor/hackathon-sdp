@@ -1,5 +1,8 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
@@ -46,3 +49,7 @@ app.include_router(seasons_router, prefix="/api/v1")
 app.include_router(activities_router, prefix="/api/v1")
 app.include_router(grades_router, prefix="/api/v1")
 app.include_router(point_attributions_router, prefix="/api/v1")
+
+# Fichiers uploadés (avatars, etc.)
+os.makedirs("uploads/avatars", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")

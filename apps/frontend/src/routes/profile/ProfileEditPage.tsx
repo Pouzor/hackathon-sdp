@@ -1,17 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import { useAstronaut, useUpdateProfile } from "@/api/astronauts";
+import { AvatarUpload } from "@/components/features/AvatarUpload";
+import type { AstronautOut } from "@/api/types";
 
 const schema = z.object({
-  photo_url: z
-    .string()
-    .max(500)
-    .refine((v) => v === "" || /^https?:\/\/.+/.test(v), { message: "URL invalide" })
-    .nullable(),
   hobbies: z.string().max(1000).nullable(),
   client: z.string().max(255).nullable(),
 });
@@ -25,6 +22,7 @@ export function ProfileEditPage() {
 
   const { data: astronaut, isLoading } = useAstronaut(astronautId ?? 0);
   const updateProfile = useUpdateProfile(astronautId ?? 0);
+  const [currentPhotoUrl, setCurrentPhotoUrl] = useState<string | null | undefined>(undefined);
 
   const {
     register,
@@ -33,22 +31,25 @@ export function ProfileEditPage() {
     formState: { errors, isDirty, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { photo_url: "", hobbies: "", client: "" },
+    defaultValues: { hobbies: "", client: "" },
   });
 
   useEffect(() => {
     if (astronaut) {
+      setCurrentPhotoUrl(astronaut.photo_url ?? null);
       reset({
-        photo_url: astronaut.photo_url ?? "",
         hobbies: (astronaut as { hobbies?: string | null }).hobbies ?? "",
         client: (astronaut as { client?: string | null }).client ?? "",
       });
     }
   }, [astronaut, reset]);
 
+  function handlePhotoUploaded(updated: AstronautOut) {
+    setCurrentPhotoUrl(updated.photo_url ?? null);
+  }
+
   async function onSubmit(values: FormValues) {
     await updateProfile.mutateAsync({
-      photo_url: values.photo_url || null,
       hobbies: values.hobbies || null,
       client: values.client || null,
     });
@@ -77,7 +78,21 @@ export function ProfileEditPage() {
           ← Retour
         </button>
 
-        <h1 className="mb-8 text-2xl font-bold">Modifier mon profil</h1>
+        <h1 className="mb-6 text-2xl font-bold">Modifier mon profil</h1>
+
+        {/* Avatar upload */}
+        {astronautId && astronaut && (
+          <div className="mb-8 flex flex-col items-center gap-3">
+            <AvatarUpload
+              astronautId={astronautId}
+              currentPhotoUrl={currentPhotoUrl}
+              initials={`${astronaut.first_name.charAt(0)}${astronaut.last_name.charAt(0)}`}
+              color="#00c8ff"
+              onUploaded={handlePhotoUploaded}
+            />
+            <p className="text-xs text-white/30">Cliquer pour changer la photo</p>
+          </div>
+        )}
 
         {updateProfile.isError && (
           <div className="mb-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
@@ -93,21 +108,6 @@ export function ProfileEditPage() {
           }}
           className="flex flex-col gap-5"
         >
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/50">
-              Photo (URL)
-            </label>
-            <input
-              {...register("photo_url")}
-              type="url"
-              placeholder="https://…"
-              className="border-white/12 w-full rounded-lg border bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/20"
-            />
-            {errors.photo_url && (
-              <p className="mt-1 text-xs text-red-400">{errors.photo_url.message}</p>
-            )}
-          </div>
-
           <div>
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/50">
               Hobbies

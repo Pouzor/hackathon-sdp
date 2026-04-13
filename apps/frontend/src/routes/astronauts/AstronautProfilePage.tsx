@@ -4,6 +4,7 @@ import { useAstronaut } from "@/api/astronauts";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
 import { useAuth } from "@/hooks/useAuth";
+import { getAvatarUrl } from "@/lib/apiClient";
 import type { PointAttribution } from "@/api/types";
 import { useMergedPlanets } from "@/api/useMergedPlanets";
 
@@ -319,9 +320,18 @@ export function AstronautProfilePage() {
                 fontWeight: 800,
                 color,
                 boxShadow: `0 0 30px ${color}30`,
+                overflow: "hidden",
               }}
             >
-              {initials}
+              {getAvatarUrl(astronaut.photo_url) ? (
+                <img
+                  src={getAvatarUrl(astronaut.photo_url)!}
+                  alt={initials}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                initials
+              )}
             </div>
 
             <div style={{ flex: 1 }}>

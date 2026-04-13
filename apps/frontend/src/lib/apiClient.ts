@@ -24,6 +24,21 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+async function uploadFile<T>(path: string, body: FormData): Promise<T> {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body,
+  });
+  if (!res.ok) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const detail: { detail?: string } = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(detail.detail ?? res.statusText);
+  }
+  return res.json() as Promise<T>;
+}
+
 export const apiClient = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body: unknown) =>
@@ -31,4 +46,12 @@ export const apiClient = {
   patch: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
   delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
+  upload: <T>(path: string, body: FormData) => uploadFile<T>(path, body),
 };
+
+/** Résout une photo_url stockée en BDD vers une URL absolue affichable. */
+export function getAvatarUrl(photoUrl: string | null | undefined): string | null {
+  if (!photoUrl) return null;
+  if (photoUrl.startsWith("/")) return `${BASE_URL}${photoUrl}`;
+  return photoUrl;
+}
