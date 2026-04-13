@@ -107,4 +107,5 @@
 - [x] Total saison en footer du widget
 - [x] Clic sur une planète du leaderboard ouvre le panneau `PlanetDetail` (même effet que clic sur le système solaire)
 - [x] Connecté à l'API via `useMergedPlanets()` → `usePlanets()` (polling 30s)
+- [x] Widget "Mes points" dans la navbar branché sur l'API (total_points réel + nb contributions)
 - [ ] Pas de page dédiée `/scoreboard` pour l'instant (acceptable MVP)

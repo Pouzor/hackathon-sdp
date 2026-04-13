@@ -19,14 +19,17 @@
 
 ---
 
-## F-602 — Gestion des planètes
+## F-602 — Gestion des planètes ✅ DONE (partiel)
 
 **Route:** `/planets`
 
+**Implémentation :** `apps/backoffice/src/routes/planets/PlanetsAdminPage.tsx`
+
 **Acceptance Criteria:**
-- [ ] Liste avec nom, couleur, is_competing, nb astronautes
-- [ ] Création, édition, suppression (protégée si astronautes rattachés)
-- [ ] Upload de blason (image)
+- [x] Liste avec nom, couleur, is_competing, score saison
+- [x] Édition inline : nom, mantra, couleur (color picker), statut compétition
+- [ ] Création de planète (non implémentée — planètes créées en BDD directement)
+- [ ] Upload de blason (image) — non implémenté
 
 **Test Cases:**
 | Cas | Attendu |
@@ -37,15 +40,18 @@
 
 ---
 
-## F-603 — Gestion des astronautes
+## F-603 — Gestion des astronautes ✅ DONE (partiel)
 
 **Route:** `/astronauts`
 
+**Implémentation :** `apps/backoffice/src/routes/astronauts/AstronautsAdminPage.tsx`
+
 **Acceptance Criteria:**
-- [ ] Liste avec search + filtre planète
-- [ ] Création, édition (tous champs), suppression
-- [ ] Réaffectation planète (conserve les points)
-- [ ] Promotion/révocation admin (F-104)
+- [x] Liste avec search + filtre planète (+ filtre "Sans planète")
+- [x] Réaffectation planète inline — badge doré "Non assigné" pour les non-affectés
+- [x] Promotion/révocation admin (F-104) via RolesPage
+- [ ] Création d'astronaute (non implémentée — OAuth only)
+- [ ] Suppression astronaute
 
 **Test Cases:**
 | Cas | Attendu |
@@ -55,16 +61,18 @@
 
 ---
 
-## F-604 — Gestion des saisons
+## F-604 — Gestion des saisons ✅ DONE
 
 **Route:** `/seasons`
 
+**Implémentation :** `apps/backoffice/src/routes/seasons/SeasonsAdminPage.tsx`
+
 **Acceptance Criteria:**
-- [ ] Liste des saisons (actives et archivées)
-- [ ] Création d'une nouvelle saison
-- [ ] Activation (désactive automatiquement l'ancienne + F-305 ancienneté)
-- [ ] Clôture (reset compteurs planète, archive trophées)
-- [ ] Impossible d'avoir 2 saisons actives
+- [x] Liste des saisons (actives et archivées), triées par date
+- [x] Création d'une nouvelle saison (nom + date début)
+- [x] Activation avec confirmation (désactive l'ancienne côté backend)
+- [x] Clôture avec confirmation (reset compteurs planète)
+- [x] Impossible d'avoir 2 saisons actives (géré par le backend)
 
 **Test Cases:**
 | Cas | Attendu |
@@ -75,14 +83,17 @@
 
 ---
 
-## F-605 — Gestion des grades & paliers
+## F-605 — Gestion des grades & paliers ✅ DONE
 
 **Route:** `/grades`
 
+**Implémentation :** `apps/backoffice/src/routes/grades/GradesAdminPage.tsx`
+
 **Acceptance Criteria:**
-- [ ] Liste des grades avec seuils éditables
-- [ ] Ajout / suppression de grade
-- [ ] Modification d'un seuil → grade recalculé pour tous les astronautes concernés
+- [x] Liste des grades triés par ordre, seuils éditables inline
+- [x] Ajout de grade (nom, seuil, ordre)
+- [x] Suppression avec confirmation
+- [x] Modification d'un seuil (recalcul automatique géré par le backend à chaque requête)
 
 **Test Cases:**
 | Cas | Attendu |
@@ -92,14 +103,17 @@
 
 ---
 
-## F-606 — Gestion des activités
+## F-606 — Gestion des activités ✅ DONE
 
 **Route:** `/activities`
 
+**Implémentation :** `apps/backoffice/src/routes/activities/ActivitiesAdminPage.tsx`
+
 **Acceptance Criteria:**
-- [ ] CRUD du catalogue
-- [ ] Édition `base_points`, `category`, `is_collaborative`, `allow_multiple_assignees`
-- [ ] Validation des champs (points > 0, nom non vide)
+- [x] CRUD du catalogue (création, édition inline, toggle actif/inactif)
+- [x] Édition `base_points`, `category`, `is_collaborative`, `allow_multiple_assignees`
+- [x] Activités inactives visuellement différenciées (opacité réduite)
+- [x] Validation des champs (points > 0, nom non vide — côté formulaire et backend)
 
 **Test Cases:**
 | Cas | Attendu |
@@ -109,16 +123,18 @@
 
 ---
 
-## F-607 — Attribution de points (UI)
+## F-607 — Attribution de points (UI) ✅ DONE
 
 **Route:** `/attributions/new`
 
+**Implémentation :** `apps/backoffice/src/routes/attributions/AttributionPage.tsx`
+
 **Acceptance Criteria:**
-- [ ] Sélection astronaute(s) (multi-select si activité collaborative)
-- [ ] Sélection activité (avec points affichés)
-- [ ] Points modifiables avec justification obligatoire si modifiés
-- [ ] Aperçu des modificateurs appliqués (×2 si 1ère ever, +25 si 1ère de saison)
-- [ ] Feedback succès avec détail des points attribués
+- [x] Sélection astronaute(s) (multi-select si activité collaborative)
+- [x] Sélection activité (avec points affichés)
+- [x] Points modifiables avec justification obligatoire si modifiés
+- [x] Aperçu des modificateurs appliqués (×2 si 1ère ever, +25 si 1ère de saison)
+- [x] Feedback succès avec détail des points attribués
 
 **Test Cases:**
 | Cas | Attendu |

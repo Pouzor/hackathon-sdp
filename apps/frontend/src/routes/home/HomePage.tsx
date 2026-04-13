@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { StarField } from "@/components/features/solar-system/StarField";
 import { SolarSystem, type PlanetData } from "@/components/features/solar-system/SolarSystem";
 import { PlanetDetail } from "@/components/features/planet-detail/PlanetDetail";
 import { useMergedPlanets } from "@/api/useMergedPlanets";
+import { useAstronaut } from "@/api/astronauts";
+import { apiClient } from "@/lib/apiClient";
 import { useAuth } from "@/hooks/useAuth";
-
-// ── Current user (mock jusqu'à l'implémentation OAuth) ──────────────────────
-const ME = { name: "Jean Dupont", points: 420, contributions: 8 };
+import type { PointAttribution } from "@/api/types";
 
 // ── NavBar ───────────────────────────────────────────────────────────────────
 const NAV_LINK: React.CSSProperties = {
@@ -52,6 +53,14 @@ function NavLink({ children, to }: { children: React.ReactNode; to?: string }) {
 
 function NavBar() {
   const { user } = useAuth();
+  const astronautId = user?.astronaut_id;
+  const { data: astronaut } = useAstronaut(astronautId ?? 0);
+  const { data: contributions = [] } = useQuery({
+    queryKey: ["point-attributions", "astronaut", astronautId],
+    queryFn: () =>
+      apiClient.get<PointAttribution[]>(`/point-attributions?astronaut_id=${astronautId ?? 0}`),
+    enabled: astronautId !== undefined,
+  });
   return (
     <div
       style={{
@@ -126,7 +135,7 @@ function NavBar() {
               fontFamily: "'Arial Black', Arial, sans-serif",
             }}
           >
-            {ME.points.toLocaleString()}
+            {(astronaut?.total_points ?? 0).toLocaleString()}
           </span>
         </div>
 
@@ -140,7 +149,7 @@ function NavBar() {
           }}
         >
           <span style={{ color: "#fbbf24", fontSize: 10, opacity: 0.8 }}>
-            {ME.contributions} contrib.
+            {contributions.length} contrib.
           </span>
         </div>
       </div>
