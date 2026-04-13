@@ -55,7 +55,8 @@
 **Implémentation :**
 - `apps/frontend/src/routes/profile/ProfileEditPage.tsx`
 - `apps/frontend/src/api/astronauts.ts` — `useUpdateProfile()`
-- PR #8 mergée le 2026-04-12
+- `apps/frontend/src/routes/astronauts/AstronautProfilePage.tsx` — bouton "Modifier mon profil" (visible sur son propre profil uniquement)
+- PR #8 mergée le 2026-04-12, accès bouton fixé le 2026-04-13
 
 **Acceptance Criteria:**
 - [x] Formulaire avec `photo_url`, `hobbies`, `client` uniquement
@@ -64,6 +65,8 @@
 - [x] Feedback erreur (message d'erreur API affiché)
 - [x] Redirect vers profil après succès
 - [x] Route protégée (nécessite auth)
+- [x] Bouton "Modifier mon profil" visible sur la page profil (son propre profil uniquement)
+- [x] Lien "Mon Profil" dans la navbar homepage fonctionnel (branché sur `user.astronaut_id`)
 
 **Test Cases:**
 | Cas | Attendu |
@@ -101,5 +104,6 @@
 **Acceptance Criteria:**
 - [x] 4 planètes `is_competing = true` triées par score, barres de progression
 - [x] Total saison en footer du widget
+- [x] Clic sur une planète du leaderboard ouvre le panneau `PlanetDetail` (même effet que clic sur le système solaire)
 - [ ] Pas de page dédiée `/scoreboard` pour l'instant (acceptable MVP)
 - [ ] Connecter à l'API (React Query, polling 30s)

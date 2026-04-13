@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAstronaut } from "@/api/astronauts";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
+import { useAuth } from "@/hooks/useAuth";
 import type { PointAttribution } from "@/api/types";
 import { useMergedPlanets } from "@/api/useMergedPlanets";
 
@@ -119,6 +120,8 @@ export function AstronautProfilePage() {
   const [tab, setTab] = useState<Tab>("contributions");
 
   const astronautId = Number(id);
+  const { user } = useAuth();
+  const isOwnProfile = user?.astronaut_id === astronautId;
   const { data: astronaut, isLoading, isError } = useAstronaut(astronautId);
   const { planets } = useMergedPlanets();
 
@@ -233,6 +236,36 @@ export function AstronautProfilePage() {
         <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}>
           {astronaut.first_name} {astronaut.last_name}
         </span>
+
+        {isOwnProfile && (
+          <>
+            <div style={{ flex: 1 }} />
+            <button
+              onClick={() => { navigate("/profile/edit"); }}
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 8,
+                color: "rgba(255,255,255,0.75)",
+                fontSize: 12,
+                letterSpacing: "0.08em",
+                padding: "6px 14px",
+                cursor: "pointer",
+                transition: "background 0.2s, color 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.1)";
+                (e.currentTarget as HTMLElement).style.color = "white";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)";
+                (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.75)";
+              }}
+            >
+              ✏ Modifier mon profil
+            </button>
+          </>
+        )}
       </div>
 
       <div

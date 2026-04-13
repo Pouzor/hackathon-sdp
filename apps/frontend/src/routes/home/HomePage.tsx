@@ -4,6 +4,7 @@ import { StarField } from "@/components/features/solar-system/StarField";
 import { SolarSystem, type PlanetData } from "@/components/features/solar-system/SolarSystem";
 import { PlanetDetail } from "@/components/features/planet-detail/PlanetDetail";
 import { useMergedPlanets } from "@/api/useMergedPlanets";
+import { useAuth } from "@/hooks/useAuth";
 
 // ── Current user (mock jusqu'à l'implémentation OAuth) ──────────────────────
 const ME = { name: "Jean Dupont", points: 420, contributions: 8 };
@@ -50,6 +51,7 @@ function NavLink({ children, to }: { children: React.ReactNode; to?: string }) {
 }
 
 function NavBar() {
+  const { user } = useAuth();
   return (
     <div
       style={{
@@ -76,7 +78,7 @@ function NavBar() {
       {/* Separator */}
       <div style={{ width: 1, height: 18, background: "rgba(255,255,255,0.1)", margin: "0 4px" }} />
 
-      <NavLink>Mon Profil</NavLink>
+      <NavLink to={user ? `/astronauts/${user.astronaut_id}` : undefined}>Mon Profil</NavLink>
 
       {/* Separator */}
       <div style={{ width: 1, height: 18, background: "rgba(255,255,255,0.1)", margin: "0 4px" }} />
@@ -149,7 +151,7 @@ function NavBar() {
 // ── Leaderboard ──────────────────────────────────────────────────────────────
 const RANK_ICONS = ["👑", "🥈", "🥉", "4"];
 
-function Leaderboard({ planets }: { planets: PlanetData[] }) {
+function Leaderboard({ planets, onPlanetClick }: { planets: PlanetData[]; onPlanetClick: (p: PlanetData) => void }) {
   const competing = [...planets].filter((p) => p.isCompeting).sort((a, b) => b.score - a.score);
 
   const max = competing[0]?.score ?? 1;
@@ -219,6 +221,7 @@ function Leaderboard({ planets }: { planets: PlanetData[] }) {
           return (
             <div
               key={planet.id}
+              onClick={() => { onPlanetClick(planet); }}
               style={{
                 padding: "10px 16px",
                 cursor: "pointer",
@@ -424,7 +427,7 @@ export function HomePage() {
       </div>
 
       {/* Leaderboard — left side */}
-      <Leaderboard planets={planets} />
+      <Leaderboard planets={planets} onPlanetClick={setSelectedPlanet} />
 
       {/* Solar System — centered, fades + shifts left when planet selected */}
       <div
