@@ -7,6 +7,7 @@ import {
   type AstronautOut,
   type PlanetOut,
 } from "@/api/astronauts";
+import { AstronautDetailDrawer } from "./AstronautDetailDrawer";
 
 function PlanetSelect({
   astronaut,
@@ -74,6 +75,7 @@ export function AstronautsAdminPage() {
   const updateAstronaut = useUpdateAstronaut();
   const [search, setSearch] = useState("");
   const [filterPlanet, setFilterPlanet] = useState<string>("all");
+  const [selectedAstronaut, setSelectedAstronaut] = useState<AstronautOut | null>(null);
 
   const filtered = useMemo(() => {
     let list = astronauts;
@@ -163,13 +165,14 @@ export function AstronautsAdminPage() {
             {filtered.map((a) => (
               <tr
                 key={a.id}
-                className="border-t border-space-600 hover:bg-space-600 transition-colors"
+                onClick={() => { setSelectedAstronaut(a); }}
+                className="border-t border-space-600 hover:bg-space-600 transition-colors cursor-pointer"
               >
                 <td className="px-4 py-3 font-medium text-slate-100">
                   {a.first_name} {a.last_name}
                 </td>
                 <td className="px-4 py-3 text-space-300">{a.email}</td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3" onClick={(e) => { e.stopPropagation(); }}>
                   <PlanetSelect
                     astronaut={a}
                     planets={planets}
@@ -205,6 +208,12 @@ export function AstronautsAdminPage() {
           </tbody>
         </table>
       </div>
+
+      <AstronautDetailDrawer
+        astronaut={selectedAstronaut}
+        planets={planets}
+        onClose={() => { setSelectedAstronaut(null); }}
+      />
     </div>
   );
 }

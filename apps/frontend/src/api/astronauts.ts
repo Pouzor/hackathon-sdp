@@ -1,6 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
-import type { Astronaut } from "./types";
+import type { Astronaut, TrophyAttribution } from "./types";
+
+export function useTrophyAttributions(astronautId: number) {
+  return useQuery({
+    queryKey: ["trophy-attributions", "astronaut", astronautId],
+    queryFn: () =>
+      apiClient.get<TrophyAttribution[]>(`/trophies/attributions?astronaut_id=${astronautId}`),
+    enabled: astronautId > 0,
+  });
+}
+
+export function usePlanetTrophyAttributions(planetId: number | null) {
+  return useQuery({
+    queryKey: ["trophy-attributions", "planet", planetId],
+    queryFn: () =>
+      apiClient.get<TrophyAttribution[]>(`/trophies/attributions?planet_id=${planetId!}`),
+    enabled: planetId !== null,
+    refetchInterval: 30_000,
+  });
+}
 
 export interface ProfileUpdatePayload {
   photo_url?: string | null;

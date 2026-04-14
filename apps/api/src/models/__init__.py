@@ -7,6 +7,8 @@ from src.models.point_attribution import PointAttribution
 from src.models.season import Season
 from src.models.season_planet_score import SeasonPlanetScore
 from src.models.seniority_config import SeniorityConfig
+from src.models.trophy import Trophy
+from src.models.trophy_attribution import TrophyAttribution
 
 __all__ = [
     "Activity",
@@ -17,4 +19,6 @@ __all__ = [
     "Season",
     "SeasonPlanetScore",
     "SeniorityConfig",
+    "Trophy",
+    "TrophyAttribution",
 ]

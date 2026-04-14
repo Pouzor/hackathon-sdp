@@ -15,3 +15,6 @@ export type PointAttributionOut = components["schemas"]["PointAttributionOut"];
 export type AstronautMe = components["schemas"]["AstronautMe"];
 export type SeasonOut = components["schemas"]["SeasonOut"];
 export type GradeOut = components["schemas"]["GradeOut"];
+export type TrophyOut = components["schemas"]["TrophyOut"];
+export type TrophyAttributionOut = components["schemas"]["TrophyAttributionOut"];
+export type TrophyAttributionCreate = components["schemas"]["TrophyAttributionCreate"];

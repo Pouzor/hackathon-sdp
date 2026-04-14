@@ -187,6 +187,89 @@ export function useUpdateActivity() {
 
 // ── Attributions ──────────────────────────────────────────────────────────────
 
+// ── Trophies ──────────────────────────────────────────────────────────────────
+
+import type { TrophyOut, TrophyAttributionOut } from "shared-types";
+export type { TrophyOut, TrophyAttributionOut };
+
+export function useTrophies() {
+  return useQuery<TrophyOut[]>({
+    queryKey: ["admin", "trophies"],
+    queryFn: () => apiClient.get<TrophyOut[]>("/trophies"),
+  });
+}
+
+export function useCreateTrophy() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      name: string;
+      description?: string | null;
+      icon_url?: string | null;
+      season_id?: number | null;
+    }) => apiClient.post<TrophyOut>("/trophies", body),
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: ["admin", "trophies"] }); },
+  });
+}
+
+export function useUpdateTrophy() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...fields }: Partial<TrophyOut> & { id: number }) =>
+      apiClient.patch<TrophyOut>(`/trophies/${id}`, fields),
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: ["admin", "trophies"] }); },
+  });
+}
+
+export function useDeleteTrophy() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => apiClient.delete<void>(`/trophies/${id}`),
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: ["admin", "trophies"] }); },
+  });
+}
+
+export function useCreateTrophyAttribution() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      trophy_id: number;
+      astronaut_id?: number | null;
+      planet_id?: number | null;
+      comment?: string | null;
+    }) => apiClient.post<TrophyAttributionOut>("/trophies/attributions", body),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "trophies"] });
+      void qc.invalidateQueries({ queryKey: ["admin", "attributions"] });
+    },
+  });
+}
+
+export function useDeleteTrophyAttribution() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => apiClient.delete<void>(`/trophies/attributions/${id}`),
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: ["admin", "trophies"] }); },
+  });
+}
+
+export function useAstronautAttributions(astronautId: number | null) {
+  return useQuery<PointAttributionOut[]>({
+    queryKey: ["admin", "attributions", "astronaut", astronautId],
+    queryFn: () =>
+      apiClient.get<PointAttributionOut[]>(`/point-attributions?astronaut_id=${astronautId!}`),
+    enabled: astronautId !== null,
+  });
+}
+
+export function useRecentAttributions(limit = 10) {
+  return useQuery<PointAttributionOut[]>({
+    queryKey: ["admin", "attributions", "recent", limit],
+    queryFn: () => apiClient.get<PointAttributionOut[]>(`/point-attributions?limit=${limit}&sort=desc`),
+    refetchInterval: 30_000,
+  });
+}
+
 export function useCreateAttribution() {
   const qc = useQueryClient();
   return useMutation({
@@ -195,6 +278,7 @@ export function useCreateAttribution() {
       activity_id: number;
       points?: number;
       comment?: string;
+      awarded_at?: string; // ISO 8601, None = now (UTC)
     }) => apiClient.post<PointAttributionOut[]>("/point-attributions", body),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["admin", "astronauts"] });

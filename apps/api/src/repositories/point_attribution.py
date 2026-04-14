@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import extract, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.point_attribution import PointAttribution
@@ -57,6 +57,30 @@ class PointAttributionRepository:
             q = q.where(PointAttribution.season_id == season_id)
         q = q.order_by(PointAttribution.awarded_at.desc()).limit(limit)
         result = await self._db.execute(q)
+        return list(result.scalars().all())
+
+    async def has_seniority_attribution(
+        self, astronaut_id: int, activity_id: int, year: int
+    ) -> bool:
+        """Vérifie si une attribution d'ancienneté existe déjà pour cet astronaute cette année."""
+        result = await self._db.execute(
+            select(func.count()).where(
+                PointAttribution.astronaut_id == astronaut_id,
+                PointAttribution.activity_id == activity_id,
+                extract("year", PointAttribution.awarded_at) == year,
+                PointAttribution.is_deleted.is_(False),
+            )
+        )
+        return int(result.scalar() or 0) > 0
+
+    async def get_recent(self, limit: int = 10) -> list[PointAttribution]:
+        """Retourne les N dernières attributions non supprimées."""
+        result = await self._db.execute(
+            select(PointAttribution)
+            .where(PointAttribution.is_deleted.is_(False))
+            .order_by(PointAttribution.awarded_at.desc())
+            .limit(limit)
+        )
         return list(result.scalars().all())
 
     async def get_by_id(self, attribution_id: int) -> PointAttribution | None:

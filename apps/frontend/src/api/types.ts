@@ -70,3 +70,16 @@ export type Grade = {
   threshold_points: number;
   order: number;
 };
+
+export type TrophyAttribution = {
+  id: number;
+  trophy_id: number;
+  trophy_name: string | null;
+  trophy_icon_url: string | null;
+  astronaut_id: number | null;
+  planet_id: number | null;
+  season_id: number;
+  awarded_by: number;
+  comment: string | null;
+  awarded_at: string;
+};

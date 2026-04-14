@@ -38,6 +38,7 @@ async def create_attribution(
         awarded_by=admin,
         custom_points=body.points,
         comment=body.comment,
+        awarded_at=body.awarded_at,
     )
     return [PointAttributionOut.model_validate(a) for a in attributions]
 

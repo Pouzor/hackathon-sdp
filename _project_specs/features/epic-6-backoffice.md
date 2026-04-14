@@ -2,19 +2,24 @@
 
 ⚠️ **Prérequis avant de démarrer :** Demander les assets graphiques (logo, charte admin).
 
-## F-601 — Dashboard admin
+## F-601 — Dashboard admin ✅ DONE
 
 **Route:** `/` (backoffice)
 
+**Implémentation :** `apps/backoffice/src/routes/dashboard/DashboardPage.tsx`
+
 **Acceptance Criteria:**
-- [ ] Métriques : nb astronautes actifs, saison active (nom + dates), dernières 10 attributions
-- [ ] Liens rapides vers les sections principales
-- [ ] Données via React Query
+- [x] Bandeau saison active (nom, durée, total points) ou alerte rouge si absente
+- [x] Classement live des planètes en compétition avec barres de progression
+- [x] 10 dernières attributions (astronaute, activité, planète, date, points) — polling 30s
+- [x] Stats flotte : total / sans planète / actifs / dormants
+- [x] Liens rapides vers toutes les sections
+- [x] Données via React Query
 
 **Test Cases:**
 | Cas | Attendu |
 |-----|---------|
-| Pas de saison active | Bandeau d'alerte visible |
+| Pas de saison active | Bandeau d'alerte rouge visible |
 | Dernières attributions | Triées par date desc |
 
 ---
@@ -44,12 +49,15 @@
 
 **Route:** `/astronauts`
 
-**Implémentation :** `apps/backoffice/src/routes/astronauts/AstronautsAdminPage.tsx`
+**Implémentation :**
+- `apps/backoffice/src/routes/astronauts/AstronautsAdminPage.tsx`
+- `apps/backoffice/src/routes/astronauts/AstronautDetailDrawer.tsx`
 
 **Acceptance Criteria:**
 - [x] Liste avec search + filtre planète (+ filtre "Sans planète")
 - [x] Réaffectation planète inline — badge doré "Non assigné" pour les non-affectés
 - [x] Promotion/révocation admin (F-104) via RolesPage
+- [x] Clic sur un astronaute → drawer slide-in avec fiche complète + historique des attributions
 - [ ] Création d'astronaute (non implémentée — OAuth only)
 - [ ] Suppression astronaute
 
@@ -135,6 +143,7 @@
 - [x] Points modifiables avec justification obligatoire si modifiés
 - [x] Aperçu des modificateurs appliqués (×2 si 1ère ever, +25 si 1ère de saison)
 - [x] Feedback succès avec détail des points attribués
+- [x] Date picker avec défaut = aujourd'hui (backdating possible)
 
 **Test Cases:**
 | Cas | Attendu |
@@ -142,17 +151,22 @@
 | Activité non collaborative + 2 astronautes | Multi-select désactivé |
 | 1ère contribution astronaute | Aperçu montre ×2 |
 | Points modifiés sans justification | Validation bloquée |
+| Date passée sélectionnée | Avertissement "backdaté" visible |
 
 ---
 
-## F-608 — Gestion des trophées
+## F-608 — Gestion des trophées ✅ DONE (partiel)
 
 **Route:** `/trophies`
 
+**Implémentation :** `apps/backoffice/src/routes/trophies/TrophiesAdminPage.tsx`
+
 **Acceptance Criteria:**
-- [ ] CRUD trophées
-- [ ] Attribution manuelle (formulaire astronaute ou planète)
-- [ ] Configuration règles automatiques (P2, formulaire JSON ou UI simplifiée)
+- [x] CRUD trophées (nom, description, icône/emoji, type manual/automatic)
+- [x] Attribution manuelle : toggle astronaute / planète, recherche, commentaire
+- [x] Alerte si aucune saison active
+- [x] Bannière succès après attribution
+- [ ] Configuration règles automatiques (P2 — formulaire JSON ou UI simplifiée)
 
 ---
 

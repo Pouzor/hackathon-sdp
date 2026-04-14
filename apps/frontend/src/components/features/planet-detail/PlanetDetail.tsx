@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { type PlanetData, PLANET_CONFIG } from "@/components/features/solar-system/SolarSystem";
-import { useAstronauts } from "@/api/astronauts";
+import { useAstronauts, usePlanetTrophyAttributions } from "@/api/astronauts";
 import { usePlanetContributions } from "@/api/planets";
-import type { Astronaut, PointAttribution } from "@/api/types";
-import { type Trophy } from "./mockData";
+import type { Astronaut, PointAttribution, TrophyAttribution } from "@/api/types";
 
 // Blason images
 import canardPng from "../../../../img/blasons/Canard.png";
@@ -131,7 +130,7 @@ function ContributionRow({ c }: { c: PointAttribution }) {
   );
 }
 
-function TrophyCard({ trophy }: { trophy: Trophy }) {
+function TrophyCard({ trophy }: { trophy: TrophyAttribution }) {
   return (
     <div
       style={{
@@ -139,20 +138,28 @@ function TrophyCard({ trophy }: { trophy: Trophy }) {
         alignItems: "center",
         gap: 14,
         padding: "12px 14px",
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.07)",
+        background: "rgba(251,191,36,0.04)",
+        border: "1px solid rgba(251,191,36,0.12)",
         borderRadius: 10,
         marginBottom: 8,
       }}
     >
-      <span style={{ fontSize: 28 }}>{trophy.icon}</span>
-      <div>
-        <div style={{ color: "white", fontSize: 13, fontWeight: 600 }}>{trophy.name}</div>
-        <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginTop: 2 }}>
-          {trophy.description}
+      <span style={{ fontSize: 28, flexShrink: 0 }}>
+        {trophy.trophy_icon_url && !trophy.trophy_icon_url.startsWith("http")
+          ? trophy.trophy_icon_url
+          : "🏆"}
+      </span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ color: "white", fontSize: 13, fontWeight: 600 }}>
+          {trophy.trophy_name ?? `Trophée #${trophy.trophy_id}`}
         </div>
+        {trophy.comment && (
+          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginTop: 2, fontStyle: "italic" }}>
+            "{trophy.comment}"
+          </div>
+        )}
         <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 10, marginTop: 3 }}>
-          {trophy.date}
+          {new Date(trophy.awarded_at).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })}
         </div>
       </div>
     </div>
@@ -175,8 +182,7 @@ export function PlanetDetail({
 
   const { data: members = [] } = useAstronauts(planet.apiId ?? undefined);
   const { data: contributions = [] } = usePlanetContributions(planet.apiId);
-  // Trophées : pas encore d'API — liste vide en attendant
-  const trophies: Trophy[] = [];
+  const { data: trophies = [] } = usePlanetTrophyAttributions(planet.apiId);
 
   const TABS: { key: Tab; label: string; count?: number }[] = [
     { key: "membres", label: "Membres", count: members.length },
@@ -484,7 +490,9 @@ export function PlanetDetail({
                   Aucun trophée pour l'instant
                 </p>
               ) : (
-                trophies.map((t) => <TrophyCard key={t.id} trophy={t} />)
+                [...trophies]
+                  .sort((a, b) => new Date(b.awarded_at).getTime() - new Date(a.awarded_at).getTime())
+                  .map((t) => <TrophyCard key={t.id} trophy={t} />)
               )}
             </div>
           )}

@@ -84,12 +84,12 @@
 **Implémentation :**
 - `apps/frontend/src/components/features/planet-detail/PlanetDetail.tsx`
 - `apps/frontend/src/api/planets.ts` — `usePlanetContributions()` (polling 30s)
-- `apps/frontend/src/api/astronauts.ts` — `useAstronauts(planetId)`
+- `apps/frontend/src/api/astronauts.ts` — `useAstronauts(planetId)` + `usePlanetTrophyAttributions(planetId)`
 
 **Acceptance Criteria:**
 - [x] Blason + planète 3D animée (pulse), couleur, total points saison
 - [x] Liste des astronautes membres (triée par points, grade affiché)
-- [x] Historique des trophées (icône, description, date)
+- [x] Historique des trophées réels (icône, nom, commentaire, date) — branché sur l'API (F-404)
 - [x] Timeline des contributions (astronaute, activité, points, bonus)
 - [x] Onglet contributions ouvert par défaut
 - [x] Connecté à l'API (useAstronauts + usePlanetContributions)

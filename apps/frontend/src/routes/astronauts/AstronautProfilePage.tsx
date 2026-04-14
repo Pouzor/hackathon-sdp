@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useAstronaut } from "@/api/astronauts";
+import { useAstronaut, useTrophyAttributions } from "@/api/astronauts";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
 import { useAuth } from "@/hooks/useAuth";
@@ -133,6 +133,8 @@ export function AstronautProfilePage() {
     enabled: !isNaN(astronautId),
   });
 
+  const { data: trophyAttributions = [] } = useTrophyAttributions(astronautId);
+
   if (isLoading) {
     return (
       <div
@@ -161,7 +163,7 @@ export function AstronautProfilePage() {
 
   const TABS: { key: Tab; label: string; count: number }[] = [
     { key: "contributions", label: "Contributions", count: contributions.length },
-    { key: "trophees", label: "Trophées", count: 0 },
+    { key: "trophees", label: "Trophées", count: trophyAttributions.length },
   ];
 
   return (
@@ -406,7 +408,7 @@ export function AstronautProfilePage() {
               color={color}
             />
             <StatCard label="Contributions" value={contributions.length.toString()} />
-            <StatCard label="Trophées" value="0" color="#fbbf24" />
+            <StatCard label="Trophées" value={trophyAttributions.length.toString()} color="#fbbf24" />
             {astronaut.client && astronaut.client !== "—" && (
               <StatCard label="Client" value={astronaut.client} />
             )}
@@ -570,9 +572,50 @@ export function AstronautProfilePage() {
           )}
 
           {tab === "trophees" && (
-            <p style={{ color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: 40 }}>
-              Aucun trophée pour l'instant
-            </p>
+            <>
+              {trophyAttributions.length === 0 ? (
+                <p style={{ color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: 40 }}>
+                  Aucun trophée pour l'instant
+                </p>
+              ) : (
+                [...trophyAttributions]
+                  .sort((a, b) => new Date(b.awarded_at).getTime() - new Date(a.awarded_at).getTime())
+                  .map((t) => (
+                    <div
+                      key={t.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 14,
+                        padding: "12px 14px",
+                        background: "rgba(251,191,36,0.04)",
+                        border: "1px solid rgba(251,191,36,0.12)",
+                        borderRadius: 10,
+                        marginBottom: 8,
+                      }}
+                    >
+                      <span style={{ fontSize: 28, flexShrink: 0 }}>
+                        {t.trophy_icon_url && !t.trophy_icon_url.startsWith("http")
+                          ? t.trophy_icon_url
+                          : "🏆"}
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ color: "white", fontSize: 13, fontWeight: 600 }}>
+                          {t.trophy_name ?? `Trophée #${t.trophy_id}`}
+                        </div>
+                        {t.comment && (
+                          <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, marginTop: 2, fontStyle: "italic" }}>
+                            "{t.comment}"
+                          </div>
+                        )}
+                        <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 10, marginTop: 3 }}>
+                          {new Date(t.awarded_at).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+              )}
+            </>
           )}
         </div>
       </div>

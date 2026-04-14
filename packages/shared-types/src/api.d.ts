@@ -205,6 +205,26 @@ export interface paths {
         patch: operations["update_astronaut_profile_api_v1_astronauts__astronaut_id__patch"];
         trace?: never;
     };
+    "/api/v1/astronauts/{astronaut_id}/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload Astronaut Photo
+         * @description Upload une photo de profil (multipart/form-data). JPEG, PNG ou WebP, max 5 Mo.
+         */
+        post: operations["upload_astronaut_photo_api_v1_astronauts__astronaut_id__photo_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/astronauts/{astronaut_id}/roles": {
         parameters: {
             query?: never;
@@ -405,6 +425,77 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/trophies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Trophies */
+        get: operations["list_trophies_api_v1_trophies_get"];
+        put?: never;
+        /** Create Trophy */
+        post: operations["create_trophy_api_v1_trophies_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/trophies/{trophy_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Trophy */
+        delete: operations["delete_trophy_api_v1_trophies__trophy_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Trophy */
+        patch: operations["update_trophy_api_v1_trophies__trophy_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/trophies/attributions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Trophy Attributions */
+        get: operations["list_trophy_attributions_api_v1_trophies_attributions_get"];
+        put?: never;
+        /** Create Trophy Attribution */
+        post: operations["create_trophy_attribution_api_v1_trophies_attributions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/trophies/attributions/{attribution_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Trophy Attribution */
+        delete: operations["delete_trophy_attribution_api_v1_trophies_attributions__attribution_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -549,6 +640,11 @@ export interface components {
             /** Roles */
             roles: string[];
         };
+        /** Body_upload_astronaut_photo_api_v1_astronauts__astronaut_id__photo_post */
+        Body_upload_astronaut_photo_api_v1_astronauts__astronaut_id__photo_post: {
+            /** File */
+            file: string;
+        };
         /** GradeCreate */
         GradeCreate: {
             /** Name */
@@ -657,6 +753,8 @@ export interface components {
             points?: number | null;
             /** Comment */
             comment?: string | null;
+            /** Awarded At */
+            awarded_at?: string | null;
         };
         /** PointAttributionDeleteRequest */
         PointAttributionDeleteRequest: {
@@ -727,6 +825,98 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** TrophyAttributionCreate */
+        TrophyAttributionCreate: {
+            /** Trophy Id */
+            trophy_id: number;
+            /** Astronaut Id */
+            astronaut_id?: number | null;
+            /** Planet Id */
+            planet_id?: number | null;
+            /** Comment */
+            comment?: string | null;
+        };
+        /** TrophyAttributionOut */
+        TrophyAttributionOut: {
+            /** Id */
+            id: number;
+            /** Trophy Id */
+            trophy_id: number;
+            /** Trophy Name */
+            trophy_name?: string | null;
+            /** Trophy Icon Url */
+            trophy_icon_url?: string | null;
+            /** Astronaut Id */
+            astronaut_id: number | null;
+            /** Planet Id */
+            planet_id: number | null;
+            /** Season Id */
+            season_id: number;
+            /** Awarded By */
+            awarded_by: number;
+            /** Comment */
+            comment: string | null;
+            /**
+             * Awarded At
+             * Format: date-time
+             */
+            awarded_at: string;
+        };
+        /** TrophyCreate */
+        TrophyCreate: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Icon Url */
+            icon_url?: string | null;
+            /**
+             * Rule Type
+             * @default manual
+             */
+            rule_type: string;
+            /** Rule Config */
+            rule_config?: string | null;
+            /** Season Id */
+            season_id?: number | null;
+        };
+        /** TrophyOut */
+        TrophyOut: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Icon Url */
+            icon_url: string | null;
+            /** Rule Type */
+            rule_type: string;
+            /** Rule Config */
+            rule_config: string | null;
+            /** Season Id */
+            season_id: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** TrophyUpdate */
+        TrophyUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Icon Url */
+            icon_url?: string | null;
+            /** Rule Type */
+            rule_type?: string | null;
+            /** Rule Config */
+            rule_config?: string | null;
+            /** Season Id */
+            season_id?: number | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -1127,6 +1317,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["AstronautPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AstronautOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_astronaut_photo_api_v1_astronauts__astronaut_id__photo_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                astronaut_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_astronaut_photo_api_v1_astronauts__astronaut_id__photo_post"];
             };
         };
         responses: {
@@ -1644,6 +1869,217 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["PointAttributionOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_trophies_api_v1_trophies_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrophyOut"][];
+                };
+            };
+        };
+    };
+    create_trophy_api_v1_trophies_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrophyCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrophyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_trophy_api_v1_trophies__trophy_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trophy_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_trophy_api_v1_trophies__trophy_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                trophy_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrophyUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrophyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_trophy_attributions_api_v1_trophies_attributions_get: {
+        parameters: {
+            query?: {
+                astronaut_id?: number | null;
+                planet_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrophyAttributionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_trophy_attribution_api_v1_trophies_attributions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrophyAttributionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrophyAttributionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_trophy_attribution_api_v1_trophies_attributions__attribution_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attribution_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

@@ -9,6 +9,8 @@ Règles appliquées dans l'ordre :
 6. Mise à jour du compteur planète de la saison
 """
 
+from datetime import datetime
+
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -38,6 +40,7 @@ class PointAttributionService:
         awarded_by: Astronaut,
         custom_points: int | None = None,
         comment: str | None = None,
+        awarded_at: datetime | None = None,
     ) -> list[PointAttribution]:
         """
         Attribue des points à un ou plusieurs astronautes.
@@ -106,7 +109,7 @@ class PointAttributionService:
                 final_points += FIRST_SEASON_BONUS
 
             # Création de l'attribution (immuable)
-            attribution = await self._pa_repo.create(
+            create_kwargs: dict[str, object] = dict(
                 astronaut_id=astronaut_id,
                 planet_id=astronaut.planet_id,
                 activity_id=activity_id,
@@ -117,6 +120,9 @@ class PointAttributionService:
                 first_ever_multiplier_applied=is_first_ever,
                 first_season_bonus_applied=is_first_of_season,
             )
+            if awarded_at is not None:
+                create_kwargs["awarded_at"] = awarded_at
+            attribution = await self._pa_repo.create(**create_kwargs)
 
             # Mise à jour astronaut.total_points
             astronaut.total_points += final_points

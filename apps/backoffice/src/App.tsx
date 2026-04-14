@@ -3,6 +3,7 @@ import { AdminLayout } from "@/components/features/AdminLayout";
 import { RequireAdmin } from "@/components/features/RequireAdmin";
 import { LoginPage } from "@/routes/auth/LoginPage";
 import { AuthCallbackPage } from "@/routes/auth/AuthCallbackPage";
+import { DashboardPage } from "@/routes/dashboard/DashboardPage";
 import { RolesPage } from "@/routes/roles/RolesPage";
 import { AstronautsAdminPage } from "@/routes/astronauts/AstronautsAdminPage";
 import { AttributionPage } from "@/routes/attributions/AttributionPage";
@@ -10,6 +11,7 @@ import { PlanetsAdminPage } from "@/routes/planets/PlanetsAdminPage";
 import { SeasonsAdminPage } from "@/routes/seasons/SeasonsAdminPage";
 import { GradesAdminPage } from "@/routes/grades/GradesAdminPage";
 import { ActivitiesAdminPage } from "@/routes/activities/ActivitiesAdminPage";
+import { TrophiesAdminPage } from "@/routes/trophies/TrophiesAdminPage";
 
 function App() {
   return (
@@ -21,19 +23,7 @@ function App() {
       {/* Routes protégées admin */}
       <Route element={<RequireAdmin />}>
         <Route path="/" element={<AdminLayout />}>
-          <Route
-            index
-            element={
-              <div className="flex flex-col gap-2">
-                <h1 className="font-orbitron text-base font-semibold tracking-wide text-slate-100">
-                  TABLEAU DE BORD
-                </h1>
-                <p className="text-sm text-space-300">
-                  Bienvenue dans le back-office — Site des Planètes.
-                </p>
-              </div>
-            }
-          />
+          <Route index element={<DashboardPage />} />
           <Route path="astronauts" element={<AstronautsAdminPage />} />
           <Route path="roles" element={<RolesPage />} />
           <Route path="attributions/new" element={<AttributionPage />} />
@@ -41,6 +31,7 @@ function App() {
           <Route path="seasons" element={<SeasonsAdminPage />} />
           <Route path="grades" element={<GradesAdminPage />} />
           <Route path="activities" element={<ActivitiesAdminPage />} />
+          <Route path="trophies" element={<TrophiesAdminPage />} />
         </Route>
       </Route>
     </Routes>

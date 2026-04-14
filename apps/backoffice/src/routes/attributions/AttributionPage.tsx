@@ -34,6 +34,9 @@ export function AttributionPage() {
   const [activityId, setActivityId] = useState<number | null>(null);
   const [customPoints, setCustomPoints] = useState<string>("");
   const [comment, setComment] = useState("");
+  const [awardedAt, setAwardedAt] = useState<string>(
+    new Date().toISOString().slice(0, 10), // YYYY-MM-DD, défaut = aujourd'hui
+  );
   const [astronautSearch, setAstronautSearch] = useState("");
   const [success, setSuccess] = useState<{ count: number; points: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -63,11 +66,14 @@ export function AttributionPage() {
     setError(null);
     try {
       const parsed = customPoints ? parseInt(customPoints, 10) : undefined;
+      // Construire la date ISO en UTC à minuit du jour sélectionné
+      const awardedAtIso = awardedAt ? new Date(awardedAt + "T12:00:00").toISOString() : undefined;
       const result = await createAttribution.mutateAsync({
         astronaut_ids: selectedAstronautIds,
         activity_id: activityId,
         ...(parsed ? { points: parsed } : {}),
         ...(comment ? { comment } : {}),
+        ...(awardedAtIso ? { awarded_at: awardedAtIso } : {}),
       });
       const totalPoints = result.reduce((s, a) => s + a.points, 0);
       setSuccess({ count: result.length, points: totalPoints });
@@ -75,6 +81,7 @@ export function AttributionPage() {
       setActivityId(null);
       setCustomPoints("");
       setComment("");
+      setAwardedAt(new Date().toISOString().slice(0, 10));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
     }
@@ -246,6 +253,28 @@ export function AttributionPage() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="awarded-at"
+                className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-space-300"
+              >
+                Date d'attribution
+              </label>
+              <input
+                id="awarded-at"
+                type="date"
+                value={awardedAt}
+                max={new Date().toISOString().slice(0, 10)}
+                onChange={(e) => { setAwardedAt(e.target.value); }}
+                className="w-full border border-space-500 bg-space-800 px-3 py-2 text-sm text-slate-200 outline-none focus:border-neon-cyan/50 transition-colors [color-scheme:dark]"
+              />
+              {awardedAt !== new Date().toISOString().slice(0, 10) && (
+                <p className="mt-1 text-xs text-neon-gold">
+                  Attribution backdatée au {new Date(awardedAt + "T12:00:00").toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })}
+                </p>
+              )}
             </div>
 
             <div>

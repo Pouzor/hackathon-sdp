@@ -22,8 +22,8 @@ class PointAttribution(Base):
     season_id: Mapped[int] = mapped_column(
         ForeignKey("seasons.id", ondelete="RESTRICT"), nullable=False, index=True
     )
-    awarded_by: Mapped[int] = mapped_column(
-        ForeignKey("astronauts.id", ondelete="RESTRICT"), nullable=False
+    awarded_by: Mapped[int | None] = mapped_column(
+        ForeignKey("astronauts.id", ondelete="SET NULL"), nullable=True
     )
     points: Mapped[int] = mapped_column(Integer, nullable=False)
     comment: Mapped[str | None] = mapped_column(Text)

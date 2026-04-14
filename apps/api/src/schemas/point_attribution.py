@@ -8,6 +8,7 @@ class PointAttributionCreate(BaseModel):
     activity_id: int
     points: int | None = Field(None, gt=0)  # None = utiliser base_points de l'activité
     comment: str | None = None
+    awarded_at: datetime | None = None  # None = maintenant (UTC)
 
     @model_validator(mode="after")
     def validate_single_astronaut_for_non_collaborative(self) -> "PointAttributionCreate":
