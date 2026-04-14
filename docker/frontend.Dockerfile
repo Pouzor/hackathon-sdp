@@ -2,7 +2,7 @@ FROM node:20-slim AS builder
 RUN npm i -g pnpm@9
 
 WORKDIR /app
-COPY pnpm-workspace.yaml package.json ./
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY packages/shared-types/package.json ./packages/shared-types/
 COPY apps/frontend/package.json ./apps/frontend/
 RUN pnpm install --frozen-lockfile

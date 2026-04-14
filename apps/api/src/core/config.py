@@ -1,5 +1,34 @@
-from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+import json
+from typing import Any
+
+from pydantic import field_validator, model_validator
+from pydantic.fields import FieldInfo
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
+from pydantic_settings.sources.providers.env import EnvSettingsSource
+
+
+class _TolerantEnvSource(EnvSettingsSource):
+    """EnvSettingsSource that silently passes complex fields through as raw strings
+    instead of raising SettingsError when json.loads fails.
+    The model_validator on Settings then converts them to the right type."""
+
+    def prepare_field_value(
+        self,
+        field_name: str,
+        field: FieldInfo,
+        value: Any,
+        value_is_complex: bool,
+    ) -> Any:
+        if value_is_complex and isinstance(value, str):
+            stripped = value.strip()
+            if stripped.startswith(("[", "{")):
+                try:
+                    return json.loads(stripped)
+                except json.JSONDecodeError:
+                    pass
+            # Return as-is; model_validator will handle comma-separated fallback
+            return stripped
+        return value
 
 
 class Settings(BaseSettings):
@@ -47,7 +76,7 @@ class Settings(BaseSettings):
     # Domaine autorisé
     allowed_domain: str = "eleven-labs.com"
 
-    # CORS — frontend (5173) + backoffice (5174)
+    # CORS — accepts JSON array OR comma-separated: "http://a,http://b"
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:5174"]
 
     # Frontend URL (pour les redirections post-login)
@@ -56,6 +85,32 @@ class Settings(BaseSettings):
 
     # Uploads
     upload_dir: str = "uploads"
+
+    @model_validator(mode="before")
+    @classmethod
+    def coerce_list_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Convert comma-separated strings to lists before field validation."""
+        co = values.get("cors_origins")
+        if isinstance(co, str):
+            stripped = co.strip()
+            if stripped.startswith("["):
+                values["cors_origins"] = json.loads(stripped)
+            else:
+                values["cors_origins"] = [v.strip() for v in stripped.split(",") if v.strip()]
+        return values
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        *args: PydanticBaseSettingsSource,
+        **kwargs: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        remaining = tuple(args) + tuple(kwargs.values())
+        return (init_settings, _TolerantEnvSource(settings_cls), dotenv_settings) + remaining
 
 
 settings = Settings()  # type: ignore[call-arg]  # pydantic-settings populates required fields from env
