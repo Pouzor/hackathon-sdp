@@ -64,12 +64,20 @@ PLANETS = [
 ]
 
 GRADES = [
-    {"name": "Recrue", "threshold_points": 0, "order": 1},
-    {"name": "Cadet", "threshold_points": 100, "order": 2},
-    {"name": "Explorateur", "threshold_points": 300, "order": 3},
-    {"name": "Navigateur", "threshold_points": 600, "order": 4},
-    {"name": "Commandant", "threshold_points": 1000, "order": 5},
-    {"name": "Amiral", "threshold_points": 2000, "order": 6},
+    {"name": "Rookie", "threshold_points": 0, "order": 1},
+    {"name": "Ensign", "threshold_points": 50, "order": 2},
+    {"name": "Lieutenant", "threshold_points": 100, "order": 3},
+    {"name": "Lt. Commander", "threshold_points": 200, "order": 4},
+    {"name": "Commander", "threshold_points": 300, "order": 5},
+    {"name": "Captain", "threshold_points": 500, "order": 6},
+    {"name": "Fleet Captain", "threshold_points": 750, "order": 7},
+    {"name": "Commodore", "threshold_points": 1000, "order": 8},
+    {"name": "Rear Admiral", "threshold_points": 1500, "order": 9},
+    {"name": "Vice Admiral", "threshold_points": 2000, "order": 10},
+    {"name": "Admiral", "threshold_points": 3000, "order": 11},
+    {"name": "Fleet Admiral", "threshold_points": 5000, "order": 12},
+    {"name": "Fleet Adm. ★★", "threshold_points": 10000, "order": 13},
+    {"name": "Fleet Adm. ★★★", "threshold_points": 15000, "order": 14},
 ]
 
 ACTIVITIES = [

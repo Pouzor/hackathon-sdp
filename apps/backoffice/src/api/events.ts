@@ -7,6 +7,7 @@ export type EventOut = {
   event_date: string;
   created_by: number | null;
   created_at: string;
+  attendance_count: number;
 };
 
 export type AttendanceResult = {

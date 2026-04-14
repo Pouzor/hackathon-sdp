@@ -22,6 +22,16 @@ class AstronautOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class AstronautCreate(BaseModel):
+    """Création manuelle d'un astronaute par un admin."""
+
+    email: str = Field(..., max_length=255)
+    first_name: str = Field(..., min_length=1, max_length=255)
+    last_name: str = Field(..., min_length=1, max_length=255)
+    planet_id: int | None = Field(default=None)
+    hire_date: date | None = Field(default=None)
+
+
 class AstronautSelfUpdate(BaseModel):
     """Champs modifiables par l'astronaute lui-même (ou un admin).
     Tous les champs sont optionnels : seuls les champs fournis sont mis à jour.

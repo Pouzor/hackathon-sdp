@@ -1,3 +1,4 @@
+from datetime import date
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,12 +36,16 @@ class AstronautRepository:
         first_name: str,
         last_name: str,
         photo_url: str | None = None,
+        planet_id: int | None = None,
+        hire_date: date | None = None,
     ) -> Astronaut:
         astronaut = Astronaut(
             email=email,
             first_name=first_name,
             last_name=last_name,
             photo_url=photo_url,
+            planet_id=planet_id,
+            hire_date=hire_date,
             roles=["astronaut"],
         )
         self._db.add(astronaut)

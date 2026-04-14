@@ -43,6 +43,22 @@ export function useUpdateRoles() {
   });
 }
 
+export function useCreateAstronaut() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      email: string;
+      first_name: string;
+      last_name: string;
+      planet_id?: number | null;
+      hire_date?: string | null;
+    }) => apiClient.post<AstronautOut>("/astronauts", body),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "astronauts"] });
+    },
+  });
+}
+
 export function useUpdateAstronaut() {
   const qc = useQueryClient();
   return useMutation({

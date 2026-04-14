@@ -88,8 +88,10 @@ function LogoutButton({ onLogout }: { onLogout: () => void }) {
   );
 }
 
+const BACKOFFICE_URL = (import.meta.env.VITE_BACKOFFICE_URL as string | undefined) ?? "http://localhost:5174";
+
 export function HomeNavBar() {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const astronautId = user?.astronaut_id;
   const { data: astronaut } = useAstronaut(astronautId ?? 0);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -119,6 +121,52 @@ export function HomeNavBar() {
         padding: "4px 6px",
       }}
     >
+      {isAdmin && (
+        <>
+          <a
+            href={BACKOFFICE_URL}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              color: "rgba(0,200,255,0.7)",
+              background: "rgba(0,200,255,0.05)",
+              border: "1px solid rgba(0,200,255,0.15)",
+              borderRadius: 6,
+              fontSize: 11,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              fontWeight: 600,
+              padding: "5px 10px",
+              textDecoration: "none",
+              transition: "color 0.2s, background 0.2s, border 0.2s",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget;
+              el.style.color = "rgba(0,200,255,1)";
+              el.style.background = "rgba(0,200,255,0.12)";
+              el.style.border = "1px solid rgba(0,200,255,0.35)";
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget;
+              el.style.color = "rgba(0,200,255,0.7)";
+              el.style.background = "rgba(0,200,255,0.05)";
+              el.style.border = "1px solid rgba(0,200,255,0.15)";
+            }}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+            </svg>
+            Mission Control
+          </a>
+          <div style={{ width: 1, height: 18, background: "rgba(255,255,255,0.1)", margin: "0 4px" }} />
+        </>
+      )}
+
       <NavLink to="/astronauts">Astronautes</NavLink>
 
       <div style={{ width: 1, height: 18, background: "rgba(255,255,255,0.1)", margin: "0 4px" }} />

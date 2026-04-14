@@ -47,7 +47,13 @@ async def list_events(
 ) -> list[EventOut]:
     repo = EventRepository(db)
     events = await repo.get_all()
-    return [EventOut.model_validate(e) for e in events]
+    counts = await repo.count_attendances_by_event([e.id for e in events])
+    result = []
+    for e in events:
+        out = EventOut.model_validate(e)
+        out.attendance_count = counts.get(e.id, 0)
+        result.append(out)
+    return result
 
 
 @router.post("", response_model=EventOut, status_code=status.HTTP_201_CREATED)

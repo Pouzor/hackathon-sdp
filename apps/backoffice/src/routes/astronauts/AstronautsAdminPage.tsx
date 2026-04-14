@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
-import { UserX, RefreshCw } from "lucide-react";
+import { UserX, RefreshCw, UserPlus } from "lucide-react";
 import {
   useAstronauts,
   usePlanets,
+  useCreateAstronaut,
   useUpdateAstronaut,
   useSyncGoogleUsers,
   type AstronautOut,
@@ -68,6 +69,140 @@ function PlanetSelect({
         </option>
       ))}
     </select>
+  );
+}
+
+function AddAstronautForm({
+  planets,
+  onClose,
+}: {
+  planets: PlanetOut[];
+  onClose: () => void;
+}) {
+  const createAstronaut = useCreateAstronaut();
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [planetId, setPlanetId] = useState<string>("");
+  const [hireDate, setHireDate] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = () => {
+    setError(null);
+    if (!email.trim()) { setError("L'email est obligatoire."); return; }
+    if (!firstName.trim()) { setError("Le prénom est obligatoire."); return; }
+    if (!lastName.trim()) { setError("Le nom est obligatoire."); return; }
+
+    createAstronaut.mutate(
+      {
+        email: email.trim(),
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        planet_id: planetId ? parseInt(planetId, 10) : null,
+        hire_date: hireDate || null,
+      },
+      {
+        onSuccess: () => { onClose(); },
+        onError: (err) => {
+          setError(err instanceof Error ? err.message : "Erreur lors de la création.");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="mb-5 border border-neon-cyan/20 bg-space-800 p-5 cyber-corner">
+      <h2 className="mb-4 font-orbitron text-xs font-semibold tracking-widest text-neon-cyan uppercase">
+        Nouvel astronaute
+      </h2>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {/* Prénom */}
+        <div>
+          <label className="mb-1 block text-xs text-space-300">Prénom <span className="text-neon-red">*</span></label>
+          <input
+            type="text"
+            value={firstName}
+            onChange={(e) => { setFirstName(e.target.value); }}
+            placeholder="Jean"
+            className="w-full border border-space-500 bg-space-700 px-3 py-2 text-sm text-slate-200 placeholder:text-space-400 outline-none focus:border-neon-cyan/50 transition-colors"
+          />
+        </div>
+
+        {/* Nom */}
+        <div>
+          <label className="mb-1 block text-xs text-space-300">Nom <span className="text-neon-red">*</span></label>
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => { setLastName(e.target.value); }}
+            placeholder="Dupont"
+            className="w-full border border-space-500 bg-space-700 px-3 py-2 text-sm text-slate-200 placeholder:text-space-400 outline-none focus:border-neon-cyan/50 transition-colors"
+          />
+        </div>
+
+        {/* Email */}
+        <div>
+          <label className="mb-1 block text-xs text-space-300">Email <span className="text-neon-red">*</span></label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => { setEmail(e.target.value); }}
+            placeholder="jean.dupont@eleven-labs.com"
+            className="w-full border border-space-500 bg-space-700 px-3 py-2 text-sm text-slate-200 placeholder:text-space-400 outline-none focus:border-neon-cyan/50 transition-colors"
+          />
+        </div>
+
+        {/* Planète (optionnel) */}
+        <div>
+          <label className="mb-1 block text-xs text-space-300">
+            Planète <span className="text-space-400">(optionnel)</span>
+          </label>
+          <select
+            value={planetId}
+            onChange={(e) => { setPlanetId(e.target.value); }}
+            className="w-full border border-space-500 bg-space-700 px-3 py-2 text-sm text-slate-200 outline-none focus:border-neon-cyan/50 transition-colors"
+          >
+            <option value="">— Aucune —</option>
+            {planets.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Date d'entrée (optionnel) */}
+        <div>
+          <label className="mb-1 block text-xs text-space-300">
+            Date d&apos;entrée <span className="text-space-400">(optionnel)</span>
+          </label>
+          <input
+            type="date"
+            value={hireDate}
+            onChange={(e) => { setHireDate(e.target.value); }}
+            className="w-full border border-space-500 bg-space-700 px-3 py-2 text-sm text-slate-200 outline-none focus:border-neon-cyan/50 transition-colors"
+          />
+        </div>
+      </div>
+
+      {error && <p className="mt-3 text-xs text-neon-red">{error}</p>}
+
+      <div className="mt-4 flex items-center gap-3">
+        <button
+          onClick={handleSubmit}
+          disabled={createAstronaut.isPending}
+          className="flex items-center gap-2 border border-neon-cyan/40 bg-neon-cyan/5 px-4 py-2 text-xs font-semibold text-neon-cyan hover:bg-neon-cyan/10 transition-colors disabled:opacity-40"
+        >
+          <UserPlus size={13} />
+          {createAstronaut.isPending ? "Création…" : "Créer l'astronaute"}
+        </button>
+        <button
+          onClick={onClose}
+          className="px-4 py-2 text-xs text-space-300 border border-space-500 hover:bg-space-600 hover:text-slate-200 transition-colors"
+        >
+          Annuler
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -176,6 +311,7 @@ export function AstronautsAdminPage() {
   const [search, setSearch] = useState("");
   const [filterPlanet, setFilterPlanet] = useState<string>("all");
   const [selectedAstronaut, setSelectedAstronaut] = useState<AstronautOut | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
   const [showSyncDialog, setShowSyncDialog] = useState(false);
   const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
@@ -226,14 +362,30 @@ export function AstronautsAdminPage() {
           ASTRONAUTES{" "}
           <span className="text-neon-cyan">({astronauts.length})</span>
         </h1>
-        <button
-          onClick={() => { setShowSyncDialog(true); }}
-          className="flex items-center gap-2 border border-neon-cyan/40 bg-neon-cyan/5 px-3 py-1.5 text-xs font-medium text-neon-cyan hover:bg-neon-cyan/10 transition-colors"
-        >
-          <RefreshCw size={13} />
-          Synchroniser avec Google
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => { setShowAddForm((v) => !v); }}
+            className="flex items-center gap-2 border border-neon-cyan/40 bg-neon-cyan/5 px-3 py-1.5 text-xs font-medium text-neon-cyan hover:bg-neon-cyan/10 transition-colors"
+          >
+            <UserPlus size={13} />
+            Ajouter un astronaute
+          </button>
+          <button
+            onClick={() => { setShowSyncDialog(true); }}
+            className="flex items-center gap-2 border border-space-500 bg-space-800 px-3 py-1.5 text-xs font-medium text-space-300 hover:bg-space-700 hover:text-slate-200 transition-colors"
+          >
+            <RefreshCw size={13} />
+            Synchroniser avec Google
+          </button>
+        </div>
       </div>
+
+      {showAddForm && (
+        <AddAstronautForm
+          planets={planets}
+          onClose={() => { setShowAddForm(false); }}
+        />
+      )}
 
       <SyncResultBanner
         result={syncResult}

@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { type PlanetData, PLANET_CONFIG } from "@/components/features/solar-system/SolarSystem";
 import { useAstronauts, usePlanetTrophyAttributions } from "@/api/astronauts";
 import { usePlanetContributions } from "@/api/planets";
+import { getAvatarUrl } from "@/lib/apiClient";
 import type { Astronaut, PointAttribution, TrophyAttribution } from "@/api/types";
 
 // Blason images
@@ -23,41 +25,71 @@ type Tab = "membres" | "contributions" | "trophees";
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function MemberRow({ member, rank, color }: { member: Astronaut; rank: number; color: string }) {
+function MemberRow({ member, rank, color, onClose }: { member: Astronaut; rank: number; color: string; onClose: () => void }) {
+  const navigate = useNavigate();
   const initials = `${member.first_name.charAt(0)}${member.last_name.charAt(0)}`;
+  const avatarUrl = getAvatarUrl(member.photo_url);
+
+  const handleClick = () => {
+    onClose();
+    navigate(`/astronauts/${member.id}`);
+  };
+
   return (
     <div
+      onClick={handleClick}
       style={{
         display: "flex",
         alignItems: "center",
         gap: 12,
-        padding: "10px 0",
+        padding: "10px 8px",
         borderBottom: "1px solid rgba(255,255,255,0.05)",
+        cursor: "pointer",
+        borderRadius: 8,
+        transition: "background 0.15s",
       }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
     >
       <span
-        style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, width: 18, textAlign: "right" }}
+        style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, width: 18, textAlign: "right", flexShrink: 0 }}
       >
         {rank}
       </span>
-      <div
-        style={{
-          width: 34,
-          height: 34,
-          borderRadius: "50%",
-          background: `linear-gradient(135deg, ${color}60, ${color}20)`,
-          border: `1px solid ${color}50`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 11,
-          fontWeight: 700,
-          color,
-          flexShrink: 0,
-        }}
-      >
-        {initials}
-      </div>
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt={`${member.first_name} ${member.last_name}`}
+          draggable={false}
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: "50%",
+            objectFit: "cover",
+            border: `1px solid ${color}50`,
+            flexShrink: 0,
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: "50%",
+            background: `linear-gradient(135deg, ${color}60, ${color}20)`,
+            border: `1px solid ${color}50`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 11,
+            fontWeight: 700,
+            color,
+            flexShrink: 0,
+          }}
+        >
+          {initials}
+        </div>
+      )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ color: "white", fontSize: 13, fontWeight: 600 }}>
           {member.first_name} {member.last_name}
@@ -66,7 +98,7 @@ function MemberRow({ member, rank, color }: { member: Astronaut; rank: number; c
           {member.grade_name ?? "—"}
         </div>
       </div>
-      <div style={{ textAlign: "right" }}>
+      <div style={{ textAlign: "right", flexShrink: 0 }}>
         <span style={{ color, fontSize: 14, fontWeight: 700 }}>
           {member.total_points.toLocaleString()}
         </span>
@@ -465,7 +497,7 @@ export function PlanetDetail({
                 [...members]
                   .sort((a, b) => b.total_points - a.total_points)
                   .map((m, i) => (
-                    <MemberRow key={m.id} member={m} rank={i + 1} color={planet.color} />
+                    <MemberRow key={m.id} member={m} rank={i + 1} color={planet.color} onClose={onClose} />
                   ))
               )}
             </div>

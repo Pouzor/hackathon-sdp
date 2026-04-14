@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarPlus, ChevronRight } from "lucide-react";
+import { CalendarPlus, ChevronRight, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEvents, useCreateEvent, type EventOut } from "@/api/events";
 
@@ -15,11 +15,15 @@ function EventRow({ event }: { event: EventOut }) {
       to={`/events/${event.id}/attendance`}
       className="flex items-center justify-between border-t border-space-600 px-4 py-3 hover:bg-space-600 transition-colors"
     >
-      <div>
+      <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-slate-100">{event.name}</p>
         <p className="text-xs text-space-300 mt-0.5">{formatted}</p>
       </div>
-      <ChevronRight size={14} className="text-space-400" />
+      <div className="flex items-center gap-1.5 shrink-0 px-2 py-0.5 border border-space-500 bg-space-700 rounded text-xs text-space-300">
+        <Users size={11} />
+        <span className="font-mono">{event.attendance_count}</span>
+      </div>
+      <ChevronRight size={14} className="text-space-400 shrink-0" />
     </Link>
   );
 }

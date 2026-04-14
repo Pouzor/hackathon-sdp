@@ -14,6 +14,7 @@ class EventOut(BaseModel):
     event_date: date
     created_by: int | None
     created_at: datetime
+    attendance_count: int = 0
 
     model_config = {"from_attributes": True}
 

@@ -3,6 +3,7 @@ import { StarField } from "@/components/features/solar-system/StarField";
 import { SolarSystem, type PlanetData } from "@/components/features/solar-system/SolarSystem";
 import { PlanetDetail } from "@/components/features/planet-detail/PlanetDetail";
 import { HomeNavBar } from "@/components/features/HomeNavBar";
+import { RankCard } from "@/components/features/RankCard";
 import { useMergedPlanets } from "@/api/useMergedPlanets";
 
 // ── Leaderboard ──────────────────────────────────────────────────────────────
@@ -286,6 +287,9 @@ export function HomePage() {
 
       {/* Leaderboard — left side */}
       <Leaderboard planets={planets} onPlanetClick={setSelectedPlanet} />
+
+      {/* Rank card — right side */}
+      <RankCard />
 
       {/* Solar System — centered, fades + shifts left when planet selected */}
       <div

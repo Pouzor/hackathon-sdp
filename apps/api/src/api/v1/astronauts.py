@@ -15,6 +15,7 @@ from src.repositories.astronaut import AstronautRepository
 from src.repositories.grade import GradeRepository
 from src.schemas.astronaut import (
     ADMIN_ONLY_FIELDS,
+    AstronautCreate,
     AstronautOut,
     AstronautPatch,
     AstronautRoleUpdate,
@@ -70,6 +71,30 @@ async def list_astronauts(
     astronauts = await astronaut_repo.get_all(planet_id=planet_id)
     grades = await grade_repo.get_all()
     return [_enrich(a, _resolve_grade(a.total_points, grades)) for a in astronauts]
+
+
+@router.post("", response_model=AstronautOut, status_code=status.HTTP_201_CREATED)
+async def create_astronaut(
+    body: AstronautCreate,
+    _admin: CurrentAdmin,
+    astronaut_repo: AstronautRepository = Depends(_astronaut_repo),
+    grade_repo: GradeRepository = Depends(_grade_repo),
+) -> AstronautOut:
+    existing = await astronaut_repo.get_by_email(body.email)
+    if existing is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Un astronaute avec cet email existe déjà.",
+        )
+    astronaut = await astronaut_repo.create(
+        email=body.email,
+        first_name=body.first_name,
+        last_name=body.last_name,
+        planet_id=body.planet_id,
+        hire_date=body.hire_date,
+    )
+    grades = await grade_repo.get_all()
+    return _enrich(astronaut, _resolve_grade(astronaut.total_points, grades))
 
 
 @router.get("/{astronaut_id}", response_model=AstronautOut)
