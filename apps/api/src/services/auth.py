@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from urllib.parse import urlencode
 
 import httpx
@@ -8,6 +10,21 @@ from src.core.security import create_access_token
 from src.models.astronaut import Astronaut
 from src.repositories.astronaut import AstronautRepository
 from src.schemas.auth import GoogleUserInfo
+
+# Scope Directory API pour la synchro Google Workspace (F-610)
+_OAUTH_SCOPES = " ".join([
+    "openid",
+    "email",
+    "profile",
+    "https://www.googleapis.com/auth/admin.directory.user.readonly",
+])
+
+
+@dataclass
+class GoogleAuthData:
+    user_info: GoogleUserInfo
+    access_token: str
+    expires_in: int  # secondes
 
 
 class AuthService:
@@ -20,15 +37,15 @@ class AuthService:
             "client_id": settings.google_client_id,
             "redirect_uri": settings.google_redirect_uri,
             "response_type": "code",
-            "scope": "openid email profile",
+            "scope": _OAUTH_SCOPES,
             "access_type": "offline",
             "state": state,
             "hd": settings.allowed_domain,  # Pré-filtre côté Google
         }
         return f"{settings.google_auth_url}?{urlencode(params)}"
 
-    async def exchange_code_for_user_info(self, code: str) -> GoogleUserInfo:
-        """Échange le code OAuth contre les infos utilisateur Google."""
+    async def exchange_code_for_user_info(self, code: str) -> GoogleAuthData:
+        """Échange le code OAuth contre les infos utilisateur Google + access_token."""
         async with httpx.AsyncClient() as client:
             # 1. Échanger le code contre un access_token
             token_response = await client.post(
@@ -47,12 +64,13 @@ class AuthService:
                     detail="Échec de l'échange du code OAuth",
                 )
             token_data = token_response.json()
-            access_token = token_data.get("access_token")
+            access_token: str = token_data.get("access_token", "")
             if not access_token:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Token Google absent ou invalide",
                 )
+            expires_in: int = int(token_data.get("expires_in", 3600))
 
             # 2. Récupérer les infos utilisateur
             userinfo_response = await client.get(
@@ -65,7 +83,11 @@ class AuthService:
                     detail="Impossible de récupérer les informations utilisateur",
                 )
 
-        return GoogleUserInfo.model_validate(userinfo_response.json())
+        return GoogleAuthData(
+            user_info=GoogleUserInfo.model_validate(userinfo_response.json()),
+            access_token=access_token,
+            expires_in=expires_in,
+        )
 
     def verify_allowed_domain(self, user_info: GoogleUserInfo) -> None:
         """Vérifie que l'email appartient au domaine autorisé."""
@@ -77,8 +99,9 @@ class AuthService:
                 detail=f"Accès réservé aux comptes @{settings.allowed_domain}",
             )
 
-    async def get_or_create_astronaut(self, user_info: GoogleUserInfo) -> Astronaut:
-        """Récupère l'astronaute existant ou le crée à la première connexion."""
+    async def get_or_create_astronaut(self, auth_data: GoogleAuthData) -> Astronaut:
+        """Récupère l'astronaute existant ou le crée, et met à jour son token Google."""
+        user_info = auth_data.user_info
         astronaut = await self._repo.get_by_email(user_info.email)
         if astronaut is None:
             astronaut = await self._repo.create(
@@ -87,6 +110,15 @@ class AuthService:
                 last_name=user_info.family_name,
                 photo_url=user_info.picture,
             )
+        # Mise à jour du token Google à chaque connexion (F-610)
+        token_expires_at = datetime.now(UTC) + timedelta(seconds=auth_data.expires_in)
+        await self._repo.update_profile(
+            astronaut,
+            {
+                "google_access_token": auth_data.access_token,
+                "google_token_expires_at": token_expires_at,
+            },
+        )
         return astronaut
 
     def create_jwt(self, astronaut: Astronaut) -> str:

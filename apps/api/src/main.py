@@ -11,6 +11,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from src.api.v1.activities import router as activities_router
+from src.api.v1.admin import router as admin_router
 from src.api.v1.astronauts import router as astronauts_router
 from src.api.v1.auth import router as auth_router
 from src.api.v1.grades import router as grades_router
@@ -81,6 +82,7 @@ app.include_router(activities_router, prefix="/api/v1")
 app.include_router(grades_router, prefix="/api/v1")
 app.include_router(point_attributions_router, prefix="/api/v1")
 app.include_router(trophies_router, prefix="/api/v1")
+app.include_router(admin_router, prefix="/api/v1")
 
 # Fichiers uploadés (avatars, etc.)
 _Path(settings.upload_dir + "/avatars").mkdir(parents=True, exist_ok=True)

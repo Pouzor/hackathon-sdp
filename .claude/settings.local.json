@@ -68,7 +68,13 @@
       "Bash(pnpm --filter backoffice lint -- --fix)",
       "Bash(pnpm --filter backoffice exec prettier --check .)",
       "Bash(pnpm --filter frontend lint)",
-      "Bash(pnpm --filter frontend exec prettier --check .)"
+      "Bash(pnpm --filter frontend exec prettier --check .)",
+      "Bash(docker exec hackathon-sdp-postgres-1:*)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(.venv/bin/python -m pytest tests/ -x -q)",
+      "Bash(uv remove:*)",
+      "Bash(pnpm eslint:*)"
     ]
   }
 }

@@ -69,7 +69,6 @@ planets/
 ├── docker/               # Dockerfiles + docker-compose
 ├── .github/workflows/    # CI GitHub Actions
 ├── CLAUDE.md
-├── FEATURES.md
 └── README.md
 ```
 
@@ -281,8 +280,8 @@ Entités principales (à raffiner dans les schémas réels) :
 
 Quand on demande à Claude Code de développer une fonctionnalité :
 
-1. **Lire** `CLAUDE.md` (ce fichier) et `FEATURES.md`.
-2. **Identifier** la feature dans `FEATURES.md` et sa priorité.
+1. **Lire** `CLAUDE.md` (ce fichier) et les features dans `_project_specs/features/`.
+2. **Identifier** la feature dans `_project_specs/features/` et sa priorité.
 3. **Vérifier** les dépendances avec d'autres features.
 4. **Proposer** un plan d'implémentation avant de coder.
 5. **Écrire les tests d'abord** (TDD encouragé) sur les règles métier critiques.

@@ -61,9 +61,9 @@ async def google_callback(
             status_code=status.HTTP_400_BAD_REQUEST, detail="State CSRF invalide"
         ) from exc
 
-    user_info = await service.exchange_code_for_user_info(code)
-    service.verify_allowed_domain(user_info)
-    astronaut = await service.get_or_create_astronaut(user_info)
+    auth_data = await service.exchange_code_for_user_info(code)
+    service.verify_allowed_domain(auth_data.user_info)
+    astronaut = await service.get_or_create_astronaut(auth_data)
     token = service.create_jwt(astronaut)
 
     if "application/json" in accept:

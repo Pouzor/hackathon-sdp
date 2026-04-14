@@ -149,7 +149,7 @@ export function useUpdateGrade() {
 export function useDeleteGrade() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => apiClient.delete<void>(`/grades/${id}`),
+    mutationFn: (id: number) => apiClient.delete<unknown>(`/grades/${id}`),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["admin", "grades"] });
     },
@@ -224,7 +224,7 @@ export function useUpdateTrophy() {
 export function useDeleteTrophy() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => apiClient.delete<void>(`/trophies/${id}`),
+    mutationFn: (id: number) => apiClient.delete<unknown>(`/trophies/${id}`),
     onSuccess: () => { void qc.invalidateQueries({ queryKey: ["admin", "trophies"] }); },
   });
 }
@@ -248,7 +248,7 @@ export function useCreateTrophyAttribution() {
 export function useDeleteTrophyAttribution() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => apiClient.delete<void>(`/trophies/attributions/${id}`),
+    mutationFn: (id: number) => apiClient.delete<unknown>(`/trophies/attributions/${id}`),
     onSuccess: () => { void qc.invalidateQueries({ queryKey: ["admin", "trophies"] }); },
   });
 }
@@ -257,7 +257,7 @@ export function useAstronautAttributions(astronautId: number | null) {
   return useQuery<PointAttributionOut[]>({
     queryKey: ["admin", "attributions", "astronaut", astronautId],
     queryFn: () =>
-      apiClient.get<PointAttributionOut[]>(`/point-attributions?astronaut_id=${astronautId!}`),
+      apiClient.get<PointAttributionOut[]>(`/point-attributions?astronaut_id=${astronautId ?? 0}`),
     enabled: astronautId !== null,
   });
 }
@@ -280,6 +280,18 @@ export function useCreateAttribution() {
       comment?: string;
       awarded_at?: string; // ISO 8601, None = now (UTC)
     }) => apiClient.post<PointAttributionOut[]>("/point-attributions", body),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "astronauts"] });
+    },
+  });
+}
+
+export type SyncResult = { created: number; updated: number; skipped: number };
+
+export function useSyncGoogleUsers() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => apiClient.post<SyncResult>("/admin/sync-google-users", {}),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["admin", "astronauts"] });
     },

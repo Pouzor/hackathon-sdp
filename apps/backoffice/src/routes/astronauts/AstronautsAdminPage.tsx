@@ -1,11 +1,13 @@
 import { useState, useMemo } from "react";
-import { UserX } from "lucide-react";
+import { UserX, RefreshCw } from "lucide-react";
 import {
   useAstronauts,
   usePlanets,
   useUpdateAstronaut,
+  useSyncGoogleUsers,
   type AstronautOut,
   type PlanetOut,
+  type SyncResult,
 } from "@/api/astronauts";
 import { AstronautDetailDrawer } from "./AstronautDetailDrawer";
 
@@ -69,13 +71,114 @@ function PlanetSelect({
   );
 }
 
+function SyncDialog({
+  onConfirm,
+  onCancel,
+  isPending,
+}: {
+  onConfirm: () => void;
+  onCancel: () => void;
+  isPending: boolean;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="w-full max-w-md border border-neon-cyan/30 bg-space-800 p-6 cyber-corner">
+        <h2 className="mb-2 font-orbitron text-sm font-semibold tracking-wide text-slate-100">
+          SYNCHRONISER AVEC GOOGLE WORKSPACE
+        </h2>
+        <p className="mb-4 text-sm text-space-300 leading-relaxed">
+          Cette opération va importer tous les utilisateurs{" "}
+          <span className="text-slate-200">@eleven-labs.com</span> depuis l&apos;annuaire Google
+          Workspace.
+        </p>
+        <ul className="mb-5 space-y-1 text-xs text-space-300">
+          <li>• Les nouveaux comptes seront créés automatiquement</li>
+          <li>• Les comptes existants auront leur nom et photo mis à jour</li>
+          <li>• Les comptes suspendus seront ignorés</li>
+          <li className="text-amber-400">
+            ⚠ Votre compte doit être Super Admin Google Workspace
+          </li>
+        </ul>
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onCancel}
+            disabled={isPending}
+            className="px-4 py-2 text-sm text-space-300 border border-space-500 hover:bg-space-600 transition-colors disabled:opacity-50"
+          >
+            Annuler
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isPending}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-space-900 bg-neon-cyan hover:bg-neon-cyan/80 transition-colors disabled:opacity-50"
+          >
+            {isPending ? (
+              <>
+                <RefreshCw size={14} className="animate-spin" />
+                Synchronisation…
+              </>
+            ) : (
+              <>
+                <RefreshCw size={14} />
+                Synchroniser
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SyncResultBanner({
+  result,
+  error,
+  onDismiss,
+}: {
+  result: SyncResult | null;
+  error: string | null;
+  onDismiss: () => void;
+}) {
+  if (!result && !error) return null;
+  return (
+    <div
+      className={`mb-4 flex items-start justify-between gap-4 border px-4 py-3 text-sm ${
+        error
+          ? "border-red-500/30 bg-red-500/10 text-red-400"
+          : "border-neon-cyan/30 bg-neon-cyan/5 text-slate-200"
+      }`}
+    >
+      {error ? (
+        <span>{error}</span>
+      ) : result ? (
+        <span>
+          Synchronisation terminée —{" "}
+          <span className="text-neon-cyan font-mono">{result.created}</span> créé(s),{" "}
+          <span className="text-neon-cyan font-mono">{result.updated}</span> mis à jour,{" "}
+          <span className="text-space-300 font-mono">{result.skipped}</span> ignoré(s)
+        </span>
+      ) : null}
+      <button
+        onClick={onDismiss}
+        className="shrink-0 text-space-300 hover:text-slate-100 transition-colors"
+      >
+        ✕
+      </button>
+    </div>
+  );
+}
+
 export function AstronautsAdminPage() {
   const { data: astronauts = [], isLoading, isError } = useAstronauts();
   const { data: planets = [] } = usePlanets();
   const updateAstronaut = useUpdateAstronaut();
+  const syncGoogleUsers = useSyncGoogleUsers();
   const [search, setSearch] = useState("");
   const [filterPlanet, setFilterPlanet] = useState<string>("all");
   const [selectedAstronaut, setSelectedAstronaut] = useState<AstronautOut | null>(null);
+  const [showSyncDialog, setShowSyncDialog] = useState(false);
+  const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let list = astronauts;
@@ -94,6 +197,23 @@ export function AstronautsAdminPage() {
     return list;
   }, [astronauts, search, filterPlanet]);
 
+  const handleSyncConfirm = () => {
+    setSyncResult(null);
+    setSyncError(null);
+    syncGoogleUsers.mutate(undefined, {
+      onSuccess: (data) => {
+        setSyncResult(data);
+        setShowSyncDialog(false);
+      },
+      onError: (err) => {
+        const msg =
+          err instanceof Error ? err.message : "Erreur lors de la synchronisation";
+        setSyncError(msg);
+        setShowSyncDialog(false);
+      },
+    });
+  };
+
   if (isLoading)
     return <div className="p-8 text-sm text-space-300">Chargement…</div>;
   if (isError)
@@ -106,7 +226,20 @@ export function AstronautsAdminPage() {
           ASTRONAUTES{" "}
           <span className="text-neon-cyan">({astronauts.length})</span>
         </h1>
+        <button
+          onClick={() => { setShowSyncDialog(true); }}
+          className="flex items-center gap-2 border border-neon-cyan/40 bg-neon-cyan/5 px-3 py-1.5 text-xs font-medium text-neon-cyan hover:bg-neon-cyan/10 transition-colors"
+        >
+          <RefreshCw size={13} />
+          Synchroniser avec Google
+        </button>
       </div>
+
+      <SyncResultBanner
+        result={syncResult}
+        error={syncError}
+        onDismiss={() => { setSyncResult(null); setSyncError(null); }}
+      />
 
       {/* Filtres */}
       <div className="mb-4 flex gap-3">
@@ -208,6 +341,14 @@ export function AstronautsAdminPage() {
           </tbody>
         </table>
       </div>
+
+      {showSyncDialog && (
+        <SyncDialog
+          onConfirm={handleSyncConfirm}
+          onCancel={() => { setShowSyncDialog(false); }}
+          isPending={syncGoogleUsers.isPending}
+        />
+      )}
 
       <AstronautDetailDrawer
         astronaut={selectedAstronaut}

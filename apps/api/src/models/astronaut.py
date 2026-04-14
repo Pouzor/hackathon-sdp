@@ -1,6 +1,6 @@
 from datetime import UTC, date, datetime
 
-from sqlalchemy import Date, DateTime, String
+from sqlalchemy import Date, DateTime, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -21,6 +21,14 @@ class Astronaut(Base):
     planet_id: Mapped[int | None] = mapped_column(nullable=True)
     roles: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=["astronaut"])
     total_points: Mapped[int] = mapped_column(nullable=False, default=0)
+
+    # Token Google stocké pour la synchro Google Workspace (F-610)
+    # Court-vécu (~1h), stocké en clair — outil interne uniquement
+    google_access_token: Mapped[str | None] = mapped_column(Text, nullable=True)
+    google_token_expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

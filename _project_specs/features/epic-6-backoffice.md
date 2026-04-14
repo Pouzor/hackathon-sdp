@@ -170,7 +170,7 @@
 
 ---
 
-## F-610 — Synchronisation des astronautes depuis Google Workspace
+## F-610 — Synchronisation des astronautes depuis Google Workspace ✅ DONE
 
 **Route:** bouton dans F-603 (gestion des astronautes)
 
@@ -193,14 +193,22 @@
 - Dialog de confirmation avant lancement
 - Affiche le résumé après synchro (X créés, Y mis à jour)
 
+**Implémentation :**
+- `apps/api/src/services/google_sync.py` — appel Directory API, upsert, résumé
+- `apps/api/src/api/v1/admin.py` — `POST /api/v1/admin/sync-google-users`
+- `apps/api/src/models/astronaut.py` — champs `google_access_token` + `google_token_expires_at`
+- Migration `b7e4f9a01c23` — colonnes token sur `astronauts`
+- `apps/api/src/services/auth.py` — scope `admin.directory.user.readonly` + stockage token à la connexion
+- `apps/backoffice/src/routes/astronauts/AstronautsAdminPage.tsx` — bouton + dialog + résultat
+
 **Acceptance Criteria:**
-- [ ] Scope `admin.directory.user.readonly` ajouté au flow OAuth
-- [ ] `access_token` Google stocké temporairement côté backend (session ou BDD)
-- [ ] `POST /api/v1/admin/sync-google-users` : upsert tous les users du domaine
-- [ ] Utilisateurs désactivés dans Google Workspace ignorés (`suspended: true`)
-- [ ] Non-admin → 403
-- [ ] Token Google expiré → 401 avec message explicite ("Reconnectez-vous pour synchroniser")
-- [ ] Résumé affiché côté front
+- [x] Scope `admin.directory.user.readonly` ajouté au flow OAuth
+- [x] `access_token` Google stocké en BDD à chaque connexion (+ expiry)
+- [x] `POST /api/v1/admin/sync-google-users` : upsert tous les users du domaine
+- [x] Utilisateurs désactivés dans Google Workspace ignorés (`suspended: true`)
+- [x] Non-admin → 403
+- [x] Token Google expiré → 401 avec message explicite ("Reconnectez-vous pour synchroniser")
+- [x] Résumé affiché côté front
 
 **Test Cases:**
 | Cas | Attendu |
