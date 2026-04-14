@@ -6,6 +6,8 @@ import { AstronautProfilePage } from "@/routes/astronauts/AstronautProfilePage";
 import { AstronautsPage } from "@/routes/astronauts/AstronautsPage";
 import { HomePage } from "@/routes/home/HomePage";
 import { ProfileEditPage } from "@/routes/profile/ProfileEditPage";
+import { NotFoundPage } from "@/routes/errors/NotFoundPage";
+import { ForbiddenPage } from "@/routes/errors/ForbiddenPage";
 
 function App() {
   return (
@@ -13,6 +15,7 @@ function App() {
       {/* Routes publiques */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      <Route path="/403" element={<ForbiddenPage />} />
 
       {/* Routes protégées */}
       <Route element={<ProtectedRoute />}>
@@ -21,6 +24,9 @@ function App() {
         <Route path="/astronauts/:id" element={<AstronautProfilePage />} />
         <Route path="/profile/edit" element={<ProfileEditPage />} />
       </Route>
+
+      {/* Fallback 404 */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

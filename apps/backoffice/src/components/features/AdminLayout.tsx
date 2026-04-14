@@ -12,6 +12,8 @@ import {
   Trophy,
   LogOut,
   Radio,
+  CalendarDays,
+  Settings,
 } from "lucide-react";
 
 const navItems = [
@@ -19,11 +21,13 @@ const navItems = [
   { to: "/astronauts", label: "Astronautes", icon: Users },
   { to: "/roles", label: "Rôles", icon: Shield },
   { to: "/attributions/new", label: "Attribution", icon: Zap },
+  { to: "/events", label: "Événements", icon: CalendarDays },
   { to: "/planets", label: "Planètes", icon: Globe },
   { to: "/seasons", label: "Saisons", icon: Calendar },
   { to: "/activities", label: "Activités", icon: Activity },
   { to: "/grades", label: "Grades", icon: Award },
   { to: "/trophies", label: "Trophées", icon: Trophy },
+  { to: "/settings", label: "Paramètres", icon: Settings },
 ];
 
 export function AdminLayout() {

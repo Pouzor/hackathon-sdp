@@ -1,6 +1,7 @@
 # Import all models here so Alembic can discover them
 from src.models.activity import Activity
 from src.models.astronaut import Astronaut
+from src.models.event import Event, EventAttendance
 from src.models.grade import Grade
 from src.models.planet import Planet
 from src.models.point_attribution import PointAttribution
@@ -13,6 +14,8 @@ from src.models.trophy_attribution import TrophyAttribution
 __all__ = [
     "Activity",
     "Astronaut",
+    "Event",
+    "EventAttendance",
     "Grade",
     "Planet",
     "PointAttribution",

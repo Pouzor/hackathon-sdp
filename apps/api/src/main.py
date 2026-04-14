@@ -14,6 +14,8 @@ from src.api.v1.activities import router as activities_router
 from src.api.v1.admin import router as admin_router
 from src.api.v1.astronauts import router as astronauts_router
 from src.api.v1.auth import router as auth_router
+from src.api.v1.config import router as config_router
+from src.api.v1.events import router as events_router
 from src.api.v1.grades import router as grades_router
 from src.api.v1.health import router as health_router
 from src.api.v1.planets import router as planets_router
@@ -83,6 +85,8 @@ app.include_router(grades_router, prefix="/api/v1")
 app.include_router(point_attributions_router, prefix="/api/v1")
 app.include_router(trophies_router, prefix="/api/v1")
 app.include_router(admin_router, prefix="/api/v1")
+app.include_router(config_router, prefix="/api/v1")
+app.include_router(events_router, prefix="/api/v1")
 
 # Fichiers uploadés (avatars, etc.)
 _Path(settings.upload_dir + "/avatars").mkdir(parents=True, exist_ok=True)

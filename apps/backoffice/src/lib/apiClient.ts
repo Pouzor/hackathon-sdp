@@ -4,6 +4,14 @@ import { AUTH_TOKEN_KEY } from "@/hooks/useAuth";
 const BASE_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:8000/api/v1";
 
+const SERVER_ORIGIN = BASE_URL.replace(/\/api\/v1\/?$/, "");
+
+export function getAvatarUrl(photoUrl: string | null | undefined): string | null {
+  if (!photoUrl) return null;
+  if (photoUrl.startsWith("/")) return `${SERVER_ORIGIN}${photoUrl}`;
+  return photoUrl;
+}
+
 function authHeaders(): Record<string, string> {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -31,6 +39,8 @@ export const apiClient = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "POST", body: JSON.stringify(body) }),
+  put: <T>(path: string, body: unknown) =>
+    request<T>(path, { method: "PUT", body: JSON.stringify(body) }),
   patch: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
   delete: <T>(path: string, body?: unknown) =>

@@ -25,4 +25,6 @@ class ActivityUpdate(BaseModel):
 class ActivityOut(ActivityBase):
     id: int
     is_active: bool
+    # base_points peut être 0 pour les activités système (ex: présence événement)
+    base_points: int = Field(..., ge=0)
     model_config = {"from_attributes": True}

@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAstronaut } from "@/api/astronauts";
 import { apiClient } from "@/lib/apiClient";
 import type { PointAttribution } from "@/api/types";
+import { HistoryDrawer } from "@/components/features/HistoryDrawer";
 
 function NavLink({ children, to }: { children: React.ReactNode; to?: string }) {
   const navigate = useNavigate();
@@ -42,10 +43,56 @@ function NavLink({ children, to }: { children: React.ReactNode; to?: string }) {
   );
 }
 
+function LogoutButton({ onLogout }: { onLogout: () => void }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={onLogout}
+      title="Se déconnecter"
+      onMouseEnter={() => { setHovered(true); }}
+      onMouseLeave={() => { setHovered(false); }}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 5,
+        background: hovered ? "rgba(255,60,60,0.10)" : "transparent",
+        border: hovered ? "1px solid rgba(255,60,60,0.25)" : "1px solid transparent",
+        borderRadius: 7,
+        padding: "5px 9px",
+        cursor: "pointer",
+        transition: "background 0.2s, border 0.2s",
+        color: hovered ? "rgba(255,120,120,0.95)" : "rgba(255,255,255,0.35)",
+      }}
+    >
+      {/* Rocket icon */}
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ transform: "rotate(45deg)", transition: "transform 0.2s" }}
+      >
+        <path d="M12 2C12 2 7 6 7 13l-2 2 1 1 2-1c0 0 1 3 4 3s4-3 4-3l2 1 1-1-2-2c0-7-5-11-5-11z" />
+        <circle cx="12" cy="13" r="1" fill="currentColor" stroke="none" />
+        <path d="M9 21l1-4M15 21l-1-4" />
+      </svg>
+      <span style={{ fontSize: 11, letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 500 }}>
+        Éjecter
+      </span>
+    </button>
+  );
+}
+
 export function HomeNavBar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const astronautId = user?.astronaut_id;
   const { data: astronaut } = useAstronaut(astronautId ?? 0);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const { data: contributions = [] } = useQuery({
     queryKey: ["point-attributions", "astronaut", astronautId],
     queryFn: () =>
@@ -108,12 +155,36 @@ export function HomeNavBar() {
           </span>
         </div>
 
-        <div style={{ background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 4, padding: "2px 6px" }}>
-          <span style={{ color: "#fbbf24", fontSize: 10, opacity: 0.8 }}>
+        <button
+          type="button"
+          onClick={() => { setHistoryOpen(true); }}
+          style={{
+            background: "rgba(251,191,36,0.12)",
+            border: "1px solid rgba(251,191,36,0.2)",
+            borderRadius: 4,
+            padding: "2px 6px",
+            cursor: "pointer",
+            transition: "background 0.15s, border 0.15s",
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(251,191,36,0.22)"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(251,191,36,0.12)"; }}
+        >
+          <span style={{ color: "#fbbf24", fontSize: 10, opacity: 0.9 }}>
             {contributions.length} contrib.
           </span>
-        </div>
+        </button>
       </div>
+
+      {historyOpen && astronautId && (
+        <HistoryDrawer
+          astronautId={astronautId}
+          onClose={() => { setHistoryOpen(false); }}
+        />
+      )}
+
+      <div style={{ width: 1, height: 18, background: "rgba(255,255,255,0.1)", margin: "0 4px" }} />
+
+      <LogoutButton onLogout={logout} />
     </div>
   );
 }
